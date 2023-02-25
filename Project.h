@@ -14,7 +14,7 @@ using namespace std;
 struct Deck
 {
 private:
-    char ranks[13] = {'2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'};
+    string ranks[13] = {"2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"};
     char suits[4] = {'\3', '\4', '\5', '\6'};
 
 public:
@@ -143,23 +143,27 @@ void recieveSimpleInformation(int &num, long long int &money, int &mandatory_bet
 }
 void PokerGame::createOrderTable()
 { // Collum 1-2
-    for (int i = 0; i < 2; i++)
-    {
-        od[1].emplace_back("call");
-        od[2].emplace_back("raise");
-        od[3].emplace_back("cheat");
-    }
+
+    od[1].emplace_back("call");
+    od[1].emplace_back("call");
+    od[1].emplace_back("check");
+    od[2].emplace_back("raise");
+    od[2].emplace_back("raise");
+    od[2].emplace_back("bet");
+    od[3].emplace_back("cheat");
+    od[3].emplace_back("cheat");
+    od[3].emplace_back("call");
     od[4].emplace_back("fold");
     od[4].emplace_back("all-in");
+    od[4].emplace_back("raise");
     od[5].emplace_back("");
     od[5].emplace_back("fold");
-    // Collum 3
-    od[1].emplace_back("check");
-    od[2].emplace_back("bet");
-    od[3].emplace_back("call");
-    od[4].emplace_back("raise");
     od[5].emplace_back("cheat");
+    od[6].emplace_back("");
+    od[6].emplace_back("");
     od[6].emplace_back("all-in");
+    od[7].emplace_back("");
+    od[7].emplace_back("");
     od[7].emplace_back("fold");
 }
 PokerGame::PokerGame(Deck &dRef, int numRef, long long int moneyRef, int mandatory_betRef) // สร้าง 1 PokerGame ต้องมีข้อมูลพื้นฐานตาม Parameterต่อไปนี้ ตำแหน่งคนจริง(&) สำรับไพ่ จำนวนคน
@@ -170,6 +174,7 @@ PokerGame::PokerGame(Deck &dRef, int numRef, long long int moneyRef, int mandato
     players.emplace_back(new Player("2", 0));
     players.emplace_back(new Player("3", 0));
     players.emplace_back(new Player("4", 0));
+    createOrderTable();
     for (int i = 0; i < numRef; i++)
     {
         players[i]->moneyGame = moneyRef;
@@ -446,7 +451,8 @@ void PokerGame::recieveOrder(Player *p) // รับคำสั่งมาก�
         {
             collum = 2;
         }
-        if (od[p->order][collum].empty() || od[p->order][collum] == "")
+        auto it = od.find(p->order);
+        if (it == od.end() || od[p->order][collum].empty())
         {
             cout << "Invalid Input Please Try Again\n";
             passStage = false;
@@ -596,7 +602,7 @@ Deck::Deck()
     {
         for (size_t j = 0; j < 4; j++)
         {
-            allCardLeft.emplace_back(string(1, ranks[i]) + string(1, suits[j]));
+            allCardLeft.emplace_back(ranks[i] + string(1, suits[j]));
         }
     }
 }

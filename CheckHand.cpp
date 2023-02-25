@@ -60,10 +60,6 @@ void convertToPairVector(vector<std::pair<int, char>> &split, vector<string> &co
         {
             combined[i].replace(0, 1, "11");
         }
-        else if (combined[i][0] == 'T')
-        {
-            combined[i].replace(0, 1, "10");
-        }
     }
     for (size_t i = 0; i < combined.size(); i++)
     {
@@ -182,9 +178,9 @@ void checkHand(const vector<string> &h, const vector<string> &b)
     convertToPairVector(split, combined);
     if (split.size() >= 5)
     {
-        if (hasRoyalFlush(split))
-            cout << "RoyalFlush!!";
-        else if (hasStraightFlush(split, maxVar, flushSuit, StraightFlush))
+        // if (hasRoyalFlush(split))
+        //     cout << "RoyalFlush!!";
+        if (hasStraightFlush(split, maxVar, flushSuit, StraightFlush))
             cout << "StraightFlush";
         else if (hasFourOfKind(split, maxVar, max2ndPairVar))
             cout << "FourOfkind";
@@ -216,8 +212,8 @@ int main()
 {
 
     // Create a vector of poker cards
-    vector<string> hand = {"7\5", "7\5"};
-    vector<string> board = {"7\5", "7\5","8\6"};
+    vector<string> hand = {"7\5", "10\5"};
+    vector<string> board = {"10\5", "7\5","10\6"};
     checkHand(hand, board);
     return 0;
 }
