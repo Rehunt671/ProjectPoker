@@ -59,6 +59,8 @@ public:
     ~PokerGame();
     vector<Player *> players;
     Deck deck;
+    map<int, vector<string>> od;
+    void createOrderTable();
     void showBoard();
     void showMoneyPot();
     void showMoneyBet();
@@ -87,6 +89,19 @@ public:
     void flop();
     void turn();
 };
+int handleString(string str)
+{
+    std::istringstream iss(str);
+    int num;
+    if (!(iss >> num))
+    {
+        return 0;
+    }
+    else
+    {
+        return num;
+    }
+}
 string convertToLower(string s)
 {
     for (int i = 0; i < s.length(); i++)
@@ -125,6 +140,27 @@ void recieveSimpleInformation(int &num, long long int &money, int &mandatory_bet
             cout << "Invalid money value\n";
         cin.ignore();
     } while (money < 1000 || money > 1000000); // ถามจะให้มีคนละกี่บาท
+}
+void PokerGame::createOrderTable()
+{ // Collum 1-2
+    for (int i = 0; i < 2; i++)
+    {
+        od[1].emplace_back("call");
+        od[2].emplace_back("raise");
+        od[3].emplace_back("cheat");
+    }
+    od[4].emplace_back("fold");
+    od[4].emplace_back("all-in");
+    od[5].emplace_back("");
+    od[5].emplace_back("fold");
+    // Collum 3
+    od[1].emplace_back("check");
+    od[2].emplace_back("bet");
+    od[3].emplace_back("call");
+    od[4].emplace_back("raise");
+    od[5].emplace_back("cheat");
+    od[6].emplace_back("all-in");
+    od[7].emplace_back("fold");
 }
 PokerGame::PokerGame(Deck &dRef, int numRef, long long int moneyRef, int mandatory_betRef) // สร้าง 1 PokerGame ต้องมีข้อมูลพื้นฐานตาม Parameterต่อไปนี้ ตำแหน่งคนจริง(&) สำรับไพ่ จำนวนคน
 {
@@ -367,42 +403,57 @@ void PokerGame::turn()
 void PokerGame::showChoice()
 {
     int num = 1;
-    if (!hasBetOrAllIn && round > 1)
+    if (round == 1)
+    {
+        cout << num++ << ".Call\n";  // 1
+        cout << num++ << ".Raise\n"; // 2
+        cout << num++ << ".Cheat\n"; // 3
+        cout << num++ << ".Fold\n";  // 4
+    }
+    else
     {
 
-        cout << num++ << ".Check\n"; //  1
-        cout << num++ << ".Bet\n";   // 2
+        if (!hasBetOrAllIn && round > 1)
+        {
+
+            cout << num++ << ".Check\n"; //  1
+            cout << num++ << ".Bet\n";   // 2
+        }
+        cout << num++ << ".Call\n";   // 1,3
+        cout << num++ << ".Raise\n";  // 2,4
+        cout << num++ << ".Cheat\n";  // 3,5
+        cout << num++ << ".All-In\n"; // 4,6
+        cout << num++ << ".Fold\n";   // 5,7
     }
-    cout << num++ << ".Call\n";   // 3
-    cout << num++ << ".Raise\n";  // 4
-    cout << num++ << ".Cheat\n";  // 5
-    cout << num++ << ".All-In\n"; // 6
-    cout << num++ << ".Fold\n";   // 7
 }
 
 void PokerGame::recieveOrder(Player *p) // รับคำสั่งมาก่อนว่าผู้เล่นต้องการทำอะไร ฟังชั่นนี้เราจะเช็คว่าเราจะทำคำสั่งนั้นได้หรือไม่ (ต้องผ่านเงื่อนไข ขั้นพื้นฐานก่อน)
 {
     string order = "";
+    int collum = 0;
     bool passStage = true;
     do
     {
         passStage = true;
         cout << "Input Your Choice: ";
         getline(cin, order);
-        p->order = stoi(order);
-        if (p->order < 1 && p->order > 7 && !hasBetOrAllIn && round > 1)
+        p->order = handleString(order);
+        if (hasBetOrAllIn && round > 1)
         {
-            cout << "Invalid Order Try Again\n";
-            passStage = false;
+            collum = 1;
         }
-        else if (p->order < 1 && p->order > 5)
+        else if (!hasBetOrAllIn && round > 1)
         {
-            cout << "Invalid Order Try Again\n";
+            collum = 2;
+        }
+        if (od[p->order][collum].empty() || od[p->order][collum] == "")
+        {
+            cout << "Invalid Input Please Try Again\n";
             passStage = false;
         }
     } while (!passStage);
-    checkOrder(p);
-    doOrder(p);
+    // checkOrder(p);
+    // doOrder(p);
 }
 void PokerGame::checkOrder(Player *p)
 {
