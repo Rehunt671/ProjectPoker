@@ -6,11 +6,11 @@
 #include<vector>
 using namespace std;
 
-class reg{
+class reg{                           // ข้อมูลของแต่ละคน: username, display name, password, เงิน
         string username;
         string displayname;
         char password[19];
-        long long int money;
+        long long int money
     public:
         reg();
         void setUsername();
@@ -18,7 +18,7 @@ class reg{
         void setPassword();
 };
 
-class allUsers{
+class allUsers{                      // เก็บข้อมูลของ user แต่ละคน (class reg) ไปใส่ใน vector all
         vector<reg> all;
     public:
         void addUserInfo(reg); 
@@ -28,7 +28,7 @@ void allUsers::addUserInfo(reg user){
     all.emplace_back(user);
 };
 
-void reg::setUsername(){
+void reg::setUsername(){            // รับ input username
     int state = 0;
     string input;
     while(state == 0){
@@ -45,7 +45,7 @@ void reg::setUsername(){
     }
 };
 
-void reg::setDisplayName(){
+void reg::setDisplayName(){           // รับ input display name          
     int state = 0;
     string input;
     while(state == 0){
@@ -62,7 +62,7 @@ void reg::setDisplayName(){
     }
 }
 
-void reg::setPassword(){
+void reg::setPassword(){             // รับ input password
     START:
     int i = 0,state = 0;
     char c,pwd[19];
@@ -98,7 +98,7 @@ void reg::setPassword(){
     }
 };
 
-reg::reg(){
+reg::reg(){               
     setUsername();
     setDisplayName();
     setPassword();
