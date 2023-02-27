@@ -1,9 +1,6 @@
-#ifndef PROJECT1_H
-#define PROJECT1_H
-#include <vector>
-#include <utility>
-#include <unordered_map>
-#include "Project.h"
+#ifndef PROJECT2_H
+#define PROJECT2_H
+#include "AllClass.h"
 using namespace std;
 bool findFreq(vector<std::pair<int, char>> hand, int &maxVar, int &max2ndPairVar, int num)
 {
@@ -61,6 +58,10 @@ void convertToPairVector(vector<std::pair<int, char>> &split, vector<string> &co
         {
             combined[i].replace(0, 1, "11");
         }
+        else if (combined[i][0] == 'T')
+        {
+            combined[i].replace(0, 1, "10");
+        }
     }
     for (size_t i = 0; i < combined.size(); i++)
     {
@@ -73,12 +74,31 @@ void convertToPairVector(vector<std::pair<int, char>> &split, vector<string> &co
     }
 }
 
-bool hasRoyalFlush(vector<std::pair<int, char>> hand)
+bool hasRoyalFlush(vector<std::pair<int, char>> hand,char &flushSuit)
 {
+    int i = hand.size()-1;
+    while (i > 0)
+    {
+        if (hand[i].first - hand[i - 1].first == 0)
+            hand.erase(hand.begin() + i);
+        i--;
+    }
+    i =  hand.size()-1 ;
+        if (
+        hand[i].first == 14 && hand[i].second == flushSuit 
+        && hand[i-1].first == 13&& hand[i-1].second == flushSuit 
+        && hand[i-2].first == 12 && hand[i-2].second == flushSuit 
+        && hand[i-3].first == 11 && hand[i-3].second == flushSuit 
+        && hand[i-4].first == 10 && hand[i-4].second == flushSuit)
+        {
+            return true;
+        }
+    
+    return false;
 }
 bool hasStraight(vector<std::pair<int, char>> hand, int &maxVar, char &flushSuit, bool &StraightFlush)
 {
-    int i = hand.size();
+    int i = hand.size()-1;
     while (i > 0)
     {
         if (hand[i].first - hand[i - 1].first == 0)
@@ -130,7 +150,7 @@ bool hasFlush(vector<std::pair<int, char>> hand, int &maxVar, char &flushSuit)
 }
 bool hasStraightFlush(vector<std::pair<int, char>> hand, int &maxVar, char &flushSuit, bool &StraightFlush)
 {
-    return hasStraight(hand, maxVar, flushSuit, StraightFlush) && hasFlush(hand, maxVar, flushSuit) && StraightFlush;
+    return hasStraight(hand, maxVar, flushSuit, StraightFlush) && flushSuit != '\0' && StraightFlush;
 }
 
 bool hasFourOfKind(vector<std::pair<int, char>> hand, int &maxVar, int &max2ndPairVar)
@@ -177,15 +197,16 @@ void PokerGame::checkHand(Player *p)
     convertToPairVector(split, combined);
     if (split.size() >= 5)
     {
-        // if (hasRoyalFlush(split))
-        //     cout << "RoyalFlush!!";
-        if (hasStraightFlush(split, maxVar, flushSuit, StraightFlush))
+        hasFlush(split, maxVar, flushSuit);//เริ่มแรกมาเช็คหน้าไพ่ก่อนเลยว่ามีซ้ำครบ 5 ใบไหม
+        if (hasRoyalFlush(split,flushSuit))//ต้องมี Flush และตรงกับ Rank A K Q J 10 
+            cout << "RoyalFlush!!";
+        else if (hasStraightFlush(split, maxVar, flushSuit, StraightFlush))//ต้องมีทั้ง Flush กับ Straight ที่ตรงกัน
             cout << "StraightFlush";
-        else if (hasFourOfKind(split, maxVar, max2ndPairVar))
+        else if (hasFourOfKind(split, maxVar, max2ndPairVar))//ต้องมีไพ่ 4 ใบ Rank เดียวกัน
             cout << "FourOfkind";
-        else if (hasFullHouse(split, maxVar, max2ndPairVar))
+        else if (hasFullHouse(split, maxVar, max2ndPairVar))//ต้องมีไพ่ ตอง 1 และ คู่ 1 คู่
             cout << "FullHouse";
-        else if (hasFlush(split, maxVar, flushSuit))
+        else if (flushSuit != '\0')//ขอแค่มี flushSuit ก็แปลว่ามีไพ่หน้าเดียวกัน 5 ใบแล้ว
             cout << "Flush";
         else if (hasStraight(split, maxVar, flushSuit, StraightFlush))
             cout << "hasStraight";
@@ -206,5 +227,7 @@ void PokerGame::checkHand(Player *p)
     }
     cout << "\nMaxVar = " << maxVar;
     cout << "\nMax2nd = " << max2ndPairVar;
+    cout << "\n";
 }
+
 #endif
