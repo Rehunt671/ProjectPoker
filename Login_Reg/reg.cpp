@@ -10,7 +10,7 @@ class reg{                           // ข้อมูลของแต่ล�
         string username;
         string displayname;
         char password[19];
-        long long int money
+        long long int money;
     public:
         reg();
         void setUsername();
@@ -104,3 +104,6 @@ reg::reg(){
     setPassword();
 
 };
+int main(){
+    reg r1;
+}

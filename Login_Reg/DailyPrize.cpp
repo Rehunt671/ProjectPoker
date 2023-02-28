@@ -1,6 +1,7 @@
 #include<iostream>
 #include<cstdlib>
 #include<ctime>
+#include <fstream>
 
 void getLoggeginTime(){
     ofstream write("time.txt");
