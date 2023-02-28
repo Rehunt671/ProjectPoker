@@ -1,11 +1,12 @@
-#ifndef PROJECT1_H
-#define PROJECT1_H
+#ifndef PROJECT2_H
+#define PROJECT2_H
 #include "AllClass.h"
-using namespace std;
+#include "CheckHand.h"
 using std::cout;
+using namespace std;
 int handleString(string str)
 {
-    std::istringstream iss(str);
+    istringstream iss(str);
     int num;
     if (!(iss >> num))
     {
@@ -89,9 +90,9 @@ PokerGame::PokerGame(Deck &dRef, int numRef, int chipRef, int mandatory_betRef) 
     players.emplace_back(new Player("3", 0));
     players.emplace_back(new Player("4", 0));
     createOrderTable();
-    for (int i = 0; i < numRef; i++)
+    for (auto &p : players)
     {
-        players[i]->chip = chipRef;
+        p->chip = chipRef;
     }                                    // กำหนดเงินเรียงคน
     dealer = rand() % num_player;        // สุ่มคนมาเป็น Role dealer
     current = (dealer + 3) % num_player; // คนซ้าย Big blind index ได้เริ่มก่อน;
@@ -104,9 +105,9 @@ PokerGame::PokerGame(Deck &dRef, int numRef, int chipRef, int mandatory_betRef) 
 }
 PokerGame::~PokerGame()
 {
-    for (int i = 0; i < players.size(); i++)
+    for (auto &p : players)
     {
-        delete players[i];
+        delete p;
     }
 }
 void PokerGame::showBoard() // Show ว่า Board มีไพ่ไหนบ้างตอนนี้
@@ -206,8 +207,10 @@ void PokerGame::moneyForMandatoryBet(Player *s, Player *b)
 
     cout << s->name << " is Small-Blind you lost money from Mandatory-bet :" << mandatory_bet / 2 << "\n";
     s->chip -= mandatory_bet / 2;
+    s->accumulateBet = mandatory_bet / 2;
     cout << b->name << " is Big-Blind you lost money from Mandatory-bet :" << mandatory_bet << "\n";
     b->chip -= mandatory_bet;
+    b->accumulateBet = mandatory_bet;
     pot += (mandatory_bet + mandatory_bet / 2);
     highestBet += mandatory_bet;
 }
@@ -265,7 +268,11 @@ void PokerGame::preflop() // เริ่มรอบแรกของเกม
 }
 void PokerGame::showHandRank(Player *p)
 {
-    cout << p->rankOfHand.first;
+
+    cout << p->name << "'s Hand: " << p->rankOfHand.first << "\n";
+    cout << p->name << "'s HandRanking: " << p->rankOfHand.second.first << "\n";
+    cout << p->name << "'s MainCard: " << p->rankOfHand.second.second.first << "\n";
+    cout << p->name << "'s MinorCard: " << p->rankOfHand.second.second.second << "\n";
 }
 bool PokerGame::findWinner()
 {
@@ -290,24 +297,54 @@ bool PokerGame::findWinner()
     }
     else if (round == 4)
     {
+        int rankingRef = 0;
+        int mainCard = 0;
+        int minorCard = 0;
         for (auto &p : players)
         {
             if (p->action == "")
                 return false;
-        }//ยังเล่นกันไม่จบ
+        } // ยังเล่นกันไม่จบ
         for (auto &p : players)
         {
-            if (p->action != "")
+            if (p->action != "fold")
             {
+                if (p->rankOfHand.second.first > rankingRef)
+                    rankingRef = p->rankOfHand.second.first;
                 cout << p->name << "'s cards :";
                 for (const auto &c : p->cards)
                 {
                     cout << c << " ";
                 }
-                // cout << "\nRank Of Hand = " << p->rankOfHand << "\n";
-                return true;
+                cout << p->name << " has " << p->rankOfHand.first << "\n";
+                cout << "Ranking : " << p->rankOfHand.second.first << "\n"; // 10 อันดับฃ
+                cout << "MainCard : " << convertToCard(p->rankOfHand.second.second.first) << "\n";
+                cout << "MinorCard : " << convertToCard(p->rankOfHand.second.second.second) << "\n";
             }
         }
+        for (auto &p : players)
+        {
+            if (p->rankOfHand.second.first == rankingRef)
+            {
+                if (p->rankOfHand.second.second.first > mainCard)
+                {
+                    mainCard = p->rankOfHand.second.second.first;
+                    if (p->rankOfHand.second.second.second > minorCard)
+                        minorCard = p->rankOfHand.second.second.second;
+                }
+            }
+            int cnt = 0;
+        }
+        for (auto &p : players)
+        {
+            if (p->rankOfHand.second.first == rankingRef && p->rankOfHand.second.second.first == mainCard && p->rankOfHand.second.second.second == minorCard)
+                cout << "Congratulation!!!! " << p->name << " is a winner here\n";
+            cout << "Press Enter to recieve money on board\n";
+            cin.get();
+            p->moneyInWeb += pot;
+            cout << "Your Money = " << p->moneyInWeb;
+        }
+        return true;
     }
 
     return false;
@@ -324,6 +361,7 @@ void PokerGame::updateRound()
     }
     resetAction();
     resetAccumulateBet();
+    resetHandRank();
     hasBetRaiseOrAllIn = false;
     round++;
 }
@@ -368,9 +406,9 @@ void PokerGame::turn()
         showMoneyBet();
         cout << players[current]->name << "'s Turn\n";
         showPlayerCards(players[current]);
-        // if (players[current]->hand == "")
-        //     checkHand(players[current]->cards, cardsOnBoard);
-        // showHandRank(players[current]);
+        if (players[current]->rankOfHand.first == "")
+            checkHand(players[current]);
+        showHandRank(players[current]);
         showPlayerMoney(players[current]);
         cout << "Enter Your Action\n";
         showChoice();
@@ -396,9 +434,9 @@ void PokerGame::river()
         showMoneyBet();
         cout << players[current]->name << "'s Turn\n";
         showPlayerCards(players[current]);
-        // if (players[current]->hand == "")
-        //     checkHand(players[current]->cards, cardsOnBoard);
-        // showHandRank(players[current]);
+        if (players[current]->rankOfHand.first == "")
+            checkHand(players[current]);
+        showHandRank(players[current]);
         showPlayerMoney(players[current]);
         cout << "Enter Your Action\n";
         showChoice();
@@ -494,7 +532,7 @@ void PokerGame::recieveOrder(Player *p) // รับคำสั่งมาก�
 void PokerGame::checkOrder(Player *p)
 {
     bool canDo = true;
-    if (p->action == "call" && p->chip < (highestBet - p->accumulateBet) || p->action == "bet" && p->chip < highestBet || p->action == "raise" && p->chip <= (highestBet - p->accumulateBet) )
+    if (p->action == "call" && p->chip < (highestBet - p->accumulateBet) || p->action == "bet" && p->chip < highestBet || p->action == "raise" && p->chip <= (highestBet - p->accumulateBet))
         canDo = false;
     if (!canDo)
     {
@@ -662,7 +700,7 @@ Deck::Deck()
     {
         for (const auto &s : suits)
         {
-            allCardsLeft.emplace_back(string(1,r) + string(1, s));
+            allCardsLeft.emplace_back(string(1, r) + string(1, s));
         }
     }
 }

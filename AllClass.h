@@ -8,11 +8,27 @@
 #include <algorithm>     //sort
 #include <vector>        //vector
 #include <utility>       //vector pair
+#include <set>           //not include same element
 #include <unordered_map> //mapscards
 #include <map>           //map
 #include <chrono>        //time
 #include <thread>        //time
 using namespace std;
+class Database
+{
+public:
+    string username, password,displayname;
+
+    string toUpperStr(string);
+    void registerUser(string, string);
+    void loginUser(string, string);
+    void writeData2_txt(const map<string, string> &, const string &);
+    void importDatafromfile(string, vector<string> &, vector<string> &);
+    void Delete_();
+    //เพิ่มเติม
+    void setDisplayName();
+};
+
 struct Deck
 {
 private:
@@ -29,21 +45,21 @@ struct Player
 {
 public:
     Player(string, long long int);
-    pair<std::string, std::vector<int>> rankOfHand; // ประกอบไปด้วย (ชนิดของไพ่บนมือ,{ไพ่สูงสุด,ไพ่รองคู่สูงสุด})
-    string name;                                    // ชื่อคนเล่น
-    long long int moneyInWeb;                       // เงินในระบบ
-    int chip;                                       // เงินในเกม
-    int moneyToRaise;                               // เงินที่ Raise เพิ่มจาก Bet สูงสุด ณ ตอนนั้น
-    int accumulateBet;                              // เงินที่เราลงเดิมพันไปแล้ว
-    vector<string> cards;                           // การ์ดบนมือเรา มี 2 ใบ
-    string action;                                  // การกระทำของเรา ณ ตอนนั้น Call Raise Bet Fold Cheat etc.
-    string role;                                    // ตำแหน่งของเรา dealer ,Small Blind, Big Blind
-    int order;                                      // คำสั่งของเรา
+    pair<string, pair<int, pair<int, int>>> rankOfHand; // ประกอบไปด้วย (Rankไพ่บนมือ(String),{Rank(int),{ไพ่สูงสุด,ไพ่รองคู่สูงสุด}})
+    string name;                                        // ชื่อคนเล่น
+    long long int moneyInWeb;                           // เงินในระบบ
+    int chip;                                           // เงินในเกม
+    int moneyToRaise;                                   // เงินที่ Raise เพิ่มจาก Bet สูงสุด ณ ตอนนั้น
+    int accumulateBet;                                  // เงินที่เราลงเดิมพันไปแล้ว
+    vector<string> cards;                               // การ์ดบนมือเรา มี 2 ใบ
+    string action;                                      // การกระทำของเรา ณ ตอนนั้น Call Raise Bet Fold Cheat etc.
+    string role;                                        // ตำแหน่งของเรา dealer ,Small Blind, Big Blind
+    int order;                                          // คำสั่งของเรา
 };
 class PokerGame
 {
 private:
-    vector<string> cardsOnBoard ; // ไพ่บนBoard
+    vector<string> cardsOnBoard; // ไพ่บนBoard
     int num_player;
     int current;   // position
     int lastRaise; // position
@@ -69,10 +85,10 @@ public:
     void showPlayerMoney(Player *);
     void showPlayerCards(Player *);
     void showHandRank(Player *p);
+    void showChoice();
     void holecards();
     void communityCards(int);
     void checkHand(Player *p);
-    void showChoice();
     void recieveOrder(Player *);
     void checkOrder(Player *);
     void doOrder(Player *);
