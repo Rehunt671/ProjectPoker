@@ -68,10 +68,10 @@ void convertToPairVector(vector<std::pair<int, char>> &split, vector<string> &co
         split[i].first = stoi(combined[i].substr(0, combined[i].length() - 1));
         split[i].second = combined[i].back();
     }
-    for (size_t i = 0; i < combined.size(); i++)
-    {
-        cout << split[i].first << split[i].second << "\n";
-    }
+//     for (size_t i = 0; i < combined.size(); i++)
+//     {
+//         cout << split[i].first << split[i].second << "\n";
+//     }
 }
 
 bool hasRoyalFlush(vector<std::pair<int, char>> hand,char &flushSuit)
