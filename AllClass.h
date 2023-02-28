@@ -43,7 +43,7 @@ public:
 class PokerGame
 {
 private:
-    vector<string> cardsOnBoard = {"A\4","Q\4","K\4","J\4","T\4"}; // ไพ่บนBoard
+    vector<string> cardsOnBoard ; // ไพ่บนBoard
     int num_player;
     int current;   // position
     int lastRaise; // position
