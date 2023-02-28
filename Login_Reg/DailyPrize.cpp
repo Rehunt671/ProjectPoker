@@ -1,53 +1,79 @@
-#include<iostream>
-#include<cstdlib>
-#include<ctime>
-#include <fstream>
+#include <iostream>
+#include <ctime>
+#include <cstdlib>
+using namespace std;
 
-void getLoggeginTime(){
-    ofstream write("time.txt");
-    ifstream read("time.txt");
-    time_t  t = time(0); 
-    write << t << endl;
-    string strtime;
-    getline(read,strtime);
-    const int a = stoi(strtime);
-    cout << a;
-    remove("time.txt");
+int money = 1000;
+
+class check {
+public:
+    bool loggedin;
+    void setBoolLoggedin(bool);
+    void resetBoolLoggedin();
+};
+
+void check::setBoolLoggedin(bool ln) {
+    loggedin = ln;
 }
 
-void dailyPrize(string name, int loggedinTime){
-    long long int allowedtime = loggedinTime+86400;
-    cout << "------------------------------------------------------------\n";
-    cout << "                       DAILY PRIZE\n";
-    if(time(0) < allowedtime){
-        cout << "You are aleready login today. Please try again tomorrow.";
-        cout << "------------------------------------------------------------\n";
-    }else{
+void check::resetBoolLoggedin() {
+    time_t now = time(0);
+    struct tm* t1 = localtime(&now);
+    t1->tm_mday += 1;
+    t1->tm_hour = 0;
+    t1->tm_min = 0;
+    t1->tm_sec = 0;
+    time_t resetTime = mktime(t1); 
+    cout << now << " : " << ctime(&now) << endl;
+    cout << resetTime << " : " << ctime(&resetTime) << endl;
+    if (now >= resetTime) {
+        loggedin = false;
+    }
+}
+
+void dailyPrize(check& user) {
+    user.resetBoolLoggedin(); 
+    if (user.loggedin == false) {
+        cout << "\n------------------------------------------------------------\n";
+        cout << "                       DAILY PRIZE\n";
         cout << "            100 , 200 , 300 , 500 , 750, 1000\n";
         cout << "------------------------------------------------------------\n";
-        cout << "Press enter to recieve daily prize";
+        cout << "           Press enter to receive daily prize\n";
+        cout << "------------------------------------------------------------";
         cin.get();
         srand(time(0));
-        int i = rand()%6;
-        switch(i){
-            case 0:
-                // บวกเงิน 10
-                break;
-            case 1:
-                // บวกเงิน 20,000
-                break;
-            case 2:
-                // บวกเงิน 30,000
-                break;
-            case 3:
-                // บวกเงิน 50,000
-                break;
-            case 4:
-                // บวกเงิน 75,000
-                break;
-            default:
-                // บวกเงิน 100,000
-                break;
+        int i = rand() % 6;
+        int value;
+        switch (i) {
+        case 0:
+            value = 100;
+            break;
+        case 1:
+            value = 200;
+            break;
+        case 2:
+            value = 300;
+            break;
+        case 3:
+            value = 500;
+            break;
+        case 4:
+            value = 750;
+            break;
+        default:
+            value = 1000;
+            break;
         }
+        money += value;
+        cout << "               You got $" << value << "!\n" << "               Total money: $" << money << endl;
+        cout << "\n------------------------------------------------------------\n";
+        user.setBoolLoggedin(true);
     }
+}
+
+int main() {
+    check z;
+    dailyPrize(z);
+    dailyPrize(z);
+    return 0;
 }
