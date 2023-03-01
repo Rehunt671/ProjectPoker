@@ -271,14 +271,14 @@ void Database::registerUser()
                 cout << "Passwords didn't match. Try again.\n";
             }
         }
-        moneyInWeb = "$500";
+        moneyInWeb = "500";
         setDisplayName();
         userDatabase[make_pair(username, password)].emplace_back(displayname);
         userDatabase[make_pair(username, password)].emplace_back(moneyInWeb);
         writeData2_txt(userDatabase, "DataLN&RG.txt");
 
         cout << "User " << username << " has been registered successfully." << endl;
-        cout << "You recieve free credit : " << moneyInWeb << " Dollar\n";
+        cout << "You recieve free credit : $" << moneyInWeb << " Dollar\n";
     }
     // Delete_();
 }
