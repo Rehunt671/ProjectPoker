@@ -27,8 +27,8 @@ void check::resetBoolLoggedin() {
     t1->tm_min = 0;
     t1->tm_sec = 0;
     time_t resetTime = mktime(t1); 
-    cout << now << " : " << ctime(&now) << endl;
-    cout << resetTime << " : " << ctime(&resetTime) << endl;
+    cout << "current time:" << ctime(&now) << endl;
+    cout << "resetTime: " << ctime(&resetTime) << endl;
     if (now >= resetTime) {
         loggedin = false;
     }
@@ -40,7 +40,6 @@ void check::readBoolLoggedin(){
     getline(read,boolLN);
     if(boolLN == "0") setBoolLoggedin(false);
     else if(boolLN == "1") setBoolLoggedin(true);
-    cout << loggedin;
 }
 void check::writeBoolLoggedin(bool ln){
     ofstream write("check.txt");
