@@ -1,22 +1,6 @@
 #ifndef PROJECT1_H
 #define PROJECT1_H
-#include "AllClass.h"
 // สร้าง map เพื่อเก็บข้อมูลของผู้ใช้งาน
-using std::cin;
-map<pair<string, string>, vector<string>> userDatabase;
-bool Database::checkIfNewWeb()
-{
-    string test;
-    ifstream newWeb("DataLN&RG.txt");
-    if (!getline(newWeb, test))
-    {
-
-        newWeb.close();
-        return true;
-    }
-    newWeb.close();
-    return false;
-}
 void Database::setDisplayName()
 { // รับ input display name
     bool state = false;
@@ -36,7 +20,7 @@ void Database::setDisplayName()
         }
         else
         {
-            displayname = input;
+            displayname.push_back(input);
             state = true;
         }
     }
@@ -66,9 +50,9 @@ void Database::Delete_()
     newfile.close();
 }
 
-void Database::writeData2_txt(const map<pair<string, string>, vector<string>> &userDatabase, const string &Datatxt)
+void Database::writeData2_txt()
 {
-    ofstream dest(Datatxt, std::ios::app);
+    ofstream dest(filename, std::ios::app);
 
     for (const auto &entry : userDatabase)
     {
@@ -84,30 +68,31 @@ void Database::writeData2_txt(const map<pair<string, string>, vector<string>> &u
     dest.close();
 }
 
-void Database::importDatafromfile(string filename, vector<string> &un, vector<string> &pw)
+void Database::importDatafromfile() // อ่านไฟล์จากไฟล์หลักพร้อมกับเขียนMapขึ้นมา
 {
-
-    ifstream source(filename.c_str());
+    un.clear();
+    pw.clear();
+    displayname.clear();
+    money.clear();
+    ifstream source(filename);
     string line;
-    char format[] = "%s %s";
+    char format[] = "%s %s %s %s ";
     char name[100];
     char pass[100];
+    char dp[100];
+    char mn[100];
     while (getline(source, line))
     {
-        sscanf(line.c_str(), format, name, pass);
+        sscanf(line.c_str(), format, name, pass, dp, mn);
 
         un.push_back(name);
         pw.push_back(pass);
+        displayname.push_back(dp);
+        money.push_back(mn);
+        userDatabase[make_pair(name, pass)].push_back(displayname.back());
+        userDatabase[make_pair(name, pass)].push_back(mn);
     }
     source.close();
-}
-
-string Database::toUpperStr(string x)
-{
-    string y = x;
-    for (unsigned i = 0; i < x.size(); i++)
-        y[i] = toupper(x[i]);
-    return y;
 }
 
 // ฟังก์ชันสำหรับ Login ผู้ใช้งาน //
@@ -118,85 +103,59 @@ string Database::toUpperStr(string x)
 //                                                           //
 //__________________________________________________________//
 
-void Database::loginUser(int &num_Userlogin)
+void Database::loginUser(vector<int> &loginIndex)
 { // ตรวจสอบว่ามีบัญชีในฐานข้อมูลหรือไม่
-    string username;
-    string password;
-    string filename = "DataLN&RG.txt";
-    vector<string> un;
-    vector<string> pw;
-    importDatafromfile(filename, un, pw);
+    importDatafromfile();
+    string userN;    // แค่ไว้เช็ค
+    string password; // แค่ไว้เช็ค
     bool valid = false;
-    while (!valid || num_Userlogin < 1 || num_Userlogin > 4)
-    { // ฟังก์ชั่นเช็คต้องใส่ตัวเลขเท่านั้น
-        cout << "How many user want to login ? :";
-        cin >> num_Userlogin;
-
-        if (cin.fail())
-        {
-            cin.clear();
-            cin.ignore(10000, '\n');
-            cout << "Please enter number(2-4)!!!\n";
-        }
-        else
-        {
-            valid = true;
-        }
-    }
 
     cout << "User Login\n";
-
-    for (int i = 1; i <= num_Userlogin; i++)
+    // ตรวจสอบว่ามีชื่ออยุ่ในฐานข้อมูลไหมน้าาา
+    bool n = true;
+    bool m = true;
+    bool checkUN = false;
+    bool checkPW = false;
+    while (n)
     {
-        // ตรวจสอบว่ามีชื่ออยุ่ในฐานข้อมูลไหมน้าาา
-        bool n = true;
-        bool m = true;
-        bool checkUN = false;
-        bool checkPW = false;
-        while (n)
-        {
-            cout << "Username  : ";
-            cin >> username;
+        cout << "Username  : ";
+        cin >> userN;
 
-            for (unsigned int i = 0; i < un.size(); i++)
-            { // เช็คว่ามีชื่อในระบบไหม
+        for (unsigned int i = 0; i < un.size(); i++)
+        { // เช็คว่ามีชื่อในระบบไหม
 
-                if (username == un[i])
-                {
-                    checkUN = true;
-                    n = false;
-                }
-            }
-            if (checkUN == false)
+            if (userN == un[i])
             {
-                cout << "Couldn't find your username\n";
-                cout << "Please enter your username again.\n";
+                loginIndex.push_back(i);
+                checkUN = true;
+                n = false;
             }
         }
-
-        // ตรวจสอบว่ารหัสผ่านถูกต้องหรือไม่
-        while (m)
+        if (checkUN == false)
         {
-            cout << "Password : ";
-            cin >> password;
-            for (unsigned int i = 0; i < pw.size(); i++)
-            {
-
-                if (password == pw[i])
-                {
-                    checkPW = true;
-                    m = false;
-                    cout << "User " << username << " has logged in successfully.\n";
-                    i = num_Userlogin + 10;
-                }
-            }
-
-            if (checkPW == false)
-            {
-                cout << "Incorrect password for user " << username << ".\n";
-            }
+            cout << "Couldn't find your username\n";
+            cout << "Please enter your username again.\n";
         }
     }
+    // ตรวจสอบว่ารหัสผ่านถูกต้องหรือไม่
+    while (m)
+    {
+        cout << "Password : ";
+        cin >> password;
+        if (password == pw[loginIndex.back()])
+        {
+            checkPW = true;
+            m = false;
+            cout << "User " << userN << " has logged in successfully.\n";
+            break;
+        }
+        if (checkPW == false)
+        {
+            loginIndex.pop_back();
+            cout << "Incorrect password for user " << userN << ".\n";
+        }
+    }
+    cin.ignore();
 }
 
 // ฟังก์ชันสำหรับ Register ผู้ใช้งาน //
@@ -210,76 +169,52 @@ void Database::loginUser(int &num_Userlogin)
 // ฟังก์ชันสำหรับ Register ผู้ใช้งาน  // เพิ่มข้อมูลผู้ใช้งานลงในฐานข้อมูล
 void Database::registerUser()
 {
+    string freeCredit = "500";
     string username;
     string password;
     string passwordCF;
     int num_UserRegister;
     bool valid = false;
-    while (!valid)
-    { // checkต้องnum เท่านั้น
-        cout << "How many user want to register ? : ";
-        cin >> num_UserRegister;
-
-        if (cin.fail())
+    while (true)
+    {
+        cout << "Username : ";
+        cin >> username;
+        bool found = false;
+        for (auto const &key_value : userDatabase)
         {
-            cin.clear();
-            cin.ignore(10000, '\n');
-            cout << "Please enter number !!!\n";
+            if (key_value.first.first == username)
+            {
+                found = true;
+                break;
+            }
         }
+        if (found)
+            cout << "That username is taken. Try another\n";
         else
         {
-            valid = true;
+            break;
         }
     }
-
-    for (int i = 1; i <= num_UserRegister; i++)
+    while (true)
     {
-        bool n = true;
-        bool m = true;
-        cout << "User Register\n";
-
-        while (true)
+        cout << "Password : ";
+        cin >> password;
+        cout << "Confirm Password : ";
+        cin >> passwordCF;
+        if (password == passwordCF)
+            break;
+        else if (password != passwordCF)
         {
-            cout << "Username : ";
-            cin >> username;
-            bool found = false;
-            for (auto const &key_value : userDatabase)
-            {
-                if (key_value.first.first == username)
-                {
-                    found = true;
-                    break;
-                }
-            }
-            if (found)
-                cout << "That username is taken. Try another\n";
-            else
-            {
-                break;
-            }
+            cout << "Passwords didn't match. Try again.\n";
         }
-        while (true)
-        {
-            cout << "Password : ";
-            cin >> password;
-            cout << "Confirm Password : ";
-            cin >> passwordCF;
-            if (password == passwordCF)
-                break;
-            else if (password != passwordCF)
-            {
-                cout << "Passwords didn't match. Try again.\n";
-            }
-        }
-        moneyInWeb = "500";
-        setDisplayName();
-        userDatabase[make_pair(username, password)].emplace_back(displayname);
-        userDatabase[make_pair(username, password)].emplace_back(moneyInWeb);
-        writeData2_txt(userDatabase, "DataLN&RG.txt");
-
-        cout << "User " << username << " has been registered successfully." << endl;
-        cout << "You recieve free credit : $" << moneyInWeb << " Dollar\n";
     }
-    // Delete_();
-}
+    setDisplayName();
+    userDatabase[make_pair(username, password)].emplace_back(displayname.back());
+    userDatabase[make_pair(username, password)].emplace_back(freeCredit);
+    writeData2_txt();
+
+    cout << "User " << username << " has been registered successfully." << endl;
+    cout << "You recieve free credit : $" << freeCredit << " Dollar\n";
+    Delete_();
+} // แปลว่าตอนเอาเงินไปอัพเดทจำเป็นต้องเขียน
 #endif

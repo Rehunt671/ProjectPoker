@@ -14,22 +14,7 @@
 #include <chrono>        //time
 #include <thread>        //time
 using namespace std;
-class Database
-{
-public:
-    string username, password, displayname, moneyInWeb;
-
-    string toUpperStr(string);
-    bool checkIfNewWeb();
-    void registerUser();
-    void loginUser(int &);
-    void writeData2_txt(const map<pair<string, string>, vector<string>> &, const string &);
-    void importDatafromfile(string, vector<string> &, vector<string> &);
-    void Delete_();
-    // เพิ่มเติม
-    void setDisplayName();
-};
-
+vector<int> loginIndex;
 struct Deck
 {
 private:
@@ -42,20 +27,42 @@ public:
     void shuffle();              // สับไพ่
     void showcardsLeft();        // Show cards ที่เหลือ
 };
+class Database
+{
+private:
+    string filename = "DataLN&RG.txt";
+
+public:
+    map<pair<string, string>, vector<string>> userDatabase; //[username,password] displayname money
+    vector<string> un;
+    vector<string> pw;
+    vector<string> displayname;
+    vector<string> money;
+    void registerUser();
+    void loginUser(vector<int> &);
+    void writeData2_txt();     // เขียนข้อมูลจาก Map To ไฟล์หลัก ใช้ตอน REGISTER
+    void importDatafromfile(); // นำข้อมูลจาก File หลักมาเก็บข้อมูลไว้ใน Vector แต่ละอัน พร้อมกับสร้าง Mapขึ้นมาทันที ใช้ตอน Login
+    // ถ้าต้องการแก้ไข Concept คือ ImportDataFromfile แล้ว ไล่แก้ ข้อมูลให้ตรงกับ Index นั้นๆแล้วนำเวกเตอร์ 4 อันนำมาสร้างแมพแล้ว ส่งกลับขึ้นไปยังไฟล์หลัก
+    void Delete_();
+    // เพิ่มเติม
+    void setDisplayName();
+};
 struct Player
 {
 public:
-    Player(string, long long int);
-    pair<string, pair<int, pair<int, int>>> rankOfHand; // ประกอบไปด้วย (Rankไพ่บนมือ(String),{Rank(int),{ไพ่สูงสุด,ไพ่รองคู่สูงสุด}})
-    string name;                                        // ชื่อคนเล่น
-    long long int moneyInWeb;                           // เงินในระบบ
-    int chip;                                           // เงินในเกม
-    int moneyToRaise;                                   // เงินที่ Raise เพิ่มจาก Bet สูงสุด ณ ตอนนั้น
-    int accumulateBet;                                  // เงินที่เราลงเดิมพันไปแล้ว
-    vector<string> cards;                               // การ์ดบนมือเรา มี 2 ใบ
-    string action;                                      // การกระทำของเรา ณ ตอนนั้น Call Raise Bet Fold Cheat etc.
-    string role;                                        // ตำแหน่งของเรา dealer ,Small Blind, Big Blind
-    int order;                                          // คำสั่งของเรา
+    Player(string, string, string, int);
+    pair<string, pair<int, pair<int, int>>> rankOfHand; // ประกอบไปด้วย (Rankไพ่บนมือ(String),{Rank(int1-10),{ไพ่สูงสุดMainCard,ไพ่รองคู่สูงสุดMinorCard}})
+    string username;
+    string password; //
+    string name;     // ชื่อคนเล่น
+    int moneyInWeb;
+    int chip;             // เงินในเกม
+    int moneyToRaise;     // เงินที่ Raise เพิ่มจาก Bet สูงสุด ณ ตอนนั้น
+    int accumulateBet;    // เงินที่เราลงเดิมพันไปแล้ว
+    vector<string> cards; // การ์ดบนมือเรา มี 2 ใบ
+    string action;        // การกระทำของเรา ณ ตอนนั้น Call Raise Bet Fold Cheat etc.
+    string role;          // ตำแหน่งของเรา dealer ,Small Blind, Big Blind
+    int order;            // คำสั่งของเรา
 };
 class PokerGame
 {
@@ -73,9 +80,10 @@ private:
     bool hasBetRaiseOrAllIn;
 
 public:
-    PokerGame(Deck &, int, int, int);
+    PokerGame(Database &, Deck &, int, int, int);
     ~PokerGame();
     vector<Player *> players;
+    Database pokerDB;
     Deck deck;
     map<int, vector<string>> od;
     void showTurn();
@@ -90,7 +98,8 @@ public:
     void showBoard1();
     void showBoard2();
     void showBoard3();
-    void showBoard4();;
+    void showBoard4();
+    ;
     void showMoneyPot();
     void showMoneyBet();
     void showPlayerMoney(Player *);
@@ -123,5 +132,55 @@ public:
     void flop();
     void turn();
     void river();
+    void updateLastestChip(string file_name);
 };
+string convertToCard(int max)
+{
+    map<int, string> maxVar;
+    maxVar[14] = "A";
+    maxVar[13] = "K";
+    maxVar[12] = "Q";
+    maxVar[11] = "J";
+    maxVar[10] = "10";
+    for (int i = 9; i > 1; i--)
+    {
+        maxVar[i] = to_string(i);
+    }
+    maxVar[0] = "";
+    if (maxVar.count(max) > 0) // กัน return bad behavior
+        return maxVar[max];
+    return 0;
+}
+int handleString(string str)
+{
+    istringstream iss(str);
+    int num;
+    if (!(iss >> num))
+    {
+        return 0;
+    }
+    else
+    {
+        return num;
+    }
+}
+string convertToLower(string s)
+{
+    for (int i = 0; i < s.length(); i++)
+    {
+        s[i] = tolower(s[i]);
+    }
+    return s;
+}
+void drawPic()
+{
+    cout << "\n=========================================================================================================================";
+    cout << "\n                               CCCCC      A        SSSSSSSSS   IIIIIIIII  NN     NN    OOOOOOOO     ";
+    cout << "\n                             CC          A  A      SS             III     NN N   NN   OO      OO    ";
+    cout << "\n                            CC          A    A     SSSSSSSSS      III     NN  N  NN   OO      OO    ";
+    cout << "\n                             CC        AAAAAAAA           SS      III     NN   N NN   OO      OO    ";
+    cout << "\n                               CCCCC  A        A   SSSSSSSSS   IIIIIIIII  NN     NN    OOOOOOOO     ";
+    cout << "\n=========================================================================================================================";
+    cout << "\n================================================= Welcome to Poker Game =================================================\n";
+}
 #endif

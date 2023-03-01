@@ -1,10 +1,6 @@
-#ifndef PROJECT2_H
-#define PROJECT2_H
+#ifndef PROJECT3_H
+#define PROJECT3_H
 #include "AllClass.h"
-#include "CheckHand.h"
-using std::cout;
-using namespace std;
-
 // void changeCard(Player *p, vector<string> deck)
 // {
 //     int c;
@@ -45,7 +41,7 @@ using namespace std;
 // {
 //     string n = "";
 //     int r, p;
-//     cout << "Which one do you cheat 1.changeCard 2.seeCard : ";
+//     cout << "Which one do you cheat 1.changeCardInHand 2.seeCard : ";
 //     cin >> n;
 //     handleString(n);
 //     p = handleString(n);
@@ -68,38 +64,6 @@ using namespace std;
 //         seeCheat(players);
 //     }
 // }
-int handleString(string str)
-{
-    istringstream iss(str);
-    int num;
-    if (!(iss >> num))
-    {
-        return 0;
-    }
-    else
-    {
-        return num;
-    }
-}
-string convertToLower(string s)
-{
-    for (int i = 0; i < s.length(); i++)
-    {
-        s[i] = tolower(s[i]);
-    }
-    return s;
-}
-void drawPic()
-{
-    cout << "\n=========================================================================================================================";
-    cout << "\n                               CCCCC      A        SSSSSSSSS   IIIIIIIII  NN     NN    OOOOOOOO     ";
-    cout << "\n                             CC          A  A      SS             III     NN N   NN   OO      OO    ";
-    cout << "\n                            CC          A    A     SSSSSSSSS      III     NN  N  NN   OO      OO    ";
-    cout << "\n                             CC        AAAAAAAA           SS      III     NN   N NN   OO      OO    ";
-    cout << "\n                               CCCCC  A        A   SSSSSSSSS   IIIIIIIII  NN     NN    OOOOOOOO     ";
-    cout << "\n=========================================================================================================================";
-    cout << "\n================================================= Welcome to Poker Game =================================================\n";
-}
 void recieveSimpleInformation(int &chip, int &mandatory_betRef)
 {
     string inputChoice;
@@ -110,7 +74,6 @@ void recieveSimpleInformation(int &chip, int &mandatory_betRef)
     {
 
         cout << "How much money do you want to play(500 - 1,000): ";
-        cin.ignore();
         getline(cin, inputChip);
         outputChip = handleString(inputChip);
         if (outputChip < 500 || outputChip > 1000 || outputChip == 0)
@@ -145,7 +108,7 @@ void recieveSimpleInformation(int &chip, int &mandatory_betRef)
         mandatory_betRef = 50;
     }
     else
-        cout << "Don't hanve " << outputChoice << " choice try again\n";
+        cout << "Don't have " << outputChoice << " choice try again\n";
     cout << "Okay!! Mandatory = " << mandatory_betRef << "\n";
 }
 void PokerGame::createOrderTable()
@@ -173,22 +136,23 @@ void PokerGame::createOrderTable()
     od[7].emplace_back("");
     od[7].emplace_back("fold");
 }
-PokerGame::PokerGame(Deck &dRef, int numRef, int chipRef, int mandatory_betRef) // สร้าง 1 PokerGame ต้องมีข้อมูลพื้นฐานตาม Parameterต่อไปนี้ ตำแหน่งคนจริง(&) สำรับไพ่ จำนวนคน
+PokerGame::PokerGame(Database &dbRef, Deck &dRef, int numRef, int chipRef, int mandatory_betRef) // สร้าง 1 PokerGame ต้องมีข้อมูลพื้นฐานตาม Parameterต่อไปนี้ ตำแหน่งคนจริง(&) สำรับไพ่ จำนวนคน
 {
+    pokerDB = dbRef;
     deck = dRef;         // กำหนด *deck ให้ตรงกับสำรับไพ่ที่เราสร้างขึ้นมา
     num_player = numRef; // กำหนดจำนวนคนของเกม Poker ของเรา
-    players.emplace_back(new Player("1", 0));
-    players.emplace_back(new Player("2", 0));
-    players.emplace_back(new Player("3", 0));
-    players.emplace_back(new Player("4", 0));
     createOrderTable();
+    for (int i = 0; i < num_player; i++)
+    {
+        players.emplace_back(new Player(pokerDB.un[loginIndex[i]], pokerDB.pw[loginIndex[i]], pokerDB.displayname[loginIndex[i]], stoi(pokerDB.money[loginIndex[i]])));
+    }
     for (auto &p : players)
     {
         p->chip = chipRef;
     }                                    // กำหนดเงินเรียงคน
-    dealer = rand() % num_player;        // สุ่มคนมาเป็น Role dealer
-    current = (dealer + 3) % num_player; // คนซ้าย Big blind index ได้เริ่มก่อน;
     mandatory_bet = mandatory_betRef;    // Chip เดิมพันขั้นต่ำที่จะเล่นกัน
+    current = (dealer + 3) % num_player; // คนซ้าย Big blind index ได้เริ่มก่อน;
+    dealer = rand() % num_player;        // สุ่มคนมาเป็น Role dealer
     pot = 0;                             // กำหนดเงินใน Board ตั้งต้น
     highestBet = 0;                      // กำหนด ว่าตอนนี้ค่าเงิน Betสูงสุดเท่าไหร่ คน Call Raise จะได้รู้
     round = 1;                           // กำหนดรอบของเกม
@@ -487,8 +451,6 @@ void PokerGame::assignRole()
 void PokerGame::moneyForMandatoryBet(Player *s, Player *b)
 {
 
-    cout << s->name << "\n";
-    cout << b->name;
     cout << s->name << " is Small-Blind you lost money from Mandatory-bet :" << mandatory_bet / 2 << "\n";
     s->chip -= mandatory_bet / 2;
     s->accumulateBet = mandatory_bet / 2;
@@ -537,6 +499,7 @@ void PokerGame::preflop() // เริ่มรอบแรกของเกม
             checkHand(players[current]);
         showHandRank(players[current]);
         showPlayerMoney(players[current]);
+        cout << players[current]->accumulateBet << "\n";
         cout << "Enter Your Action\n";
         showChoice();
         recieveOrder(players[current]);
@@ -586,13 +549,13 @@ bool PokerGame::findWinner()
         {
             if (p->action == "")
                 return false;
-        } // ยังเล่นกันไม่จบ
+        } // ยังไม่จบรอบนั้นๆ
         for (auto &p : players)
         {
             if (p->action != "fold")
             {
                 if (p->rankOfHand.second.first > rankingRef)
-                    rankingRef = p->rankOfHand.second.first;
+                    rankingRef = p->rankOfHand.second.first; // หา Ranking ไพ่สูงสุด 1-10ว่าคนที่ไม่หมอบคนไหนสูงสุด
                 cout << p->name << "'s cards :";
                 for (const auto &c : p->cards)
                 {
@@ -603,7 +566,7 @@ bool PokerGame::findWinner()
                 cout << "MainCard : " << convertToCard(p->rankOfHand.second.second.first) << "\n";
                 cout << "MinorCard : " << convertToCard(p->rankOfHand.second.second.second) << "\n";
             }
-        }
+        } // หาเรียบร้อยแล้วว่าคนไหนที่ไม่หมอบมี อันดับสูงสุด
         for (auto &p : players)
         {
             if (p->rankOfHand.second.first == rankingRef)
@@ -623,8 +586,8 @@ bool PokerGame::findWinner()
                 cout << "Congratulation!!!! " << p->name << " is a winner here\n";
             cout << "Press Enter to recieve money on board\n";
             cin.get();
-            p->moneyInWeb += pot;
-            cout << "Your Money = " << p->moneyInWeb;
+            p->chip += pot;
+            cout << "Your Money = " << p->chip;
         }
         return true;
     }
@@ -662,6 +625,7 @@ void PokerGame::flop()
             checkHand(players[current]);
         showHandRank(players[current]);
         showPlayerMoney(players[current]);
+        cout << players[current]->accumulateBet << "\n";
         cout << "Enter Your Action\n";
         showChoice();
         recieveOrder(players[current]);
@@ -688,6 +652,7 @@ void PokerGame::turn()
             checkHand(players[current]);
         showHandRank(players[current]);
         showPlayerMoney(players[current]);
+        cout << players[current]->accumulateBet << "\n";
         cout << "Enter Your Action\n";
         showChoice();
         recieveOrder(players[current]);
@@ -714,6 +679,7 @@ void PokerGame::river()
             checkHand(players[current]);
         showHandRank(players[current]);
         showPlayerMoney(players[current]);
+        cout << players[current]->accumulateBet << "\n";
         cout << "Enter Your Action\n";
         showChoice();
         recieveOrder(players[current]);
@@ -963,7 +929,7 @@ void PokerGame::fold(Player *p)
 {
     p->action = "fold";
 }
-Player::Player(string name, long long int moneyInWeb) : name(name), moneyInWeb(moneyInWeb)
+Player::Player(string username, string password, string name, int moneyInWeb) : username(username), password(password), name(name), moneyInWeb(moneyInWeb)
 {
     action = "";
     role = "";
@@ -992,5 +958,4 @@ void Deck::showcardsLeft()
     }
     cout << "\n";
 }
-
 #endif

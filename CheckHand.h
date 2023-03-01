@@ -1,7 +1,6 @@
-#ifndef PROJECT3_H
-#define PROJECT3_H
+#ifndef PROJECT2_H
+#define PROJECT2_H
 #include "AllClass.h"
-using namespace std;
 bool findFreq(vector<std::pair<int, char>> hand, int &mainCardValue, int &minorCardValue, int num)
 {
     // Reset ค่าออกให้หมดก่อน
@@ -54,23 +53,7 @@ int findRankInNumber(string strRank)
         return ranking[strRank];
     return 0;
 }
-string convertToCard(int max)
-{
-    map<int, string> maxVar;
-    maxVar[14] = "A";
-    maxVar[13] = "K";
-    maxVar[12] = "Q";
-    maxVar[11] = "J";
-    maxVar[10] = "10";
-    for (int i = 9; i > 1; i--)
-    {
-        maxVar[i] = to_string(i);
-    }
-    maxVar[0] = "";
-    if (maxVar.count(max) > 0) // กัน return bad behavior
-        return maxVar[max];
-    return 0;
-}
+
 void convertToPairVector(vector<std::pair<int, char>> &split, vector<string> &combined)
 {
     split.resize(combined.size());
@@ -102,10 +85,6 @@ void convertToPairVector(vector<std::pair<int, char>> &split, vector<string> &co
         split[i].first = stoi(combined[i].substr(0, combined[i].length() - 1));
         split[i].second = combined[i].back();
     }
-    //     for (size_t i = 0; i < combined.size(); i++)
-    //     {
-    //         cout << split[i].first << split[i].second << "\n";
-    //     }
 }
 
 bool hasRoyalFlush(vector<std::pair<int, char>> hand, char &flushSuit)
