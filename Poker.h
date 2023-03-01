@@ -103,31 +103,50 @@ void drawPic()
 void recieveSimpleInformation(int &chip, int &mandatory_betRef)
 {
     string inputChoice;
+    string inputChip;
     int outputChoice;
+    int outputChip;
     do
     {
-        cout << "How much money do you want to play(1,000 - 1,000,000): ";
-        cin >> chip;
-        if (chip < 500 || chip > 1000 )
+
+        cout << "How much money do you want to play(500 - 1,000): ";
+        getline(cin, inputChip);
+        outputChip = handleString(inputChip);
+        if (outputChip < 500 || outputChip > 1000 || outputChip == 0)
             cout << "Invalid money value\n";
-        cin.ignore();
-    } while (chip < 500 || chip > 1000 ); // ถามจะให้มีคนละกี่บาท
+    } while (outputChip < 500 || outputChip > 1000 || outputChip == 0); // ถามจะให้มีคนละกี่บาท
+    chip = outputChip;
     cout << "How Much Mandatory do you want to play\n";
-    cout << "1.10\n2.20\n3.30\n4.40\n5.50";
+    cout << "1.10\n2.20\n3.30\n4.40\n5.50\n";
     getline(cin, inputChoice);
     outputChoice = handleString(inputChoice);
     if (outputChoice == 0)
         cout << "Invalid Input try again\n";
     else if (outputChoice == 1)
+    {
         cout << "Okay!! Mandatory = 10\n";
+        mandatory_betRef = 10;
+    }
     else if (outputChoice == 2)
+    {
         cout << "Okay!! Mandatory = 20\n";
+        mandatory_betRef = 20;
+    }
     else if (outputChoice == 3)
+    {
         cout << "Okay!! Mandatory = 30\n";
+        mandatory_betRef = 30;
+    }
     else if (outputChoice == 4)
+    {
         cout << "Okay!! Mandatory = 40\n";
+        mandatory_betRef = 40;
+    }
     else if (outputChoice == 4)
+    {
         cout << "Okay!! Mandatory = 50\n";
+        mandatory_betRef = 50;
+    }
     else
         cout << "Don't hanve " << outputChoice << " choice try again\n";
 }
@@ -248,22 +267,33 @@ void showUiCardHand(vector<string> s)
         cout << "|_ _ _ _ _|    | _ _ _ _ |" << endl;
     }
 }
-void PokerGame::topboard(){
+void PokerGame::topboard()
+{
 
-    cout << "Current Board: \n"; 
+    cout << "Current Board: \n";
     cout << setw(30) << "                                                          Dealer                                       \n\n";
     cout << setw(30) << "                               ============================================================\n";
-    cout << setw(30) << "                             //                                                            \\\\" << "\n";
-    cout << setw(30) << "                            //                                                              \\\\" << "\n";
-    cout << setw(30) << "                           //                                                                \\\\" << "\n";
-    cout << setw(30) << "                          //                                                                  \\\\" << "\n";
-    cout << setw(30) << "                         //                                                                    \\\\" << "\n";
-    cout << setw(30) << "                        //                                                                      \\\\" << "\n";
-    cout << setw(30) << "                       //                                                                        \\\\" << "\n";
-    cout << setw(30) << "                      //                                                                          \\\\" << "\n";
-    cout << setw(30) << "                     //                                                                            \\\\" << "\n\n";
+    cout << setw(30) << "                             //                                                            \\\\"
+         << "\n";
+    cout << setw(30) << "                            //                                                              \\\\"
+         << "\n";
+    cout << setw(30) << "                           //                                                                \\\\"
+         << "\n";
+    cout << setw(30) << "                          //                                                                  \\\\"
+         << "\n";
+    cout << setw(30) << "                         //                                                                    \\\\"
+         << "\n";
+    cout << setw(30) << "                        //                                                                      \\\\"
+         << "\n";
+    cout << setw(30) << "                       //                                                                        \\\\"
+         << "\n";
+    cout << setw(30) << "                      //                                                                          \\\\"
+         << "\n";
+    cout << setw(30) << "                     //                                                                            \\\\"
+         << "\n\n";
 }
-void PokerGame::midboard0(){
+void PokerGame::midboard0()
+{
     cout << setw(30) << "                    ||                                                                              ||\n";
     cout << setw(30) << "                    ||        _ _ _ _ _    _ _ _ _ _    _ _ _ _ _    _ _ _ _ _    _ _ _ _ _         ||\n";
     cout << setw(30) << "                    ||       |         |  |         |  |         |  |         |  |         |        ||\n";
@@ -277,13 +307,14 @@ void PokerGame::midboard0(){
     cout << setw(30) << "                    ||                                                                              ||\n\n";
 }
 
-void PokerGame::midboard3(){
+void PokerGame::midboard3()
+{
     cout << setw(30) << "                    ||                                                                              ||\n";
     cout << setw(30) << "                    ||        _________    _________    _________    _ _ _ _ _    _ _ _ _ _         ||\n";
     cout << setw(30) << "                    ||       |         |  |         |  |         |  |         |  |         |        ||\n";
-    cout << setw(30) << "                    ||       |    "<<cardsOnBoard[0][0]<<"    |  |    "<<cardsOnBoard[1][0]<<"    |  |    "<<cardsOnBoard[2][0]<<"    |  |         |  |         |        ||\n";
+    cout << setw(30) << "                    ||       |    " << cardsOnBoard[0][0] << "    |  |    " << cardsOnBoard[1][0] << "    |  |    " << cardsOnBoard[2][0] << "    |  |         |  |         |        ||\n";
     cout << setw(30) << "                    ||       |         |  |         |  |         |  |         |  |         |        ||\n";
-    cout << setw(30) << "                    ||       |    "<<cardsOnBoard[0][1]<<"    |  |    "<<cardsOnBoard[1][1]<<"    |  |    "<<cardsOnBoard[2][1]<<"    |  |         |  |         |        ||\n";
+    cout << setw(30) << "                    ||       |    " << cardsOnBoard[0][1] << "    |  |    " << cardsOnBoard[1][1] << "    |  |    " << cardsOnBoard[2][1] << "    |  |         |  |         |        ||\n";
     cout << setw(30) << "                    ||       |         |  |         |  |         |  |         |  |         |        ||\n";
     cout << setw(30) << "                    ||       |_________|  |_________|  |_________|  |_ _ _ _ _|  |_ _ _ _ _|        ||\n";
     cout << setw(30) << "                    ||                                                                              ||\n";
@@ -291,13 +322,14 @@ void PokerGame::midboard3(){
     cout << setw(30) << "                    ||                                                                              ||\n\n";
 }
 
-void PokerGame::midboard4(){
+void PokerGame::midboard4()
+{
     cout << setw(30) << "                    ||                                                                              ||\n";
     cout << setw(30) << "                    ||        _________    _________    _________    _________    _ _ _ _ _         ||\n";
     cout << setw(30) << "                    ||       |         |  |         |  |         |  |         |  |         |        ||\n";
-    cout << setw(30) << "                    ||       |    "<<cardsOnBoard[0][0]<<"    |  |    "<<cardsOnBoard[1][0]<<"    |  |    "<<cardsOnBoard[2][0]<<"    |  |    "<<cardsOnBoard[3][0]<<"    |  |         |        ||\n";
+    cout << setw(30) << "                    ||       |    " << cardsOnBoard[0][0] << "    |  |    " << cardsOnBoard[1][0] << "    |  |    " << cardsOnBoard[2][0] << "    |  |    " << cardsOnBoard[3][0] << "    |  |         |        ||\n";
     cout << setw(30) << "                    ||       |         |  |         |  |         |  |         |  |         |        ||\n";
-    cout << setw(30) << "                    ||       |    "<<cardsOnBoard[0][1]<<"    |  |    "<<cardsOnBoard[1][1]<<"    |  |    "<<cardsOnBoard[2][1]<<"    |  |    "<<cardsOnBoard[3][1]<<"    |  |         |        ||\n";
+    cout << setw(30) << "                    ||       |    " << cardsOnBoard[0][1] << "    |  |    " << cardsOnBoard[1][1] << "    |  |    " << cardsOnBoard[2][1] << "    |  |    " << cardsOnBoard[3][1] << "    |  |         |        ||\n";
     cout << setw(30) << "                    ||       |         |  |         |  |         |  |         |  |         |        ||\n";
     cout << setw(30) << "                    ||       |_________|  |_________|  |_________|  |_________|  |_ _ _ _ _|        ||\n";
     cout << setw(30) << "                    ||                                                                              ||\n";
@@ -305,13 +337,14 @@ void PokerGame::midboard4(){
     cout << setw(30) << "                    ||                                                                              ||\n\n";
 }
 
-void PokerGame::midboard5(){
+void PokerGame::midboard5()
+{
     cout << setw(30) << "                    ||                                                                              ||\n";
     cout << setw(30) << "                    ||        _________    _________    _________    _________    _________         ||\n";
     cout << setw(30) << "                    ||       |         |  |         |  |         |  |         |  |         |        ||\n";
-    cout << setw(30) << "                    ||       |    "<<cardsOnBoard[0][0]<<"    |  |    "<<cardsOnBoard[1][0]<<"    |  |    "<<cardsOnBoard[2][0]<<"    |  |    "<<cardsOnBoard[3][0]<<"    |  |    "<<cardsOnBoard[4][0]<<"    |        ||\n";
+    cout << setw(30) << "                    ||       |    " << cardsOnBoard[0][0] << "    |  |    " << cardsOnBoard[1][0] << "    |  |    " << cardsOnBoard[2][0] << "    |  |    " << cardsOnBoard[3][0] << "    |  |    " << cardsOnBoard[4][0] << "    |        ||\n";
     cout << setw(30) << "                    ||       |         |  |         |  |         |  |         |  |         |        ||\n";
-    cout << setw(30) << "                    ||       |    "<<cardsOnBoard[0][1]<<"    |  |    "<<cardsOnBoard[1][1]<<"    |  |    "<<cardsOnBoard[2][1]<<"    |  |    "<<cardsOnBoard[3][1]<<"    |  |    "<<cardsOnBoard[4][1]<<"    |        ||\n";
+    cout << setw(30) << "                    ||       |    " << cardsOnBoard[0][1] << "    |  |    " << cardsOnBoard[1][1] << "    |  |    " << cardsOnBoard[2][1] << "    |  |    " << cardsOnBoard[3][1] << "    |  |    " << cardsOnBoard[4][1] << "    |        ||\n";
     cout << setw(30) << "                    ||       |         |  |         |  |         |  |         |  |         |        ||\n";
     cout << setw(30) << "                    ||       |_________|  |_________|  |_________|  |_________|  |_________|        ||\n";
     cout << setw(30) << "                    ||                                                                              ||\n";
@@ -319,7 +352,8 @@ void PokerGame::midboard5(){
     cout << setw(30) << "                    ||                                                                              ||\n\n";
 }
 
-void PokerGame::botomtboard(){
+void PokerGame::botomtboard()
+{
     cout << setw(30) << "                     \\\\                                                                            //\n";
     cout << setw(30) << "                      \\\\                                                                          //\n";
     cout << setw(30) << "                       \\\\                                                                        //\n";
@@ -336,11 +370,12 @@ void PokerGame::botomtboard(){
     cout << setw(30) << "\n";
 }
 
-void PokerGame::actionboard(){
-    
-    cout << "player1 : " << players[0] << setw(30) << "player2 : " << players[1] << setw(30) <<"player3 : " << players[2] << setw(30) << "player4 : " << players[3] << "\n";
+void PokerGame::actionboard()
+{
+
+    cout << "player1 : " << players[0]->name << setw(30) << "player2 : " << players[1]->name << setw(30) << "player3 : " << players[2]->name << setw(30) << "player4 : " << players[3]->name << "\n";
     cout << "money : " << players[0]->chip << setw(40) << "money : " << players[1]->chip << setw(40) << "money : " << players[2]->chip << setw(40) << "money : " << players[3]->chip << "\n";
-    cout << "action : " << players[0]->action << setw(45) << "action : " << players[1]->action << setw(45) << "action : " << players[2]->action << setw(45) << "action : " << players[3]->action <<  "\n";
+    cout << "action : " << players[0]->action << setw(45) << "action : " << players[1]->action << setw(45) << "action : " << players[2]->action << setw(45) << "action : " << players[3]->action << "\n";
     cout << "\n";
 }
 
@@ -454,6 +489,8 @@ void PokerGame::assignRole()
 void PokerGame::moneyForMandatoryBet(Player *s, Player *b)
 {
 
+    cout << s->name << "\n";
+    cout << b->name;
     cout << s->name << " is Small-Blind you lost money from Mandatory-bet :" << mandatory_bet / 2 << "\n";
     s->chip -= mandatory_bet / 2;
     s->accumulateBet = mandatory_bet / 2;
