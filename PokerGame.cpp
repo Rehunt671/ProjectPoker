@@ -36,7 +36,7 @@ int main()
                 PK.registerUser();
             else
                 exit(0);
-        } while (outputChoice == 0);
+        } while (outputChoice == 0 ||outputChoice == 2);
     }
     recieveSimpleInformation(chipRef, mandatory_betRef);
     PokerGame poker(dRef, num_player, chipRef, mandatory_betRef); // เข้ามานั่งในเกมโป๊กเกอร์พร้อมที่จะเล่นเกม
