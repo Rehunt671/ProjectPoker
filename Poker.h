@@ -110,6 +110,7 @@ void recieveSimpleInformation(int &chip, int &mandatory_betRef)
     {
 
         cout << "How much money do you want to play(500 - 1,000): ";
+        cin.ignore();
         getline(cin, inputChip);
         outputChip = handleString(inputChip);
         if (outputChip < 500 || outputChip > 1000 || outputChip == 0)
@@ -124,31 +125,28 @@ void recieveSimpleInformation(int &chip, int &mandatory_betRef)
         cout << "Invalid Input try again\n";
     else if (outputChoice == 1)
     {
-        cout << "Okay!! Mandatory = 10\n";
         mandatory_betRef = 10;
     }
     else if (outputChoice == 2)
     {
-        cout << "Okay!! Mandatory = 20\n";
+
         mandatory_betRef = 20;
     }
     else if (outputChoice == 3)
     {
-        cout << "Okay!! Mandatory = 30\n";
         mandatory_betRef = 30;
     }
     else if (outputChoice == 4)
     {
-        cout << "Okay!! Mandatory = 40\n";
         mandatory_betRef = 40;
     }
-    else if (outputChoice == 4)
+    else if (outputChoice == 5)
     {
-        cout << "Okay!! Mandatory = 50\n";
         mandatory_betRef = 50;
     }
     else
         cout << "Don't hanve " << outputChoice << " choice try again\n";
+    cout << "Okay!! Mandatory = " << mandatory_betRef << "\n";
 }
 void PokerGame::createOrderTable()
 { // Collum 1-2
@@ -555,8 +553,8 @@ void PokerGame::showHandRank(Player *p)
 
     cout << p->name << "'s Hand: " << p->rankOfHand.first << "\n";
     cout << p->name << "'s HandRanking: " << p->rankOfHand.second.first << "\n";
-    cout << p->name << "'s MainCard: " << p->rankOfHand.second.second.first << "\n";
-    cout << p->name << "'s MinorCard: " << p->rankOfHand.second.second.second << "\n";
+    cout << p->name << "'s MainCard: " << convertToCard(p->rankOfHand.second.second.first) << "\n";
+    cout << p->name << "'s MinorCard: " << convertToCard(p->rankOfHand.second.second.second) << "\n";
 }
 bool PokerGame::findWinner()
 {
