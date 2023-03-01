@@ -13,13 +13,14 @@ map<string, string> userDatabase;
 class Database{
     public:
 string username,password;
-
+int num_player,num_Userlogin,num_UserRegister;
 string toUpperStr(string);
 void registerUser(string,string);
 void loginUser(string,string);
 void writeData2_txt(const map<string,string>&, const string&);
 void importDatafromfile(string,vector<string> &,vector<string> &);
 void Delete_();
+void checkLNorRE();
 };
 
 void Database::Delete_(){
@@ -39,7 +40,7 @@ void Database::Delete_(){
     for(auto it = collet.begin();it != collet.end();++it){
         newfile << *it<<endl;
     }
-newfile.close();
+    newfile.close();
 
 
 
@@ -78,7 +79,34 @@ string Database::toUpperStr(string x){
     return y;
 }
 
+void Database::checkLNorRE(){
+    char choice;
+    for(int i=1 ; i<=num_player;i++){
+        cout<<"[1] Login \n[2] Register\n";
+        cout<<"User "<<i<<" Please enter your choice: "; 
+        cin>>choice;
+        if(choice == '1'){
+            num_Userlogin = 1;
+            loginUser(username,password);
 
+    }else if(choice=='2'){
+        num_UserRegister = 1;
+            registerUser(username,password);
+             loginUser(username,password);
+
+
+    }
+    }
+    
+    
+
+
+
+
+
+
+
+}
 
               // ฟังก์ชันสำหรับ Login ผู้ใช้งาน //
 
@@ -90,34 +118,17 @@ string Database::toUpperStr(string x){
 
 
 void Database::loginUser(string username, string password){   // ตรวจสอบว่ามีบัญชีในฐานข้อมูลหรือไม่
-            
-Database x;
-string filename = "DataLN&RG.txt";
+            Database x;
 vector<string> un;
 vector<string> pw;
+num_Userlogin = 0;
+string filename = "DataLN&RG.txt";
 x.importDatafromfile(filename,un,pw);
-
-int num_Userlogin;
-bool valid = false; 
-            while(!valid){                               //ฟังก์ชั่นเช็คต้องใส่ตัวเลขเท่านั้น
-            cout<<"How UserLogin ? :";
-            cin>>num_Userlogin;
-
-                if(cin.fail()){
-                    cin.clear();
-                    cin.ignore(10000,'\n');
-                    cout<<"Please enter number !!!\n";
-                }else{
-                    valid = true;
-                }
-                  }
-                  
-
 
 cout<<"User Login\n";
 
 
- for(int i=1;i<=num_Userlogin;i++){   
+ for(int i=0;i<=num_Userlogin;i++){   
                                                          //ตรวจสอบว่ามีชื่ออยุ่ในฐานข้อมูลไหมน้าาา
     bool n = true;
     bool m = true;
@@ -181,50 +192,38 @@ while(n){
 // ฟังก์ชันสำหรับ Register ผู้ใช้งาน  // เพิ่มข้อมูลผู้ใช้งานลงในฐานข้อมูล
 void Database::registerUser(string username, string password){
    
+
+Database x;
+string filename = "DataLN&RG.txt";
+vector<string> un;
+vector<string> pw;
+
+
     string passwordCF;
-    int num_UserRegister;
-    bool valid = false;
-    while(!valid){                                                  //checkต้องnum เท่านั้น
-        cout<<"How UserRegister ? : ";
-        cin>>num_UserRegister;
+    num_UserRegister = 0;
+    bool valid = false;   
 
-        if(cin.fail()){
-            cin.clear();
-            cin.ignore(10000,'\n');
-            cout<<"Please enter number !!!\n";
-        }else{
-            valid = true;
-        }
-}   
-
-
-
-
-    for(int i=1;i<=num_UserRegister;i++ ){
+    for(int i=0;i<=num_UserRegister;i++ ){
     bool n = true;
     bool m = true;
     cout<<"User Register\n";
     
-    while(true){
+    while(n){
     cout<<"Username : ";
     cin>>username;
      if(userDatabase.count(username)>0 ){
         cout<<"That username is taken. Try another\n";
-
-     }else if(username == toUpperStr(username)){
-        cout<<"That username is taken. Try another\n";
+     }
+        n = false;
+    }
     
-    }else{
-        break;
-    }
-
-    }
-    while(true){
+    
+    while(m){
     cout<<"Password : ";
     cin>>password;
     cout<<"Confirm Passwowrd : ";
     cin>>passwordCF;
-    if(password == passwordCF) break;
+    if(password == passwordCF){ m = false; }
    else if(password != passwordCF){
     cout<<"Passwords didn't match. Try again.\n";
    }
@@ -232,19 +231,28 @@ void Database::registerUser(string username, string password){
     }
     userDatabase[username] = password;
     writeData2_txt(userDatabase,"DataLN&RG.txt");
-   
-    cout << "User " << username << " has been registered successfully." << endl;
-    
-}
     Delete_();
-}
-
-
-int main() {
-    
-Database x;
+   x.importDatafromfile(filename,un,pw);
+    cout << "User " << username << " has been registered successfully." << endl;
    
-    x.registerUser(x.username, x.password);
+}
+}
+    
+
+
+
+int main(){
+Database x;  
+
+cout<<"num_player : ";
+cin>>x.num_player;
+
+   x.checkLNorRE();
+
+
+
+   
+ //   x.registerUser(x.username, x.password);
    // x.loginUser(x.username,x.password);
     return 0;
 }
