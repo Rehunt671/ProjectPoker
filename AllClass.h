@@ -17,15 +17,16 @@ using namespace std;
 class Database
 {
 public:
-    string username, password,displayname;
+    string username, password, displayname, moneyInWeb;
 
     string toUpperStr(string);
-    void registerUser(string, string);
-    void loginUser(string, string);
-    void writeData2_txt(const map<string, string> &, const string &);
+    bool checkIfNewWeb();
+    void registerUser();
+    void loginUser(int &);
+    void writeData2_txt(const map<pair<string, string>, vector<string>> &, const string &);
     void importDatafromfile(string, vector<string> &, vector<string> &);
     void Delete_();
-    //เพิ่มเติม
+    // เพิ่มเติม
     void setDisplayName();
 };
 
@@ -79,7 +80,17 @@ public:
     map<int, vector<string>> od;
     void showTurn();
     void createOrderTable();
-    void showBoard();
+    void topboard();
+    void midboard0();
+    void midboard3();
+    void midboard4();
+    void midboard5();
+    void botomtboard();
+    void actionboard();
+    void showBoard1();
+    void showBoard2();
+    void showBoard3();
+    void showBoard4();;
     void showMoneyPot();
     void showMoneyBet();
     void showPlayerMoney(Player *);
@@ -96,6 +107,7 @@ public:
     void check(Player *);
     void bet(Player *);
     void call(Player *);
+    void cheat();
     void raise(Player *);
     void allIn(Player *);
     void fold(Player *);
