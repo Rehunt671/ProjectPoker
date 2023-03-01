@@ -1,6 +1,7 @@
 #include <iostream>
 #include <ctime>
 #include <cstdlib>
+#include <fstream>
 using namespace std;
 
 int money = 1000;
@@ -10,6 +11,8 @@ public:
     bool loggedin;
     void setBoolLoggedin(bool);
     void resetBoolLoggedin();
+    void readBoolLoggedin();
+    void writeBoolLoggedin(bool);
 };
 
 void check::setBoolLoggedin(bool ln) {
@@ -31,8 +34,22 @@ void check::resetBoolLoggedin() {
     }
 }
 
+void check::readBoolLoggedin(){
+    ifstream read("check.txt");
+    string boolLN;
+    getline(read,boolLN);
+    if(boolLN == "0") setBoolLoggedin(false);
+    else if(boolLN == "1") setBoolLoggedin(true);
+    cout << loggedin;
+}
+void check::writeBoolLoggedin(bool ln){
+    ofstream write("check.txt");
+    write << ln;
+}
+
 void dailyPrize(check& user) {
-    user.resetBoolLoggedin(); 
+    user.readBoolLoggedin();
+    user.resetBoolLoggedin(); // reset loggedin if necessary
     if (user.loggedin == false) {
         cout << "\n------------------------------------------------------------\n";
         cout << "                       DAILY PRIZE\n";
@@ -68,12 +85,12 @@ void dailyPrize(check& user) {
         cout << "               You got $" << value << "!\n" << "               Total money: $" << money << endl;
         cout << "\n------------------------------------------------------------\n";
         user.setBoolLoggedin(true);
+        user.writeBoolLoggedin(user.loggedin);
     }
 }
 
 int main() {
     check z;
-    dailyPrize(z);
     dailyPrize(z);
     return 0;
 }
