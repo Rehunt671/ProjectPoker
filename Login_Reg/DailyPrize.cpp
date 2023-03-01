@@ -27,7 +27,7 @@ void check::resetBoolLoggedin() {
     t1->tm_min = 0;
     t1->tm_sec = 0;
     time_t resetTime = mktime(t1); 
-    cout << "current time:" << ctime(&now) << endl;
+    cout << "current time: " << ctime(&now) << endl;
     cout << "resetTime: " << ctime(&resetTime) << endl;
     if (now >= resetTime) {
         loggedin = false;
@@ -48,7 +48,7 @@ void check::writeBoolLoggedin(bool ln){
 
 void dailyPrize(check& user) {
     user.readBoolLoggedin();
-    user.resetBoolLoggedin(); // reset loggedin if necessary
+    // user.resetBoolLoggedin(); 
     if (user.loggedin == false) {
         cout << "\n------------------------------------------------------------\n";
         cout << "                       DAILY PRIZE\n";
@@ -82,7 +82,7 @@ void dailyPrize(check& user) {
         }
         money += value;
         cout << "               You got $" << value << "!\n" << "               Total money: $" << money << endl;
-        cout << "\n------------------------------------------------------------\n";
+        cout << "------------------------------------------------------------\n";
         user.setBoolLoggedin(true);
         user.writeBoolLoggedin(user.loggedin);
     }
@@ -90,6 +90,7 @@ void dailyPrize(check& user) {
 
 int main() {
     check z;
+    z.resetBoolLoggedin();
     dailyPrize(z);
     return 0;
 }
