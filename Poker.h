@@ -1,71 +1,135 @@
 #ifndef PROJECT3_H
 #define PROJECT3_H
 #include "AllClass.h"
-// void changeCard(Player *p, vector<string> deck)
-// {
-//     int c;
-//     string needcard, thiscard;
-//     bool have = false;
-//     cout << "What card do you change 1 or 2 ?";
-//     cin >> c;
-//     c = c - 1;
-//     cout << "What card do you need type ex. 3\\3 = 3\3 when \\3 = Heart , \\4 = Diamond , \\5 = Club , \\6 = Spade";
-//     cin >> needcard;
-//     for (int i = 0; i < deck.size(); i++)
-//     {
-//         if (needcard == deck[i])
-//         {
-//             thiscard = deck[i];
-//             have = true;
-//         }
-//         if (!have)
-//         {
-//             cout << "";
-//         }
-//     }
-//     string tempcard = p->cards[c];
-//     p->cards[c] = thiscard;
-//     thiscard = tempcard;
-//     showUiCardHand(p->cards);
-// }
-// void seeCheat(vector<Player *> p){
-//     int num,temp,r;
-//     cout << "Which player do you want to see card ";
-//     cin >> num;
-//     temp = num;
-//     num--;
-//     r = rand()%2+1;
-//     cout << "\nrandom card of player "<<temp<<" is : " <<p[num]->cards[r];
-// }
-// void PokerGame::cheat()
-// {
-//     string n = "";
-//     int r, p;
-//     cout << "Which one do you cheat 1.changeCardInHand 2.seeCard : ";
-//     cin >> n;
-//     handleString(n);
-//     p = handleString(n);
-//     srand(time(0));
-//     r = rand() % 100 + 1;
-//     if (p == 1 && r <= 80)
-//     {
-//         cout << "\nYou fail to cheat";
-//     }
-//     else if (p == 1 && r > 80)
-//     {
-//         changeCard(players[current], deck.allCardsLeft);
-//     }
-//     else if (p == 2 && r <= 80)
-//     {
-//         cout << "\nYou fail to cheat";
-//     }
-//     else if (p == 2 && r > 80)
-//     {
-//         seeCheat(players);
-//     }
-// }
-void recieveSimpleInformation(int &moneyInGame, int &mandatory_betRef)
+void showUiCardHand(vector<string> s)
 {
+    string x1, x2;
+    bool f[2] = {false, false};
+    for (unsigned int i = 0; i < s.size(); i++)
+    {
+        if (s[i][0] == 'T')
+        {
+            s[i].replace(0, 1, "10");
+            f[i] = true;
+        }
+    }
+    x1 = s[0].substr(0, s[0].length() - 1);
+    x2 = s[1].substr(0, s[1].length() - 1);
+
+    if (!f[0] && !f[1])
+    {
+        cout << "\n"; // 1 1
+        cout << " _ _ _ _ _      _ _ _ _ _ " << endl;
+        cout << "|         |    |         |" << endl;
+        cout << "|    " << x1 << "    |    |    " << x2 << "    |" << endl;
+        cout << "|         |    |         |" << endl;
+        cout << "|    " << s[0].back() << "    |    |    " << s[1].back() << "    |" << endl;
+        cout << "|         |    |         |" << endl;
+        cout << "|_ _ _ _ _|    | _ _ _ _ |" << endl;
+    }
+
+    else if (f[0] && !f[1]) // 10 1 ผ่าน
+    {
+        cout << "\n";
+        cout << " _ _ _ _ _      _ _ _ _ _ " << endl;
+        cout << "|         |    |         |" << endl;
+        cout << "|    " << x1 << "   |    |    " << x2 << "    |" << endl;
+        cout << "|         |    |         |" << endl;
+        cout << "|    " << s[0].back() << "    |    |    " << s[1].back() << "    |" << endl;
+        cout << "|         |    |         |" << endl;
+        cout << "|_ _ _ _ _|    | _ _ _ _ |" << endl;
+    }
+
+    else if (!f[0] && f[1]) // 1 10 ผ่าน
+    {
+        cout << "\n";
+        cout << " _ _ _ _ _      _ _ _ _ _ " << endl;
+        cout << "|         |    |         |" << endl;
+        cout << "|    " << x1 << "    |    |    " << x2 << "   |" << endl;
+        cout << "|         |    |         |" << endl;
+        cout << "|    " << s[0].back() << "    |    |    " << s[1].back() << "    |" << endl;
+        cout << "|         |    |         |" << endl;
+        cout << "|_ _ _ _ _|    | _ _ _ _ |" << endl;
+    }
+
+    else if (f[0] && f[1]) // 10 10
+    {
+        cout << "\n";
+        cout << " _ _ _ _ _      _ _ _ _ _ " << endl;
+        cout << "|         |    |         |" << endl;
+        cout << "|   " << x1 << "    |    |   " << x2 << "    |" << endl;
+        cout << "|         |    |         |" << endl;
+        cout << "|    " << s[0].back() << "    |    |    " << s[1].back() << "    |" << endl;
+        cout << "|         |    |         |" << endl;
+        cout << "|_ _ _ _ _|    | _ _ _ _ |" << endl;
+    }
+}
+void changeCard(Player *p, vector<string> deck)
+{
+    int c;
+    string needcard, thiscard;
+    bool have = false;
+    cout << "What card do you change 1 or 2 ?";
+    cin >> c;
+    c = c - 1;
+    cout << "What card do you need type ex. 3\\3 = 3\3 when \\3 = Heart , \\4 = Diamond , \\5 = Club , \\6 = Spade";
+    cin >> needcard;
+    for (int i = 0; i < deck.size(); i++)
+    {
+        if (needcard == deck[i])
+        {
+            thiscard = deck[i];
+            have = true;
+        }
+        if (!have)
+        {
+            cout << "";
+        }
+    }
+    string tempcard = p->cards[c];
+    p->cards[c] = thiscard;
+    thiscard = tempcard;
+    showUiCardHand(p->cards);
+}
+void seeCheat(vector<Player *> p)
+{
+    int num, temp, r;
+    cout << "Which player do you want to see card ";
+    cin >> num;
+    temp = num;
+    num--;
+    r = rand() % 2 + 1;
+    cout << "\nrandom card of player " << temp << " is : " << p[num]->cards[r];
+}
+void PokerGame::cheat()
+{
+    string n = "";
+    int r, p;
+    cout << "Which one do you cheat 1.changeCardInHand 2.seeCard : ";
+    cin >> n;
+    handleString(n);
+    p = handleString(n);
+    srand(time(0));
+    r = rand() % 100 + 1;
+    if (p == 1 && r <= 80)
+    {
+        cout << "\nYou fail to cheat";
+    }
+    else if (p == 1 && r > 80)
+    {
+        changeCard(players[current], deck.allCardsLeft);
+    }
+    else if (p == 2 && r <= 80)
+    {
+        cout << "\nYou fail to cheat";
+    }
+    else if (p == 2 && r > 80)
+    {
+        seeCheat(players);
+    }
+}
+void recieveSimpleInformation(int &moneyInGame, int &mandatory_betRef)
+{   
     int money, choice;
     do
     {
@@ -80,6 +144,7 @@ void recieveSimpleInformation(int &moneyInGame, int &mandatory_betRef)
     cin >> choice;
     switch (choice)
     {
+
     case 1:
         mandatory_betRef = 10;
         break;
@@ -156,69 +221,6 @@ PokerGame::~PokerGame()
     for (auto &p : players)
     {
         delete p;
-    }
-}
-void showUiCardHand(vector<string> s)
-{
-    string x1, x2;
-    bool f[2] = {false, false};
-    for (unsigned int i = 0; i < s.size(); i++)
-    {
-        if (s[i][0] == 'T')
-        {
-            s[i].replace(0, 1, "10");
-            f[i] = true;
-        }
-    }
-    x1 = s[0].substr(0, s[0].length() - 1);
-    x2 = s[1].substr(0, s[1].length() - 1);
-
-    if (!f[0] && !f[1])
-    {
-        cout << "\n"; // 1 1
-        cout << " _ _ _ _ _      _ _ _ _ _ " << endl;
-        cout << "|         |    |         |" << endl;
-        cout << "|    " << x1 << "    |    |    " << x2 << "    |" << endl;
-        cout << "|         |    |         |" << endl;
-        cout << "|    " << s[0].back() << "    |    |    " << s[1].back() << "    |" << endl;
-        cout << "|         |    |         |" << endl;
-        cout << "|_ _ _ _ _|    | _ _ _ _ |" << endl;
-    }
-
-    else if (f[0] && !f[1]) // 10 1 ผ่าน
-    {
-        cout << "\n";
-        cout << " _ _ _ _ _      _ _ _ _ _ " << endl;
-        cout << "|         |    |         |" << endl;
-        cout << "|    " << x1 << "   |    |    " << x2 << "    |" << endl;
-        cout << "|         |    |         |" << endl;
-        cout << "|    " << s[0].back() << "    |    |    " << s[1].back() << "    |" << endl;
-        cout << "|         |    |         |" << endl;
-        cout << "|_ _ _ _ _|    | _ _ _ _ |" << endl;
-    }
-
-    else if (!f[0] && f[1]) // 1 10 ผ่าน
-    {
-        cout << "\n";
-        cout << " _ _ _ _ _      _ _ _ _ _ " << endl;
-        cout << "|         |    |         |" << endl;
-        cout << "|    " << x1 << "    |    |    " << x2 << "   |" << endl;
-        cout << "|         |    |         |" << endl;
-        cout << "|    " << s[0].back() << "    |    |    " << s[1].back() << "    |" << endl;
-        cout << "|         |    |         |" << endl;
-        cout << "|_ _ _ _ _|    | _ _ _ _ |" << endl;
-    }
-
-    else if (f[0] && f[1]) // 10 10
-    {
-        cout << "\n";
-        cout << " _ _ _ _ _      _ _ _ _ _ " << endl;
-        cout << "|         |    |         |" << endl;
-        cout << "|   " << x1 << "    |    |   " << x2 << "    |" << endl;
-        cout << "|         |    |         |" << endl;
-        cout << "|    " << s[0].back() << "    |    |    " << s[1].back() << "    |" << endl;
-        cout << "|         |    |         |" << endl;
-        cout << "|_ _ _ _ _|    | _ _ _ _ |" << endl;
     }
 }
 void PokerGame::topboard()
@@ -323,14 +325,113 @@ void PokerGame::botomtboard()
     showMoneyBet();
     cout << setw(30) << "\n";
 }
-
-void PokerGame::actionboard()
+void PokerGame::actionboard2()
 {
 
-    cout << "player1 : " << players[0]->name << setw(30) << "player2 : " << players[1]->name << setw(30) << "player3 : " << players[2]->name << setw(30) << "player4 : " << players[3]->name << "\n";
-    cout << "money : " << players[0]->chip << setw(40) << "money : " << players[1]->chip << setw(40) << "money : " << players[2]->chip << setw(40) << "money : " << players[3]->chip << "\n";
-    cout << "action : " << players[0]->action << setw(45) << "action : " << players[1]->action << setw(45) << "action : " << players[2]->action << setw(45) << "action : " << players[3]->action << "\n";
+    cout << left << "player1 : ";
+    cout.width(23);
+    cout << players[0]->name;
+    cout << left << "player2 : ";
+    cout.width(23);
+    cout << players[1]->name << "\n";
+    cout << left << "money : ";
+    cout.width(25);
+    cout << players[0]->chip;
+    cout << left << "player2 : ";
+    cout.width(25);
+    cout << players[1]->chip << "\n";
+    cout << left << "action : ";
+    cout.width(24);
+    cout << players[0]->action;
+    cout << left << "player2 : ";
+    cout.width(24);
+    cout << players[1]->action << "\n";
     cout << "\n";
+}
+
+void PokerGame::actionboard3()
+{
+
+    cout << left << "player1 : ";
+    cout.width(23);
+    cout << players[0]->name;
+    cout << left << "player2 : ";
+    cout.width(23);
+    cout << players[1]->name;
+    cout << left << "player3 : ";
+    cout.width(23);
+    cout << players[2]->name << "\n";
+    cout << left << "money : ";
+    cout.width(25);
+    cout << players[0]->chip;
+    cout << left << "money : ";
+    cout.width(25);
+    cout << players[1]->chip;
+    cout << left << "money : ";
+    cout.width(25);
+    cout << players[2]->chip << "\n";
+    cout << left << "action : ";
+    cout.width(24);
+    cout << players[0]->action;
+    cout << left << "action : ";
+    cout.width(24);
+    cout << players[1]->action;
+    cout << left << "action : ";
+    cout.width(24);
+    cout << players[2]->action << "\n";
+    cout << "\n";
+}
+
+void PokerGame::actionboard4()
+{
+
+    cout << left << "player1 : ";
+    cout.width(23);
+    cout << players[0]->name;
+    cout << left << "player2 : ";
+    cout.width(23);
+    cout << players[1]->name;
+    cout << left << "player3 : ";
+    cout.width(23);
+    cout << players[2]->name;
+    cout << left << "player4 : ";
+    cout.width(24);
+    cout << players[3]->name << "\n";
+    cout << left << "money : ";
+    cout.width(25);
+    cout << players[0]->chip;
+    cout << left << "money : ";
+    cout.width(25);
+    cout << players[1]->chip;
+    cout << left << "money : ";
+    cout.width(25);
+    cout << players[2]->chip;
+    cout << left << "money : ";
+    cout.width(20);
+    cout << players[3]->chip << "\n";
+    cout << left << "action : ";
+    cout.width(24);
+    cout << players[0]->action;
+    cout << left << "action : ";
+    cout.width(24);
+    cout << players[1]->action;
+    cout << left << "action : ";
+    cout.width(24);
+    cout << players[2]->action;
+    cout << left << "action : ";
+    cout.width(19);
+    cout << players[3]->action << "\n";
+    cout << "\n";
+}
+
+void PokerGame::setactionboard()
+{
+    if (num_player == 2)
+        actionboard2();
+    else if (num_player == 3)
+        actionboard3();
+    else if (num_player == 4)
+        actionboard4();
 }
 
 void PokerGame::showBoard1() // Show ว่า Board preflop มีไพ่ไหนบ้างตอนนี้
@@ -338,7 +439,7 @@ void PokerGame::showBoard1() // Show ว่า Board preflop มีไพ่ไ�
     topboard();
     midboard0();
     botomtboard();
-    actionboard();
+    setactionboard();
 }
 
 void PokerGame::showBoard2() // Show ว่า Board flop มีไพ่ไหนบ้างตอนนี้
@@ -346,7 +447,7 @@ void PokerGame::showBoard2() // Show ว่า Board flop มีไพ่ไห�
     topboard();
     midboard3();
     botomtboard();
-    actionboard();
+    setactionboard();
 }
 
 void PokerGame::showBoard3() // Show ว่า Board turn มีไพ่ไหนบ้างตอนนี้
@@ -354,7 +455,7 @@ void PokerGame::showBoard3() // Show ว่า Board turn มีไพ่ไห�
     topboard();
     midboard4();
     botomtboard();
-    actionboard();
+    setactionboard();
 }
 
 void PokerGame::showBoard4() // Show ว่า Board river มีไพ่ไหนบ้างตอนนี้
@@ -362,15 +463,15 @@ void PokerGame::showBoard4() // Show ว่า Board river มีไพ่ไห
     topboard();
     midboard5();
     botomtboard();
-    actionboard();
+    setactionboard();
 }
 void PokerGame::showMoneyPot() // Show ว่าเงินใน Board มีเท่าไหร่แล้ว
 {
-    cout << "Current Board Money: " << pot << "\n";
+    cout << "Pot: " << pot << "\n";
 }
 void PokerGame::showMoneyBet() // Show ว่าเงิน Bet สูงสุดตอนนี้เท่าไหร่แล้ว
 {
-    cout << "Current Bet Money: " << highestBet << "\n";
+    cout << "Current Highest Bet Money: " << highestBet << "\n";
 }
 void PokerGame::showPlayerMoney(Player *p) // Showว่าเงินคนปัจจุบัน(ใน Parameter ) เหลือเท่าไหร่
 {
@@ -378,7 +479,7 @@ void PokerGame::showPlayerMoney(Player *p) // Showว่าเงินคนป
 }
 void PokerGame::showPlayerCards(Player *p) // Showว่าไพ่คนปัจจุบัน(ใน Parameter ) มีอะไรบ้าง
 {
-    cout << p->name << "'s cards: ";
+    cout << p->name << "'s Cards: ";
     showUiCardHand(p->cards);
     cout << "\n";
 }
@@ -501,8 +602,7 @@ void PokerGame::preflop() // เริ่มรอบแรกของเกม
         showHandRank(players[current]);
         showPlayerMoney(players[current]);
         showPlayerAccumulateBet(players[current]);
-        cout << "Enter Your Action\n";
-        showChoice();
+        showActionChoice();
         recieveOrder(players[current]);
         if (findWinner())
             break;
@@ -637,8 +737,7 @@ void PokerGame::flop()
         showHandRank(players[current]);
         showPlayerMoney(players[current]);
         showPlayerAccumulateBet(players[current]);
-        cout << "Enter Your Action\n";
-        showChoice();
+        showActionChoice();
         recieveOrder(players[current]);
         if (findWinner())
             break;
@@ -667,8 +766,7 @@ void PokerGame::turn()
         showHandRank(players[current]);
         showPlayerMoney(players[current]);
         showPlayerAccumulateBet(players[current]);
-        cout << "Enter Your Action\n";
-        showChoice();
+        showActionChoice();
         recieveOrder(players[current]);
         if (findWinner())
             break;
@@ -697,8 +795,7 @@ void PokerGame::river()
         showHandRank(players[current]);
         showPlayerMoney(players[current]);
         showPlayerAccumulateBet(players[current]);
-        cout << "Enter Your Action\n";
-        showChoice();
+        showActionChoice();
         recieveOrder(players[current]);
         if (findWinner())
             break;
@@ -708,9 +805,10 @@ void PokerGame::river()
         }
     }
 }
-void PokerGame::showChoice()
+void PokerGame::showActionChoice()
 {
     int num = 1;
+    cout << "Enter Your Action\n";
     if (round == 1)
     {
         cout << num++ << ".Call\n";  // 1
