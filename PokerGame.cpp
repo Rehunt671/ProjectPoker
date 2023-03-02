@@ -27,7 +27,7 @@ int main()
     } while (num_player < 2 || num_player > 4);
     while (cnt <= num_player)
     {
-        cout << " =================================================Player " << cnt << "=================================================\n" ;   
+        cout << " ================================================= Player " << cnt << " =================================================\n" ;   
         cout << "Select Your Choice\n1.Login\n2.Register\n3.Exit\n";
         cin >> choice;
         switch (choice)
