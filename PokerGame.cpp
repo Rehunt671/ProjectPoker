@@ -7,10 +7,10 @@ int main()
 {
     srand(time(NULL));
     Database pokerDB;
-    Deck deck; // เตรียมสำรับไพ่ที่ยังไม่ได้สับ
-    string inChoice;
-    int outChoice;
+    Deck deck;                      // เตรียมสำรับไพ่ที่ยังไม่ได้สับ
+    pokerDB.importDatafromfile();   // อ่านลง Vector 4 ตัว มี Username Password Displayname money ใน Class pokerDB
     int num_player;
+    int choice;
     int cnt = 1;
     int moneyInGame; // Money in game
     int mandatory_betRef;
@@ -19,16 +19,18 @@ int main()
     do
     {
         cout << "Enter number of player(2-4)\n";
-        getline(cin, inChoice);
-        outChoice = handleString(inChoice);
-    } while (outChoice < 2 || outChoice > 4);
-    num_player = outChoice;
+        cin >> num_player;
+        if (num_player < 2 || num_player > 4)
+        {
+            clearInput();
+        }
+    } while (num_player < 2 || num_player > 4);
     while (cnt <= num_player)
     {
-        cout << "Player " << cnt << "\nSelect Your Choice\n1.Login\n2.Register\n3.Exit\n";
-        getline(cin, inChoice);
-        outChoice = handleString(inChoice);
-        switch (outChoice)
+        cout << " =================================================Player " << cnt << "=================================================\n" ;   
+        cout << "Select Your Choice\n1.Login\n2.Register\n3.Exit\n";
+        cin >> choice;
+        switch (choice)
         {
         case 1:
             pokerDB.loginUser(pokerDB.loginIndex);
@@ -40,10 +42,11 @@ int main()
             exit(0);
             break;
         default:
+            clearInput();
             cout << "Invalid input try again\n";
             break;
         }
-        if (outChoice == 1)
+        if (choice == 1)
             cnt++;
     }
     recieveSimpleInformation(moneyInGame, mandatory_betRef);
