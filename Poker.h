@@ -129,17 +129,14 @@ void PokerGame::cheat()
     }
 }
 void recieveSimpleInformation(int &moneyInGame, int &mandatory_betRef)
-{
+{   
     int money, choice;
     do
     {
         cout << "How much money do you want to play(500 - 1,000): ";
         cin >> money;
         if (money < 500 || money > 1000)
-        {
-            clearInput();
             cout << "Invalid money value\n";
-        }
     } while (money < 500 || money > 1000); // ถามจะให้มีคนละกี่บาท
     moneyInGame = money;
     cout << "How Much Mandatory do you want to play\n";
@@ -147,6 +144,7 @@ void recieveSimpleInformation(int &moneyInGame, int &mandatory_betRef)
     cin >> choice;
     switch (choice)
     {
+
     case 1:
         mandatory_betRef = 10;
         break;
