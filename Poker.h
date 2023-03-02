@@ -66,49 +66,40 @@
 // }
 void recieveSimpleInformation(int &moneyInGame, int &mandatory_betRef)
 {
-    string inputChoice;
-    string inMoneyInGame;
-    int outChoice;
-    int outMoneyInGame;
+    int money, choice;
     do
     {
-
         cout << "How much money do you want to play(500 - 1,000): ";
-        getline(cin, inMoneyInGame);
-        outMoneyInGame = handleString(inMoneyInGame);
-        if (outMoneyInGame < 500 || outMoneyInGame > 1000 || outMoneyInGame == 0)
+        cin >> money;
+        if (money < 500 || money > 1000)
             cout << "Invalid money value\n";
-    } while (outMoneyInGame < 500 || outMoneyInGame > 1000 || outMoneyInGame == 0); // ถามจะให้มีคนละกี่บาท
-    moneyInGame = outMoneyInGame;
+    } while (money < 500 || money > 1000); // ถามจะให้มีคนละกี่บาท
+    moneyInGame = money;
     cout << "How Much Mandatory do you want to play\n";
     cout << "1.10\n2.20\n3.30\n4.40\n5.50\n";
-    getline(cin, inputChoice);
-    outChoice = handleString(inputChoice);
-    if (outChoice == 0)
-        cout << "Invalid Input try again\n";
-    else if (outChoice == 1)
+    cin >> choice;
+    switch (choice)
     {
+    case 1:
         mandatory_betRef = 10;
-    }
-    else if (outChoice == 2)
-    {
-
+        break;
+    case 2:
         mandatory_betRef = 20;
-    }
-    else if (outChoice == 3)
-    {
+        break;
+    case 3:
         mandatory_betRef = 30;
-    }
-    else if (outChoice == 4)
-    {
+        break;
+    case 4:
         mandatory_betRef = 40;
-    }
-    else if (outChoice == 5)
-    {
+        break;
+    case 5:
         mandatory_betRef = 50;
+        break;
+    default:
+        clearInput();
+        cout << "Don't have input choice try again\n";
+        break;
     }
-    else
-        cout << "Don't have " << outChoice << " choice try again\n";
     cout << "Okay!! Mandatory = " << mandatory_betRef << "\n";
 }
 void PokerGame::createOrderTable()
