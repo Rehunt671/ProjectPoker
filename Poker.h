@@ -64,70 +64,44 @@ void showUiCardHand(vector<string> s)
         cout << "|_ _ _ _ _|    | _ _ _ _ |" << endl;
     }
 }
-void changeCard(Player *p, vector<string> deck)
-{
-    int c;
-    string needcard, thiscard;
-    bool have = false;
-    cout << "What card do you change 1 or 2 ?";
-    cin >> c;
-    c = c - 1;
-    cout << "What card do you need type ex. 3\\3 = 3\3 when \\3 = Heart , \\4 = Diamond , \\5 = Club , \\6 = Spade";
-    cin >> needcard;
-    for (int i = 0; i < deck.size(); i++)
-    {
-        if (needcard == deck[i])
-        {
-            thiscard = deck[i];
-            have = true;
-        }
-        if (!have)
-        {
-            cout << "";
-        }
-    }
-    string tempcard = p->cards[c];
-    p->cards[c] = thiscard;
-    thiscard = tempcard;
-    showUiCardHand(p->cards);
-}
-void seeCheat(vector<Player *> p)
-{
-    int num, temp, r;
-    cout << "Which player do you want to see card ";
-    cin >> num;
-    temp = num;
-    num--;
-    r = rand() % 2 + 1;
-    cout << "\nrandom card of player " << temp << " is : " << p[num]->cards[r];
-}
-void PokerGame::cheat()
-{
-    string n = "";
-    int r, p;
-    cout << "Which one do you cheat 1.changeCardInHand 2.seeCard : ";
-    cin >> n;
-    handleString(n);
-    p = handleString(n);
-    srand(time(0));
-    r = rand() % 100 + 1;
-    if (p == 1 && r <= 80)
-    {
-        cout << "\nYou fail to cheat";
-    }
-    else if (p == 1 && r > 80)
-    {
-        changeCard(players[current], deck.allCardsLeft);
-    }
-    else if (p == 2 && r <= 80)
-    {
-        cout << "\nYou fail to cheat";
-    }
-    else if (p == 2 && r > 80)
-    {
-        seeCheat(players);
-    }
-}
+// void changeCard(Player *p, vector<string> deck)
+// {
+//     int c;
+//     string needcard, thiscard;
+//     bool have = false;
+//     cout << "What card do you change 1 or 2 ?";
+//     cin >> c;
+//     c = c - 1;
+//     cout << "What card do you need type ex. 3\\3 = 3\3 when \\3 = Heart , \\4 = Diamond , \\5 = Club , \\6 = Spade";
+//     cin >> needcard;
+//     for (int i = 0; i < deck.size(); i++)
+//     {
+//         if (needcard == deck[i])
+//         {
+//             thiscard = deck[i];
+//             have = true;
+//         }
+//         if (!have)
+//         {
+//             cout << "";
+//         }
+//     }
+//     string tempcard = p->cards[c];
+//     p->cards[c] = thiscard;
+//     thiscard = tempcard;
+//     showUiCardHand(p->cards);
+// }
+// void seeCheat(vector<Player *> p)
+// {
+//     int num, temp, r;
+//     cout << "Which player do you want to see card ";
+//     cin >> num;
+//     temp = num;
+//     num--;
+//     r = rand() % 2 + 1;
+//     cout << "\nrandom card of player " << temp << " is : " << p[num]->cards[r];
+// }
+
 void recieveSimpleInformation(int &moneyInGame, int &mandatory_betRef)
 {
     int choice;
@@ -321,10 +295,10 @@ void PokerGame::botomtboard()
     cout << setw(30) << "                            \\\\                                                              //\n";
     cout << setw(30) << "                             \\\\                                                            //\n";
     cout << setw(30) << "                               ============================================================\n";
-    cout << setw(30) << "\n";
+    cout << "\n";
     showMoneyPot();
     showMoneyBet();
-    cout << setw(30) << "\n";
+    cout << "\n";
 }
 void PokerGame::actionboard2()
 {
@@ -338,13 +312,13 @@ void PokerGame::actionboard2()
     cout << left << "money : ";
     cout.width(25);
     cout << players[0]->chip;
-    cout << left << "player2 : ";
+    cout << left << "money : ";
     cout.width(25);
     cout << players[1]->chip << "\n";
     cout << left << "action : ";
     cout.width(24);
     cout << players[0]->action;
-    cout << left << "player2 : ";
+    cout << left << "action : ";
     cout.width(24);
     cout << players[1]->action << "\n";
     cout << "\n";
@@ -606,7 +580,10 @@ void PokerGame::preflop() // เริ่มรอบแรกของเกม
         showActionChoice();
         recieveOrder(players[current]);
         if (findWinner())
+        {
+            exit(0);
             break;
+        }
         else
         {
             updateRound();
@@ -716,8 +693,6 @@ void PokerGame::flop()
 {
     showTurn();
     communityCards(3); // เปิดไพ่กองกลาง 3 ใบ
-    cout << "\n"
-         << round;
     while (round == 2) // เริ่มรอบสองอย่างเป็นทางการ
     {
         if (players[current]->action == "fold")
@@ -741,7 +716,10 @@ void PokerGame::flop()
         showActionChoice();
         recieveOrder(players[current]);
         if (findWinner())
+        {
+            exit(0);
             break;
+        }
         else
         {
             updateRound();
@@ -770,7 +748,10 @@ void PokerGame::turn()
         showActionChoice();
         recieveOrder(players[current]);
         if (findWinner())
+        {
+            exit(0);
             break;
+        }
         else
         {
             updateRound();
@@ -799,7 +780,10 @@ void PokerGame::river()
         showActionChoice();
         recieveOrder(players[current]);
         if (findWinner())
+        {
+            exit(0);
             break;
+        }
         else
         {
             updateRound();
@@ -838,31 +822,40 @@ void PokerGame::recieveOrder(Player *p) // รับคำสั่งมาก�
 {
     const int MAX_TURN_TIME = 8000; // maximum turn time in milliseconds
     int collum = 0;
-    string order = "";
-    bool passTurn = false;
+    int order = 0;
+    bool forceFold = false;
     bool passStage = true;
     do
     {
         passStage = true;
-        cout << "Input Your Choice: ";
-        // while (true)
-        // {
-        // auto start_time = chrono::high_resolution_clock::now();
-        getline(cin, order);
-        // auto end_time = chrono::high_resolution_clock::now();
-        // auto duration = chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
-        // if (duration > MAX_TURN_TIME)
-        // {
-        //     cout << "Player exceeded turn time limit, skipping turn...\n";
-        //     passTurn = true;
-        //     break;
-        // }
-        // else
-        //     break;
-        // }
-        // if (passTurn)
-        //     break;
-        p->order = handleString(order);
+        cout << "Input Your Choice\n";
+        while (true)
+        {
+            auto start_time = chrono::high_resolution_clock::now();
+            cin >> order;
+            cin.ignore(100, '\n');
+            auto end_time = chrono::high_resolution_clock::now();
+            auto duration = chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+            if (duration > MAX_TURN_TIME)
+            {
+                cout << "Player exceeded turn time limit, skipping turn...\n";
+                p->action = "fold";
+                forceFold = true;
+                break;
+            }
+            else
+            {
+                if (!cin.fail())
+                {
+                    p->order = order;
+                    break;
+                }
+                else
+                    clearInput();
+            }
+        }
+        if (forceFold)
+            break;
         if (hasBetRaiseOrAllIn && round > 1)
         {
             collum = 1;
@@ -872,20 +865,15 @@ void PokerGame::recieveOrder(Player *p) // รับคำสั่งมาก�
             collum = 2;
         }
         auto it = od.find(p->order);
-        if (it == od.end() || od[p->order][collum].empty())
+        if (it == od.end() || od[p->order][collum].empty()) // ไม่มี or หาไม่เจอ
         {
             cout << "Invalid Input Please Try Again\n";
             passStage = false;
         }
     } while (!passStage);
-    if (passTurn)
-        p->action = "fold";
-    else
-    {
-        p->action = od[p->order][collum];
-        checkOrder(p);
-        doOrder(p);
-    }
+    p->action = od[p->order][collum];
+    checkOrder(p);
+    doOrder(p);
 }
 void PokerGame::checkOrder(Player *p)
 {
@@ -913,10 +901,10 @@ void PokerGame::doOrder(Player *p) // หลังจากทำได้เร
     {
         raise(p);
     }
-    /* else if (p->action == "cheat")
+    else if (p->action == "cheat")
     {
-        cheat(p);
-    } */
+        // cheat(p);
+    }
     else if (p->action == "all-in")
     {
         allIn(p);
@@ -1041,6 +1029,46 @@ void PokerGame::allIn(Player *p)
     p->action = "all-in";
     hasBetRaiseOrAllIn = true;
 }
+// void PokerGame::cheat(Player *p)
+// {
+//     int r, p, choice;
+//     do
+//     {
+//         cout << "Which one do you want to cheat\n1.Change card in hand\n2.See other player's card\n";
+//         cin >> choice;
+//         switch (choice)
+//         {
+//         case 1:
+//             changeCard(p, deck);
+//             break;
+//         case 2:
+//             seeCheat(players);
+//             break;
+
+//         default:
+//             clearInput();
+//             break;
+//         }
+
+//     } while (choice != 1 || choice != 2)
+//         r = rand() % 100 + 1;
+//     if (p == 1 && r <= 80)
+//     {
+//         cout << "\nYou fail to cheat";
+//     }
+//     else if (p == 1 && r > 80)
+//     {
+//         changeCard(players[current], deck.allCardsLeft);
+//     }
+//     else if (p == 2 && r <= 80)
+//     {
+//         cout << "\nYou fail to cheat";
+//     }
+//     else if (p == 2 && r > 80)
+//     {
+//         seeCheat(players);
+//     }
+// }
 void PokerGame::fold(Player *p)
 {
     p->action = "fold";
