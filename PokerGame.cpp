@@ -43,7 +43,7 @@ int main()
             cout << "Invalid input try again\n";
             break;
         }
-        if (outChoice == 1 || outChoice == 2)
+        if (outChoice == 1)
             cnt++;
     }
     recieveSimpleInformation(moneyInGame, mandatory_betRef);
