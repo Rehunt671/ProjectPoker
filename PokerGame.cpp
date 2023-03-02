@@ -12,7 +12,7 @@ int main()
     int outChoice;
     int num_player;
     int cnt = 1;
-    int chip; // Money in game
+    int moneyInGame; // Money in game
     int mandatory_betRef;
 
     cout << "Welcome to Poker Game\n";
@@ -31,7 +31,7 @@ int main()
         switch (outChoice)
         {
         case 1:
-            pokerDB.loginUser(loginIndex);
+            pokerDB.loginUser(pokerDB.loginIndex);
             break;
         case 2:
             pokerDB.registerUser();
@@ -46,8 +46,8 @@ int main()
         if (outChoice == 1 || outChoice == 2)
             cnt++;
     }
-    recieveSimpleInformation(chip, mandatory_betRef);
-    PokerGame poker(pokerDB, deck, num_player, chip, mandatory_betRef); // เข้ามานั่งในเกมโป๊กเกอร์พร้อมที่จะเล่นเกม
+    recieveSimpleInformation(moneyInGame, mandatory_betRef);
+    PokerGame poker(pokerDB, deck, num_player, moneyInGame, mandatory_betRef); // เข้ามานั่งในเกมโป๊กเกอร์พร้อมที่จะเล่นเกม
     poker.beforeStart();
     poker.preflop();
     poker.flop();
