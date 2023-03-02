@@ -15,7 +15,6 @@ class check {
         int resetTime;      // เพิ่มใน Database
         void setBoolLoggedin(bool);
         void setResetTime();
-        void getResetTime();
         void reset();
         void read();
         void write(bool,int);
