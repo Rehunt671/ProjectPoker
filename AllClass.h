@@ -14,7 +14,6 @@
 #include <chrono>        //time
 #include <thread>        //time
 using namespace std;
-vector<int> loginIndex;
 struct Deck
 {
 private:
@@ -26,26 +25,6 @@ public:
     vector<string> allCardsLeft; // ไพ่ใน Deck ที่เหลือ ณ ตอนนั้น
     void shuffle();              // สับไพ่
     void showcardsLeft();        // Show cards ที่เหลือ
-};
-class Database
-{
-private:
-    string filename = "DataLN&RG.txt";
-
-public:
-    map<pair<string, string>, vector<string>> userDatabase; //[username,password] displayname money
-    vector<string> un;
-    vector<string> pw;
-    vector<string> displayname;
-    vector<string> money;
-    void registerUser();
-    void loginUser(vector<int> &);
-    void writeData2_txt();     // เขียนข้อมูลจาก Map To ไฟล์หลัก ใช้ตอน REGISTER
-    void importDatafromfile(); // นำข้อมูลจาก File หลักมาเก็บข้อมูลไว้ใน Vector แต่ละอัน พร้อมกับสร้าง Mapขึ้นมาทันที ใช้ตอน Login
-    // ถ้าต้องการแก้ไข Concept คือ ImportDataFromfile แล้ว ไล่แก้ ข้อมูลให้ตรงกับ Index นั้นๆแล้วนำเวกเตอร์ 4 อันนำมาสร้างแมพแล้ว ส่งกลับขึ้นไปยังไฟล์หลัก
-    void Delete_();
-    // เพิ่มเติม
-    void setDisplayName();
 };
 struct Player
 {
@@ -64,6 +43,27 @@ public:
     string role;          // ตำแหน่งของเรา dealer ,Small Blind, Big Blind
     int order;            // คำสั่งของเรา
 };
+class Database
+{
+private:
+    string filename = "DataLN&RG.txt";
+
+public:
+    map<pair<string, string>, vector<string>> userDatabase; //[username,password] displayname money
+    vector<int> loginIndex;
+    vector<string> un;
+    vector<string> pw;
+    vector<string> displayname;
+    vector<string> money;
+    void registerUser();
+    void loginUser(vector<int> &);
+    void writeData2_txt();     // เขียนข้อมูลจาก Map To ไฟล์หลัก ใช้ตอน REGISTER
+    void importDatafromfile(); // นำข้อมูลจาก File หลักมาเก็บข้อมูลไว้ใน Vector แต่ละอัน พร้อมกับสร้าง Mapขึ้นมาทันที ใช้ตอน Login
+    // ถ้าต้องการแก้ไข Concept คือ ImportDataFromfile แล้ว ไล่แก้ ข้อมูลให้ตรงกับ Index นั้นๆแล้วนำเวกเตอร์ 4 อันนำมาสร้างแมพแล้ว ส่งกลับขึ้นไปยังไฟล์หลัก
+    void Delete_();
+    // เพิ่มเติม
+    void setDisplayName();
+};
 class PokerGame
 {
 private:
@@ -77,6 +77,7 @@ private:
     int pot;        // เงินใน Board รวม
     int highestBet; // เงินเดิมพันสูงสุด ณ ตอนนี้resetAccumulateBet
     bool restart;
+    bool cleanIncludeLastRaise;
     bool hasBetRaiseOrAllIn;
 
 public:
@@ -102,6 +103,7 @@ public:
     ;
     void showMoneyPot();
     void showMoneyBet();
+    void showPlayerAccumulateBet(Player *);
     void showPlayerMoney(Player *);
     void showPlayerCards(Player *);
     void showHandRank(Player *p);
@@ -121,7 +123,7 @@ public:
     void allIn(Player *);
     void fold(Player *);
     void assignRole();
-    void resetAction();
+    void resetAction(bool);
     void resetHandRank();
     void resetAccumulateBet();
     void moneyForMandatoryBet(Player *, Player *);
