@@ -820,7 +820,7 @@ void PokerGame::showActionChoice()
 
 void PokerGame::recieveOrder(Player *p) // รับคำสั่งมาก่อนว่าผู้เล่นต้องการทำอะไร ฟังชั่นนี้เราจะเช็คว่าเราจะทำคำสั่งนั้นได้หรือไม่ (ต้องผ่านเงื่อนไข ขั้นพื้นฐานก่อน)
 {
-    const int MAX_TURN_TIME = 8000; // maximum turn time in milliseconds
+    const int MAX_TURN_TIME = 100000; // maximum turn time in milliseconds
     int collum = 0;
     int order = 0;
     bool forceFold = false;
@@ -833,7 +833,7 @@ void PokerGame::recieveOrder(Player *p) // รับคำสั่งมาก�
         {
             auto start_time = chrono::high_resolution_clock::now();
             cin >> order;
-            cin.ignore(100, '\n');
+            cin.ignore(100, '\n');//เอาที่เหลือจากเว้นวรรคแรกลบออกหมดจนกว่าจะเจอ'\n'
             auto end_time = chrono::high_resolution_clock::now();
             auto duration = chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
             if (duration > MAX_TURN_TIME)
@@ -841,7 +841,7 @@ void PokerGame::recieveOrder(Player *p) // รับคำสั่งมาก�
                 cout << "Player exceeded turn time limit, skipping turn...\n";
                 p->action = "fold";
                 forceFold = true;
-                break;
+                return;
             }
             else
             {
@@ -854,8 +854,6 @@ void PokerGame::recieveOrder(Player *p) // รับคำสั่งมาก�
                     clearInput();
             }
         }
-        if (forceFold)
-            break;
         if (hasBetRaiseOrAllIn && round > 1)
         {
             collum = 1;
