@@ -52,19 +52,12 @@ void Database::Delete_()
 
 void Database::writeData2_txt()
 {
-    ofstream dest(filename, std::ios::app);
-
-    for (const auto &entry : userDatabase)
-    {
-        const auto &key = entry.first;
-        const auto &value = entry.second;
-        dest << key.first << " " << key.second << " ";
-        for (const auto &elem : value)
-        {
-            dest << elem << " ";
-        }
-        dest << "\n";
-    }
+    ofstream dest(filename, ios::app);
+    dest << un.back() << " ";
+    dest << pw.back() << " ";
+    dest << displayname.back() << " ";
+    dest << money.back() << " ";
+    dest << "\n";
     dest.close();
 }
 
@@ -89,8 +82,6 @@ void Database::importDatafromfile() // อ่านไฟล์จากไฟ�
         pw.push_back(pass);
         displayname.push_back(dp);
         money.push_back(mn);
-        userDatabase[make_pair(name, pass)].push_back(displayname.back());
-        userDatabase[make_pair(name, pass)].push_back(mn);
     }
     source.close();
 }
@@ -104,18 +95,15 @@ void Database::importDatafromfile() // อ่านไฟล์จากไฟ�
 //__________________________________________________________//
 
 void Database::loginUser(vector<int> &loginIndex)
-{ // ตรวจสอบว่ามีบัญชีในฐานข้อมูลหรือไม่
-    importDatafromfile();
+{                    // ตรวจสอบว่ามีบัญชีในฐานข้อมูลหรือไม่
     string userN;    // แค่ไว้เช็ค
     string password; // แค่ไว้เช็ค
-    bool valid = false;
-
-    cout << "User Login\n";
     // ตรวจสอบว่ามีชื่ออยุ่ในฐานข้อมูลไหมน้าาา
     bool n = true;
     bool m = true;
     bool checkUN = false;
     bool checkPW = false;
+    cout << "User Login\n";
     while (n)
     {
         cout << "Username  : ";
@@ -153,6 +141,8 @@ void Database::loginUser(vector<int> &loginIndex)
         {
             loginIndex.pop_back();
             cout << "Incorrect password for user " << userN << ".\n";
+            loginUser(loginIndex);
+            return;
         }
     }
     cin.ignore();
@@ -180,9 +170,9 @@ void Database::registerUser()
         cout << "Username : ";
         cin >> username;
         bool found = false;
-        for (auto const &key_value : userDatabase)
+        for (auto const &user : un) // Loop ใน Vector
         {
-            if (key_value.first.first == username)
+            if (username == user)
             {
                 found = true;
                 break;
@@ -209,12 +199,12 @@ void Database::registerUser()
         }
     }
     setDisplayName();
-    userDatabase[make_pair(username, password)].emplace_back(displayname.back());
-    userDatabase[make_pair(username, password)].emplace_back(freeCredit);
+    un.push_back(username);
+    pw.push_back(password);
+    money.push_back(freeCredit);
     writeData2_txt();
 
     cout << "User " << username << " has been registered successfully." << endl;
     cout << "You recieve free credit : $" << freeCredit << " Dollar\n";
-    Delete_();
-} // แปลว่าตอนเอาเงินไปอัพเดทจำเป็นต้องเขียน
+}
 #endif

@@ -95,19 +95,22 @@ public:
     void midboard4();
     void midboard5();
     void botomtboard();
-    void actionboard();
+
     void showBoard1();
     void showBoard2();
     void showBoard3();
     void showBoard4();
-    ;
+    void actionboard2();
+    void actionboard3();
+    void actionboard4();
+    void setactionboard();
     void showMoneyPot();
     void showMoneyBet();
     void showPlayerAccumulateBet(Player *);
     void showPlayerMoney(Player *);
     void showPlayerCards(Player *);
     void showHandRank(Player *p);
-    void showChoice();
+    void showActionChoice();
     void holecards();
     void communityCards(int);
     void checkHand(Player *p);
@@ -136,6 +139,17 @@ public:
     void river();
     void updateLastestChip(string file_name);
 };
+void drawPic()
+{
+    cout << "\n=========================================================================================================================";
+    cout << "\n                               CCCCC      A        SSSSSSSSS   IIIIIIIII  NN     NN    OOOOOOOO     ";
+    cout << "\n                             CC          A  A      SS             III     NN N   NN   OO      OO    ";
+    cout << "\n                            CC          A    A     SSSSSSSSS      III     NN  N  NN   OO      OO    ";
+    cout << "\n                             CC        AAAAAAAA           SS      III     NN   N NN   OO      OO    ";
+    cout << "\n                               CCCCC  A        A   SSSSSSSSS   IIIIIIIII  NN     NN    OOOOOOOO     ";
+    cout << "\n=========================================================================================================================";
+    cout << "\n================================================= Welcome to Poker Game =================================================\n";
+}
 string convertToCard(int max)
 {
     map<int, string> maxVar;
@@ -153,36 +167,8 @@ string convertToCard(int max)
         return maxVar[max];
     return 0;
 }
-int handleString(string str)
-{
-    istringstream iss(str);
-    int num;
-    if (!(iss >> num))
-    {
-        return 0;
-    }
-    else
-    {
-        return num;
-    }
-}
-string convertToLower(string s)
-{
-    for (int i = 0; i < s.length(); i++)
-    {
-        s[i] = tolower(s[i]);
-    }
-    return s;
-}
-void drawPic()
-{
-    cout << "\n=========================================================================================================================";
-    cout << "\n                               CCCCC      A        SSSSSSSSS   IIIIIIIII  NN     NN    OOOOOOOO     ";
-    cout << "\n                             CC          A  A      SS             III     NN N   NN   OO      OO    ";
-    cout << "\n                            CC          A    A     SSSSSSSSS      III     NN  N  NN   OO      OO    ";
-    cout << "\n                             CC        AAAAAAAA           SS      III     NN   N NN   OO      OO    ";
-    cout << "\n                               CCCCC  A        A   SSSSSSSSS   IIIIIIIII  NN     NN    OOOOOOOO     ";
-    cout << "\n=========================================================================================================================";
-    cout << "\n================================================= Welcome to Poker Game =================================================\n";
+void clearInput(){
+    cin.clear();
+    cin.ignore(10000,'\n');
 }
 #endif
