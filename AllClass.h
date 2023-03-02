@@ -109,19 +109,19 @@ public:
     void showPlayerAccumulateBet(Player *);
     void showPlayerMoney(Player *);
     void showPlayerCards(Player *);
-    void showHandRank(Player *p);
+    void showHandRank(Player *);
     void showActionChoice();
     void holecards();
     void communityCards(int);
-    void checkHand(Player *p);
+    void checkHand(Player *);
     void recieveOrder(Player *);
     void checkOrder(Player *);
     void doOrder(Player *);
-    void updateLastBetRaiseOrAllIn(Player *p);
+    void updateLastBetRaiseOrAllIn(Player *);
     void check(Player *);
     void bet(Player *);
     void call(Player *);
-    void cheat();
+    // void cheat(Player *p);
     void raise(Player *);
     void allIn(Player *);
     void fold(Player *);
@@ -137,7 +137,7 @@ public:
     void flop();
     void turn();
     void river();
-    void updateLastestChip(string file_name);
+    void updateLastestChip(string);
 };
 void drawPic()
 {
@@ -167,8 +167,9 @@ string convertToCard(int max)
         return maxVar[max];
     return 0;
 }
-void clearInput(){
+void clearInput()
+{
     cin.clear();
-    cin.ignore(10000,'\n');
+    cin.ignore(10000, '\n');
 }
 #endif
