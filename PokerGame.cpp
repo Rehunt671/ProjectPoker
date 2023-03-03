@@ -8,7 +8,6 @@ int main()
     srand(time(NULL));
     Database pokerDB;
     Deck deck;                      // เตรียมสำรับไพ่ที่ยังไม่ได้สับ
-    pokerDB.importDatafromfile();   // อ่านลง Vector 4 ตัว มี Username Password Displayname money ใน Class pokerDB
     int num_player;
     int choice;
     int cnt = 1;
@@ -28,12 +27,12 @@ int main()
     while (cnt <= num_player)
     {
         cout << " ================================================= Player " << cnt << " =================================================\n" ;   
-        cout << "Select Your Choice\n1.Login\n2.Register\n3.Exit\n";
+        cout << "Select Your Choice\n[1] Login\n[2] Register\n[3] Exit\n";
         cin >> choice;
         switch (choice)
         {
         case 1:
-            pokerDB.loginUser(pokerDB.loginIndex);
+            pokerDB.loginUser();
             break;
         case 2:
             pokerDB.registerUser();
