@@ -50,9 +50,12 @@ int main()
     }
     recieveSimpleInformation(moneyInGame, mandatory_betRef);
     PokerGame poker(pokerDB, deck, num_player, moneyInGame, mandatory_betRef); // เข้ามานั่งในเกมโป๊กเกอร์พร้อมที่จะเล่นเกม
+    do{
     poker.beforeStart();
     poker.preflop();
     poker.flop();
     poker.turn();
     poker.river();
+    }while(poker.restart);
+
 }
