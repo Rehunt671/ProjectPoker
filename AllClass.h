@@ -49,24 +49,24 @@ private:
     string filename = "DataLN&RG.txt";
 
 public:
+    Database();
+    // ~Database();
     map<pair<string, string>, vector<string>> userDatabase; //[username,password] displayname money
-    vector<int> loginIndex;
-    vector<string> un;
-    vector<string> pw;
-    vector<string> displayname;
-    vector<string> money;
+    vector<string> loginUserName;               // [username,password]
     void registerUser();
-    void loginUser(vector<int> &);
+    void setDisplayName(string &); // ใช้ตอนสมัครเท่านั้น
+    void loginUser();
     void writeData2_txt();     // เขียนข้อมูลจาก Map To ไฟล์หลัก ใช้ตอน REGISTER
     void importDatafromfile(); // นำข้อมูลจาก File หลักมาเก็บข้อมูลไว้ใน Vector แต่ละอัน พร้อมกับสร้าง Mapขึ้นมาทันที ใช้ตอน Login
     // ถ้าต้องการแก้ไข Concept คือ ImportDataFromfile แล้ว ไล่แก้ ข้อมูลให้ตรงกับ Index นั้นๆแล้วนำเวกเตอร์ 4 อันนำมาสร้างแมพแล้ว ส่งกลับขึ้นไปยังไฟล์หลัก
     void Delete_();
-    // เพิ่มเติม
-    void setDisplayName();
 };
 class PokerGame
 {
 private:
+    vector<Player *> players;
+    Database pokerDB;
+    Deck deck;
     vector<string> cardsOnBoard; // ไพ่บนBoard
     int num_player;
     int current;   // position
@@ -83,12 +83,10 @@ private:
 public:
     PokerGame(Database &, Deck &, int, int, int);
     ~PokerGame();
-    vector<Player *> players;
-    Database pokerDB;
-    Deck deck;
     map<int, vector<string>> od;
-    void showTurn();
+    void createPlayer();
     void createOrderTable();
+    void showTurn();
     void topboard();
     void midboard0();
     void midboard3();
