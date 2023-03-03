@@ -172,11 +172,8 @@ PokerGame::PokerGame(Database &dbRef, Deck &dRef, int numRef, int chipRef, int m
     pokerDB = dbRef;
     deck = dRef;         // กำหนด *deck ให้ตรงกับสำรับไพ่ที่เราสร้างขึ้นมา
     num_player = numRef; // กำหนดจำนวนคนของเกม Poker ของเรา
+    createPlayer();
     createOrderTable();
-    for (int i = 0; i < num_player; i++)
-    {
-        players.emplace_back(new Player(pokerDB.un[pokerDB.loginIndex[i]], pokerDB.pw[pokerDB.loginIndex[i]], pokerDB.displayname[pokerDB.loginIndex[i]], stoi(pokerDB.money[pokerDB.loginIndex[i]])));
-    }
     for (auto &p : players)
     {
         p->chip = chipRef;
@@ -196,6 +193,26 @@ PokerGame::~PokerGame()
     for (auto &p : players)
     {
         delete p;
+    }
+}
+
+void PokerGame::createPlayer()
+{
+    string pw;      // ไม่จำเป็นต้องเอาตัวแปรมารับก็ได้แต่ ทำไว้เผื่อทวน
+    string dp;      // ไม่จำเป็นต้องเอาตัวแปรมารับก็ได้แต่ ทำไว้เผื่อทวน
+    int moneyInWeb; // ไม่จำเป็นต้องเอาตัวแปรมารับก็ได้แต่ ทำไว้เผื่อทวน
+    for (auto &user : pokerDB.loginUserName)
+    {
+        for (const auto &element : pokerDB.userDatabase) //[username,password]
+        {
+            if (user == element.first.first)
+            {
+                pw = element.first.second;
+                dp = element.second[0];
+                moneyInWeb = stoi(element.second[1]);
+                players.emplace_back(new Player(user, pw, dp, moneyInWeb));
+            }
+        } // เช็คว่าซ้ำไหม
     }
 }
 void PokerGame::topboard()
@@ -833,7 +850,7 @@ void PokerGame::recieveOrder(Player *p) // รับคำสั่งมาก�
         {
             auto start_time = chrono::high_resolution_clock::now();
             cin >> order;
-            cin.ignore(100, '\n');//เอาที่เหลือจากเว้นวรรคแรกลบออกหมดจนกว่าจะเจอ'\n'
+            cin.ignore(100, '\n'); // เอาที่เหลือจากเว้นวรรคแรกลบออกหมดจนกว่าจะเจอ'\n'
             auto end_time = chrono::high_resolution_clock::now();
             auto duration = chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
             if (duration > MAX_TURN_TIME)
