@@ -1,6 +1,5 @@
 #ifndef PROJECT2_H
 #define PROJECT2_H
-#include "AllClass.h"
 int handleString(string str)
 {
     istringstream iss(str);
@@ -250,9 +249,7 @@ void PokerGame::checkHand(Player *p)
     p->rankOfHand.second.first = findRankInNumber(p->rankOfHand.first);
     p->rankOfHand.second.second.first = mainCardValue;
     p->rankOfHand.second.second.second = minorCardValue;
-    // cout << "\nmainCardValue = " << mainCardValue;
-    // cout << "\nMinorCardValue = " << minorCardValue;
-    // cout << "\n";
+
 }
 
 #endif
