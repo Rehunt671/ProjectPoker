@@ -3,7 +3,12 @@
 // สร้าง map เพื่อเก็บข้อมูลของผู้ใช้งาน
 Database::Database()
 {
+    filename = "DataLN&RG.txt";
     importDatafromfile();
+}
+Database::~Database()
+{
+    cout << "PokerGame database was deleted" ;
 }
 void Database::setDisplayName(string &dp)
 { // รับ input display name
