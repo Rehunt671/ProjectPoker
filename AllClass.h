@@ -46,13 +46,13 @@ public:
 class Database
 {
 private:
-    string filename = "DataLN&RG.txt";
+    string filename;
 
 public:
     Database();
-    // ~Database();
+    ~Database();
     map<pair<string, string>, vector<string>> userDatabase; //[username,password] displayname money
-    vector<string> loginUserName;               // [username,password]
+    vector<string> loginUserName;                           // [username,password]
     void registerUser();
     void setDisplayName(string &); // ใช้ตอนสมัครเท่านั้น
     void loginUser();
@@ -76,7 +76,6 @@ private:
     int mandatory_bet;
     int pot;        // เงินใน Board รวม
     int highestBet; // เงินเดิมพันสูงสุด ณ ตอนนี้resetAccumulateBet
-    bool restart;
     bool cleanIncludeLastRaise;
     bool hasBetRaiseOrAllIn;
 
@@ -92,8 +91,7 @@ public:
     void midboard3();
     void midboard4();
     void midboard5();
-    void botomtboard();
-
+    void botomboard();
     void showBoard1();
     void showBoard2();
     void showBoard3();
@@ -101,7 +99,7 @@ public:
     void actionboard2();
     void actionboard3();
     void actionboard4();
-    void setactionboard();
+    void setActionboard();
     void showMoneyPot();
     void showMoneyBet();
     void showPlayerAccumulateBet(Player *);
@@ -113,13 +111,13 @@ public:
     void communityCards(int);
     void checkHand(Player *);
     void recieveOrder(Player *);
-    void checkOrder(Player *);
+    bool checkOrder(Player* ,string);
     void doOrder(Player *);
     void updateLastBetRaiseOrAllIn(Player *);
     void check(Player *);
     void bet(Player *);
     void call(Player *);
-    // void cheat(Player *p);
+    void cheat(Player *p);
     void raise(Player *);
     void allIn(Player *);
     void fold(Player *);
@@ -136,6 +134,7 @@ public:
     void turn();
     void river();
     void updateLastestChip(string);
+    bool restart;
 };
 void drawPic()
 {
@@ -168,6 +167,6 @@ string convertToCard(int max)
 void clearInput()
 {
     cin.clear();
-    cin.ignore(10000, '\n');
+    cin.ignore(numeric_limits<streamsize>::max(), '\n'); // ignore any remaining input
 }
 #endif
