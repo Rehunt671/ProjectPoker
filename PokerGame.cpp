@@ -5,9 +5,10 @@
 using namespace std;
 int main()
 {
+
     srand(time(NULL));
     Database pokerDB;
-    Deck deck;                      // เตรียมสำรับไพ่ที่ยังไม่ได้สับ
+    Deck deck;
     int num_player;
     int choice;
     int cnt = 1;
@@ -26,7 +27,7 @@ int main()
     } while (num_player < 2 || num_player > 4);
     while (cnt <= num_player)
     {
-        cout << " ================================================= Player " << cnt << " =================================================\n" ;   
+        cout << " ================================================= Player " << cnt << " =================================================\n";
         cout << "Select Your Choice\n[1] Login\n[2] Register\n[3] Exit\n";
         cin >> choice;
         switch (choice)
@@ -50,12 +51,12 @@ int main()
     }
     recieveSimpleInformation(moneyInGame, mandatory_betRef);
     PokerGame poker(pokerDB, deck, num_player, moneyInGame, mandatory_betRef); // เข้ามานั่งในเกมโป๊กเกอร์พร้อมที่จะเล่นเกม
-    do{
-    poker.beforeStart();
-    poker.preflop();
-    poker.flop();
-    poker.turn();
-    poker.river();
-    }while(poker.restart);
-
+    do
+    {
+        poker.beforeStart();
+        poker.preflop();
+        poker.flop();
+        poker.turn();
+        poker.river();
+    } while (poker.restart);
 }
