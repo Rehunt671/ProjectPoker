@@ -1,28 +1,5 @@
 #ifndef PROJECT3_H
 #define PROJECT3_H
-bool findFiveSuit(vector<std::pair<int, char>> hand, char &flushSuit)
-{
-    unordered_map<char, int> suitCounts;
-    for (auto &p : hand)
-    {
-        suitCounts[p.second]++;
-    }
-
-    for (auto &sc : suitCounts)
-    {
-        if (sc.second >= 5)
-        {
-            flushSuit = sc.first;
-            break;
-        }
-    }
-
-    if (flushSuit == '\0')
-    {
-        return false; // no flush
-    }
-    return true;
-}
 bool findFreq(vector<std::pair<int, char>> hand, int &mainCardValue, int &minorCardValue, int num)
 {
     // Reset ค่าออกให้หมดก่อน
@@ -57,6 +34,24 @@ bool findFreq(vector<std::pair<int, char>> hand, int &mainCardValue, int &minorC
     if (found)
         return true;
     return false;
+}
+
+string convertToCard(int max)
+{
+    map<int, string> maxVar;
+    maxVar[14] = "A";
+    maxVar[13] = "K";
+    maxVar[12] = "Q";
+    maxVar[11] = "J";
+    maxVar[10] = "10";
+    for (int i = 9; i > 1; i--)
+    {
+        maxVar[i] = to_string(i);
+    }
+    maxVar[0] = "";
+    if (maxVar.count(max) > 0) // กัน return bad behavior
+        return maxVar[max];
+    return 0;
 }
 int findRankInNumber(string strRank)
 {
@@ -135,7 +130,7 @@ bool hasStraight(vector<std::pair<int, char>> hand, int &mainCardValue, char &fl
         if (hand[i].first - hand[i - 1].first == 0)
             hand.erase(hand.begin() + i);
         i--;
-    } // ลบซ่ำ
+    } // ลบซ้ำ
     for (size_t i = hand.size() - 1; i > 0; i--)
     {
         if (i - 4 >= 0 && hand[i].first - hand[i - 1].first == 1 && hand[i].first - hand[i - 2].first == 2 && hand[i].first - hand[i - 3].first == 3 && hand[i].first - hand[i - 4].first == 4)
@@ -147,6 +142,29 @@ bool hasStraight(vector<std::pair<int, char>> hand, int &mainCardValue, char &fl
         }
     }
     return false;
+}
+bool findFiveSuit(vector<std::pair<int, char>> hand, char &flushSuit)
+{
+    unordered_map<char, int> suitCounts;
+    for (auto &p : hand)
+    {
+        suitCounts[p.second]++;
+    }
+
+    for (auto &sc : suitCounts)
+    {
+        if (sc.second >= 5)
+        {
+            flushSuit = sc.first;
+            break;
+        }
+    }
+
+    if (flushSuit == '\0')
+    {
+        return false; // no flush
+    }
+    return true;
 }
 bool hasFlush(vector<std::pair<int, char>> hand, int &mainCardValue, int &minorCardValue, char &flushSuit)
 {
