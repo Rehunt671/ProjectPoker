@@ -5,10 +5,11 @@ void Database::dailyPrize(const string &un, const string &pw)
 {
     cout << "\n------------------------------------------------------------\n";
     cout << "                       DAILY PRIZE\n";
-    cout << "            50 , 100, 200 , 300 , 400, 500\n";
+    cout << "           $50 , $100 , $200 , $300 , $400 , $500\n";
     cout << "------------------------------------------------------------\n";
-    cout << "           Press enter to receive daily prize\n";
-    cout << "------------------------------------------------------------\n";
+    cout << "            Press Enter to receive daily prize.\n";
+    cout << "------------------------------------------------------------";
+    cin.ignore();
     cin.get();
     int i = rand() % 6; // prob ของ แต่ละรางวัลเป็น 1/6
     string value;
@@ -34,9 +35,10 @@ void Database::dailyPrize(const string &un, const string &pw)
         break;
     }
     userDatabase[{un, pw}][1] = to_string(stoi(userDatabase[{un, pw}][1]) + stoi(value));
-    cout << "               You got $" + value + "!\n"
-         << "               Total money: $" << userDatabase[{un, pw}][1] << endl;
+    cout << "                     You got $" + value + "!\n"
+         << "                    Total money: $" << userDatabase[{un, pw}][1] << endl;
     cout << "------------------------------------------------------------\n";
+    cout << "                 Press Enter to continue.\n";
     userDatabase[{un, pw}][2] = "1";                       // หลังจากบวกเงินของ user แล้ว set ค่า loggedin เป็น true
     userDatabase[{un, pw}][3] = to_string(setResetTime()); // set เวลา reset ให้เป็น 00.00 น. ของวันถัดไป
     writeData2_txt();                                      // เขียนค่า loggedin กับ resetTime ลงไฟล์
