@@ -55,7 +55,6 @@ public:
     ~Database();
     map<pair<string, string>, vector<string>> userDatabase; //[username,password] displayname money
     vector<string> loginUserName;                           // [username,password]
-    bool loggedin;                                          // เพิ่มใน Database
     unsigned long long int resetTime;                       // เพิ่มใน Database
     void registerUser();
     void setDisplayName(string &); // ใช้ตอนสมัครเท่านั้น
@@ -65,7 +64,9 @@ public:
     void Delete_();
     // time
     void dailyPrize(const string &, const string &);
-    void reset(int &, unsigned long long int);
+    void reset(int &, unsigned long long int &);
+    unsigned long long int setResetTime();
+    
 };
 class PokerGame
 {
@@ -153,6 +154,7 @@ void drawPic()
     cout << "\n=========================================================================================================================";
     cout << "\n================================================= Welcome to Poker Game =================================================\n";
 }
+
 string convertToCard(int max)
 {
     map<int, string> maxVar;
