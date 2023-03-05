@@ -1,4 +1,5 @@
 #include "AllClass.h"
+#include "Design.h"
 #include "LN_REG.h"
 #include "CheckHand.h"
 #include "Poker.h"
