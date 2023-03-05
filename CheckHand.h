@@ -1,18 +1,5 @@
-#ifndef PROJECT2_H
-#define PROJECT2_H
-int handleString(string str)
-{
-    istringstream iss(str);
-    int num;
-    if (!(iss >> num))
-    {
-        return 0;
-    }
-    else
-    {
-        return num;
-    }
-}
+#ifndef PROJECT3_H
+#define PROJECT3_H
 bool findFreq(vector<std::pair<int, char>> hand, int &mainCardValue, int &minorCardValue, int num)
 {
     // Reset ค่าออกให้หมดก่อน
