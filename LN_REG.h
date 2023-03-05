@@ -1,14 +1,53 @@
 #ifndef PROJECT1_H
 #define PROJECT1_H
 // สร้าง map เพื่อเก็บข้อมูลของผู้ใช้งาน
-Database::Database()
+void Database::dailyPrize(const string &un, const string &pw)
 {
-    filename = "DataLN&RG.txt";
+    cout << "\n------------------------------------------------------------\n";
+    cout << "                       DAILY PRIZE\n";
+    cout << "            50 , 100, 200 , 300 , 400, 500\n";
+    cout << "------------------------------------------------------------\n";
+    cout << "           Press enter to receive daily prize\n";
+    cout << "------------------------------------------------------------\n";
+    cin.get();
+    int i = rand() % 6; // prob ของ แต่ละรางวัลเป็น 1/6
+    string value;
+    switch (i)
+    {
+    case 0:
+        value = "50"; // +$50
+        break;
+    case 1:
+        value = "100"; // +$100
+        break;
+    case 2:
+        value = "200"; // +$200
+        break;
+    case 3:
+        value = "300"; // +$300
+        break;
+    case 4:
+        value = "400"; // +$400
+        break;
+    default:
+        value = "500"; // +$500
+        break;
+    }
+    userDatabase[{un, pw}][1] = to_string(stoi(userDatabase[{un, pw}][1]) + stoi(value));
+    cout << "               You got $" + value + "!\n"
+         << "               Total money: $" << userDatabase[{un, pw}][1] << endl;
+    cout << "------------------------------------------------------------\n";
+    userDatabase[{un, pw}][2] = "1";                       // หลังจากบวกเงินของ user แล้ว set ค่า loggedin เป็น true
+    userDatabase[{un, pw}][3] = to_string(setResetTime()); // set เวลา reset ให้เป็น 00.00 น. ของวันถัดไป
+    writeData2_txt();                                      // เขียนค่า loggedin กับ resetTime ลงไฟล์
+}
+Database::Database() : filename("DataLN&RG.txt")
+{
     importDatafromfile();
 }
 Database::~Database()
 {
-    cout << "PokerGame database was deleted" ;
+    cout << "PokerGame database was deleted";
 }
 void Database::setDisplayName(string &dp)
 { // รับ input display name
@@ -37,7 +76,7 @@ void Database::Delete_()
 {
     set<string> collet;
     string line;
-    ifstream file("DataLN&RG.txt");
+    ifstream file(filename);
 
     if (file.is_open())
     {
@@ -49,7 +88,7 @@ void Database::Delete_()
         file.close();
     }
 
-    ofstream newfile("DataLN&RG.txt");
+    ofstream newfile(filename);
     for (auto it = collet.begin(); it != collet.end(); ++it)
     {
         newfile << *it << endl;
@@ -80,16 +119,21 @@ void Database::importDatafromfile() // อ่านไฟล์จากไฟ�
 {
     ifstream source(filename);
     string line;
-    char format[] = "%s %s %s %s ";
+    char format[] = "%s %s %s %s %s %s";
     char name[100];
     char pass[100];
     char dp[100];
     char mn[100];
+    int boolLoggedin;
+    unsigned long long int rst;
     while (getline(source, line))
     {
-        sscanf(line.c_str(), format, name, pass, dp, mn);
+        sscanf(line.c_str(), format, name, pass, dp, mn, &boolLoggedin, &rst);
+        reset(boolLoggedin, rst); // เช็คว่าจะรีเซ็ต DailyPrize ให้คนนั้นๆไหมก่อนจะนำข้อมูลไปเก็บใน Map
         userDatabase[{name, pass}].push_back(dp);
         userDatabase[{name, pass}].push_back(mn);
+        userDatabase[{name, pass}].push_back(to_string(boolLoggedin));
+        userDatabase[{name, pass}].push_back(to_string(rst));
     }
     source.close();
 }
@@ -142,6 +186,11 @@ void Database::loginUser()
             checkPW = true;
             m = false;
             cout << "User " << un << " has logged in successfully.\n";
+            cout << userDatabase[{un, pw}][3];
+            if (userDatabase[{un, pw}][2] == "0" && time(0) > stoi(userDatabase[{un, pw}][3]))
+            {
+                dailyPrize(un, pw);
+            }
             loginUserName.push_back(un);
             break;
         }
@@ -171,6 +220,8 @@ void Database::registerUser()
     string passwordCF;
     string displayname;
     string freeCredit = "500";
+    string login = "0";
+    string time = "0";
     // ไม่มี money เพราะ money ถูก Fix แล้ว 500 บาท
     int num_UserRegister;
     bool valid = false;
@@ -210,9 +261,43 @@ void Database::registerUser()
     setDisplayName(displayname);
     userDatabase[{username, password}].push_back(displayname);
     userDatabase[{username, password}].push_back(freeCredit);
+    userDatabase[{username, password}].push_back(login);
+    userDatabase[{username, password}].push_back(time);
     writeData2_txt();
 
     cout << "User " << username << " has been registered successfully." << endl;
     cout << "You recieve free credit : $" << freeCredit << " Dollar\n";
 }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+////                                                                                                  ////
+////                                                                                                  ////
+////                                            Daily Login                                           ////
+////                                                                                                  ////
+////                                                                                                  ////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+void Database::reset(int &logedin, unsigned long long int resetTime)
+{ // reset ค่า loggedin ให้เป็น false ทุก ๆ 00.00 น.
+    if (time(0) > resetTime)
+        logedin = 0;
+    else
+    {
+        logedin = 1;
+    }
+}
+int Database::setResetTime()
+{                             // set เวลา reset โดยอ้างอิงเวลาของ วันที่ 01/01/23 เวลา 00.00 น.
+    time_t base = 1672506000; // Thu Jan  1 00:00:00 2023
+    struct tm t1 = *localtime(&base);
+    time_t next = mktime(&t1);
+
+    time_t now = time(0); // เวลาตอนนี้
+    struct tm t2 = *localtime(&now);
+    time_t next2 = mktime(&t2);
+
+    int a = t2.tm_yday - t1.tm_yday;
+
+    time_t rs = base + 86400 * (a + 1); // เวลา reset
+    return rs;
+}
+
 #endif
