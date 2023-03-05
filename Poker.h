@@ -1,121 +1,5 @@
 #ifndef PROJECT4_H
 #define PROJECT4_H
-void showUiCardHand(vector<string> s)
-{
-    string x1, x2;
-    bool f[2] = {false, false};
-    for (unsigned int i = 0; i < s.size(); i++)
-    {
-        if (s[i][0] == 'T')
-        {
-            s[i].replace(0, 1, "10");
-            f[i] = true;
-        }
-    }
-    x1 = s[0].substr(0, s[0].length() - 1);
-    x2 = s[1].substr(0, s[1].length() - 1);
-
-    if (!f[0] && !f[1])
-    {
-
-        cout << " _ _ _ _ _      _ _ _ _ _ " << endl;
-        cout << "|         |    |         |" << endl;
-        cout << "|    " << x1 << "    |    |    " << x2 << "    |" << endl;
-        cout << "|         |    |         |" << endl;
-        cout << "|    " << s[0].back() << "    |    |    " << s[1].back() << "    |" << endl;
-        cout << "|         |    |         |" << endl;
-        cout << "|_ _ _ _ _|    | _ _ _ _ |" << endl;
-    }
-
-    else if (f[0] && !f[1]) // 10 1 ผ่าน
-    {
-        cout << " _ _ _ _ _      _ _ _ _ _ " << endl;
-        cout << "|         |    |         |" << endl;
-        cout << "|    " << x1 << "   |    |    " << x2 << "    |" << endl;
-        cout << "|         |    |         |" << endl;
-        cout << "|    " << s[0].back() << "    |    |    " << s[1].back() << "    |" << endl;
-        cout << "|         |    |         |" << endl;
-        cout << "|_ _ _ _ _|    | _ _ _ _ |" << endl;
-    }
-
-    else if (!f[0] && f[1]) // 1 10 ผ่าน
-    {
-
-        cout << " _ _ _ _ _      _ _ _ _ _ " << endl;
-        cout << "|         |    |         |" << endl;
-        cout << "|    " << x1 << "    |    |    " << x2 << "   |" << endl;
-        cout << "|         |    |         |" << endl;
-        cout << "|    " << s[0].back() << "    |    |    " << s[1].back() << "    |" << endl;
-        cout << "|         |    |         |" << endl;
-        cout << "|_ _ _ _ _|    | _ _ _ _ |" << endl;
-    }
-
-    else if (f[0] && f[1]) // 10 10
-    {
-
-        cout << " _ _ _ _ _      _ _ _ _ _ " << endl;
-        cout << "|         |    |         |" << endl;
-        cout << "|   " << x1 << "    |    |   " << x2 << "    |" << endl;
-        cout << "|         |    |         |" << endl;
-        cout << "|    " << s[0].back() << "    |    |    " << s[1].back() << "    |" << endl;
-        cout << "|         |    |         |" << endl;
-        cout << "|_ _ _ _ _|    | _ _ _ _ |" << endl;
-    }
-}
-void changeCard(Player *p, vector<string> &deck)
-{
-    int c;
-    string needcard;
-    bool have = false;
-    do
-    {
-        cout << "What card do you change 1 or 2 ?\n";
-        cin >> c;
-        if (c != 1 && c != 2)
-            clearInput();
-    } while (c != 1 && c != 2);
-    c -= 1;
-    cout << "What card do you need (Press Alt+3,4,5,6 to type Symbol \3 \4 \5 \6) Ex. K\3,3\6,A\4 \n";
-    cin >> needcard;
-    for (int i = 0; i < deck.size(); i++)
-    {
-        if (needcard == deck[i])
-        {
-            have = true;
-            break;
-        }
-        if (i == deck.size() - 1 && !have)
-        {
-            cout << "Unlucky Y^Y you select card that don't exist in deck\n";
-            return;
-        }
-    }
-    string tempcard = p->cards[c];
-    p->cards[c] = needcard;
-    needcard = tempcard;
-    cout << "This is your hand now:\n";
-    showUiCardHand(p->cards);
-    p->rankOfHand.first == ""; // resetRankOfHand
-}
-void seeCheat(Player *p, vector<Player *> players)
-{
-    int num, r;
-    do
-    {
-        cout << "Which player do you want to see card [1],[2],[3],[4]\n";
-        cin >> num;
-        if (num >= 1 && num <= 4 && players[num - 1]->username == p->username)
-            cout << "Can't watch yourself card!!\n";
-        else if (num < 1 || num > players.size() - 1 || cin.fail())
-        {
-            clearInput();
-            cout << "Invalid index of player try again\n";
-        }
-    } while (players[num - 1]->username == p->username || num < 1 || num > players.size() - 1 || cin.fail());
-    num--;
-    r = rand() % 2;
-    cout << "\nrandom card of player " << num + 1 << " is : " << players[num]->cards[r] << "\n";
-}
 
 void recieveSimpleInformation(int &moneyInGame, int &mandatory_betRef)
 {
@@ -168,19 +52,13 @@ void PokerGame::createOrderTable()
     od[2].emplace_back("bet");
     od[3].emplace_back("cheat");
     od[3].emplace_back("cheat");
-    od[3].emplace_back("call");
+    od[3].emplace_back("cheat");
     od[4].emplace_back("fold");
     od[4].emplace_back("all-in");
-    od[4].emplace_back("raise");
+    od[4].emplace_back("all-in");
     od[5].emplace_back("");
     od[5].emplace_back("fold");
-    od[5].emplace_back("cheat");
-    od[6].emplace_back("");
-    od[6].emplace_back("");
-    od[6].emplace_back("all-in");
-    od[7].emplace_back("");
-    od[7].emplace_back("");
-    od[7].emplace_back("fold");
+    od[5].emplace_back("fold");
 }
 PokerGame::PokerGame(Database &dbRef, Deck &dRef, int numRef, int chipRef, int mandatory_betRef) // สร้าง 1 PokerGame ต้องมีข้อมูลพื้นฐานตาม Parameterต่อไปนี้ ตำแหน่งคนจริง(&) สำรับไพ่ จำนวนคน
 {
@@ -230,248 +108,7 @@ void PokerGame::createPlayer()
         } // เช็คว่าซ้ำไหม
     }
 }
-void PokerGame::topboard()
-{
 
-    cout << "Current Board: \n";
-    cout << setw(30) << "                                                          Dealer                                       \n\n";
-    cout << setw(30) << "                               ============================================================\n";
-    cout << setw(30) << "                             //                                                            \\\\"
-         << "\n";
-    cout << setw(30) << "                            //                                                              \\\\"
-         << "\n";
-    cout << setw(30) << "                           //                                                                \\\\"
-         << "\n";
-    cout << setw(30) << "                          //                                                                  \\\\"
-         << "\n";
-    cout << setw(30) << "                         //                                                                    \\\\"
-         << "\n";
-    cout << setw(30) << "                        //                                                                      \\\\"
-         << "\n";
-    cout << setw(30) << "                       //                                                                        \\\\"
-         << "\n";
-    cout << setw(30) << "                      //                                                                          \\\\"
-         << "\n";
-    cout << setw(30) << "                     //                                                                            \\\\"
-         << "\n\n";
-}
-void PokerGame::midboard0()
-{
-    cout << setw(30) << "                    ||                                                                              ||\n";
-    cout << setw(30) << "                    ||        _ _ _ _ _    _ _ _ _ _    _ _ _ _ _    _ _ _ _ _    _ _ _ _ _         ||\n";
-    cout << setw(30) << "                    ||       |         |  |         |  |         |  |         |  |         |        ||\n";
-    cout << setw(30) << "                    ||       |         |  |         |  |         |  |         |  |         |        ||\n";
-    cout << setw(30) << "                    ||       |         |  |         |  |         |  |         |  |         |        ||\n";
-    cout << setw(30) << "                    ||       |         |  |         |  |         |  |         |  |         |        ||\n";
-    cout << setw(30) << "                    ||       |         |  |         |  |         |  |         |  |         |        ||\n";
-    cout << setw(30) << "                    ||       |_ _ _ _ _|  |_ _ _ _ _|  |_ _ _ _ _|  |_ _ _ _ _|  |_ _ _ _ _|        ||\n";
-    cout << setw(30) << "                    ||                                                                              ||\n";
-    cout << setw(30) << "                    ||                                                                              ||\n";
-    cout << setw(30) << "                    ||                                                                              ||\n\n";
-}
-
-void PokerGame::midboard3()
-{
-    cout << setw(30) << "                    ||                                                                              ||\n";
-    cout << setw(30) << "                    ||        _________    _________    _________    _ _ _ _ _    _ _ _ _ _         ||\n";
-    cout << setw(30) << "                    ||       |         |  |         |  |         |  |         |  |         |        ||\n";
-    cout << setw(30) << "                    ||       |    " << cardsOnBoard[0][0] << "    |  |    " << cardsOnBoard[1][0] << "    |  |    " << cardsOnBoard[2][0] << "    |  |         |  |         |        ||\n";
-    cout << setw(30) << "                    ||       |         |  |         |  |         |  |         |  |         |        ||\n";
-    cout << setw(30) << "                    ||       |    " << cardsOnBoard[0][1] << "    |  |    " << cardsOnBoard[1][1] << "    |  |    " << cardsOnBoard[2][1] << "    |  |         |  |         |        ||\n";
-    cout << setw(30) << "                    ||       |         |  |         |  |         |  |         |  |         |        ||\n";
-    cout << setw(30) << "                    ||       |_________|  |_________|  |_________|  |_ _ _ _ _|  |_ _ _ _ _|        ||\n";
-    cout << setw(30) << "                    ||                                                                              ||\n";
-    cout << setw(30) << "                    ||                                                                              ||\n";
-    cout << setw(30) << "                    ||                                                                              ||\n\n";
-}
-
-void PokerGame::midboard4()
-{
-    cout << setw(30) << "                    ||                                                                              ||\n";
-    cout << setw(30) << "                    ||        _________    _________    _________    _________    _ _ _ _ _         ||\n";
-    cout << setw(30) << "                    ||       |         |  |         |  |         |  |         |  |         |        ||\n";
-    cout << setw(30) << "                    ||       |    " << cardsOnBoard[0][0] << "    |  |    " << cardsOnBoard[1][0] << "    |  |    " << cardsOnBoard[2][0] << "    |  |    " << cardsOnBoard[3][0] << "    |  |         |        ||\n";
-    cout << setw(30) << "                    ||       |         |  |         |  |         |  |         |  |         |        ||\n";
-    cout << setw(30) << "                    ||       |    " << cardsOnBoard[0][1] << "    |  |    " << cardsOnBoard[1][1] << "    |  |    " << cardsOnBoard[2][1] << "    |  |    " << cardsOnBoard[3][1] << "    |  |         |        ||\n";
-    cout << setw(30) << "                    ||       |         |  |         |  |         |  |         |  |         |        ||\n";
-    cout << setw(30) << "                    ||       |_________|  |_________|  |_________|  |_________|  |_ _ _ _ _|        ||\n";
-    cout << setw(30) << "                    ||                                                                              ||\n";
-    cout << setw(30) << "                    ||                                                                              ||\n";
-    cout << setw(30) << "                    ||                                                                              ||\n\n";
-}
-
-void PokerGame::midboard5()
-{
-    cout << setw(30) << "                    ||                                                                              ||\n";
-    cout << setw(30) << "                    ||        _________    _________    _________    _________    _________         ||\n";
-    cout << setw(30) << "                    ||       |         |  |         |  |         |  |         |  |         |        ||\n";
-    cout << setw(30) << "                    ||       |    " << cardsOnBoard[0][0] << "    |  |    " << cardsOnBoard[1][0] << "    |  |    " << cardsOnBoard[2][0] << "    |  |    " << cardsOnBoard[3][0] << "    |  |    " << cardsOnBoard[4][0] << "    |        ||\n";
-    cout << setw(30) << "                    ||       |         |  |         |  |         |  |         |  |         |        ||\n";
-    cout << setw(30) << "                    ||       |    " << cardsOnBoard[0][1] << "    |  |    " << cardsOnBoard[1][1] << "    |  |    " << cardsOnBoard[2][1] << "    |  |    " << cardsOnBoard[3][1] << "    |  |    " << cardsOnBoard[4][1] << "    |        ||\n";
-    cout << setw(30) << "                    ||       |         |  |         |  |         |  |         |  |         |        ||\n";
-    cout << setw(30) << "                    ||       |_________|  |_________|  |_________|  |_________|  |_________|        ||\n";
-    cout << setw(30) << "                    ||                                                                              ||\n";
-    cout << setw(30) << "                    ||                                                                              ||\n";
-    cout << setw(30) << "                    ||                                                                              ||\n\n";
-}
-
-void PokerGame::botomboard()
-{
-    cout << setw(30) << "                     \\\\                                                                            //\n";
-    cout << setw(30) << "                      \\\\                                                                          //\n";
-    cout << setw(30) << "                       \\\\                                                                        //\n";
-    cout << setw(30) << "                        \\\\                                                                      //\n";
-    cout << setw(30) << "                         \\\\                                                                    //\n";
-    cout << setw(30) << "                          \\\\                                                                  //\n";
-    cout << setw(30) << "                           \\\\                                                                //\n";
-    cout << setw(30) << "                            \\\\                                                              //\n";
-    cout << setw(30) << "                             \\\\                                                            //\n";
-    cout << setw(30) << "                               ============================================================\n";
-    cout << "\n";
-    showMoneyPot();
-    showMoneyBet();
-    cout << "\n";
-}
-void PokerGame::actionboard2()
-{
-
-    cout << left << "player1 : ";
-    cout.width(23);
-    cout << players[0]->name;
-    cout << left << "player2 : ";
-    cout.width(23);
-    cout << players[1]->name << "\n";
-    cout << left << "money : ";
-    cout.width(25);
-    cout << players[0]->chip;
-    cout << left << "money : ";
-    cout.width(25);
-    cout << players[1]->chip << "\n";
-    cout << left << "action : ";
-    cout.width(24);
-    cout << players[0]->action;
-    cout << left << "action : ";
-    cout.width(24);
-    cout << players[1]->action << "\n";
-    cout << "\n";
-}
-
-void PokerGame::actionboard3()
-{
-
-    cout << left << "player1 : ";
-    cout.width(23);
-    cout << players[0]->name;
-    cout << left << "player2 : ";
-    cout.width(23);
-    cout << players[1]->name;
-    cout << left << "player3 : ";
-    cout.width(23);
-    cout << players[2]->name << "\n";
-    cout << left << "money : ";
-    cout.width(25);
-    cout << players[0]->chip;
-    cout << left << "money : ";
-    cout.width(25);
-    cout << players[1]->chip;
-    cout << left << "money : ";
-    cout.width(25);
-    cout << players[2]->chip << "\n";
-    cout << left << "action : ";
-    cout.width(24);
-    cout << players[0]->action;
-    cout << left << "action : ";
-    cout.width(24);
-    cout << players[1]->action;
-    cout << left << "action : ";
-    cout.width(24);
-    cout << players[2]->action << "\n";
-    cout << "\n";
-}
-
-void PokerGame::actionboard4()
-{
-
-    cout << left << "player1 : ";
-    cout.width(23);
-    cout << players[0]->name;
-    cout << left << "player2 : ";
-    cout.width(23);
-    cout << players[1]->name;
-    cout << left << "player3 : ";
-    cout.width(23);
-    cout << players[2]->name;
-    cout << left << "player4 : ";
-    cout.width(24);
-    cout << players[3]->name << "\n";
-    cout << left << "money : ";
-    cout.width(25);
-    cout << players[0]->chip;
-    cout << left << "money : ";
-    cout.width(25);
-    cout << players[1]->chip;
-    cout << left << "money : ";
-    cout.width(25);
-    cout << players[2]->chip;
-    cout << left << "money : ";
-    cout.width(20);
-    cout << players[3]->chip << "\n";
-    cout << left << "action : ";
-    cout.width(24);
-    cout << players[0]->action;
-    cout << left << "action : ";
-    cout.width(24);
-    cout << players[1]->action;
-    cout << left << "action : ";
-    cout.width(24);
-    cout << players[2]->action;
-    cout << left << "action : ";
-    cout.width(19);
-    cout << players[3]->action << "\n";
-    cout << "\n";
-}
-
-void PokerGame::setActionboard()
-{
-    if (num_player == 2)
-        actionboard2();
-    else if (num_player == 3)
-        actionboard3();
-    else if (num_player == 4)
-        actionboard4();
-}
-
-void PokerGame::showBoard1() // Show ว่า Board preflop มีไพ่ไหนบ้างตอนนี้
-{
-    topboard();
-    midboard0();
-    botomboard();
-    setActionboard();
-}
-
-void PokerGame::showBoard2() // Show ว่า Board flop มีไพ่ไหนบ้างตอนนี้
-{
-    topboard();
-    midboard3();
-    botomboard();
-    setActionboard();
-}
-
-void PokerGame::showBoard3() // Show ว่า Board turn มีไพ่ไหนบ้างตอนนี้
-{
-    topboard();
-    midboard4();
-    botomboard();
-    setActionboard();
-}
-
-void PokerGame::showBoard4() // Show ว่า Board river มีไพ่ไหนบ้างตอนนี้
-{
-    topboard();
-    midboard5();
-    botomboard();
-    setActionboard();
-}
 void PokerGame::showMoneyPot() // Show ว่าเงินใน Board มีเท่าไหร่แล้ว
 {
     cout << "Pot: " << pot << "\n";
@@ -533,7 +170,6 @@ void PokerGame::resetAccumulateBet()
 }
 void PokerGame::resetHandRank()
 {
-
     for (auto &p : players)
     {
         p->rankOfHand.first = "";
@@ -596,16 +232,18 @@ void PokerGame::preflop() // เริ่มรอบแรกของเกม
     showTurn();
     while (round == 1) // เริ่มรอบแรกอย่างเป็นทางการ
     {
-        if (players[current]->action == "fold" || players[current]->action == "dead")
+         if (players[current]->action == "all-in" ||players[current]->action == "fold" || players[current]->action == "dead")
         {
             updateRound();
-            continue; // เจอคนหมอบหรือคนตายก็ข้ามได้เลย
+            continue; // เจอคนหมอบก็ข้ามได้เลย
         }
         showBoard1();
         cout << players[current]->name << "'s Turn\n";
         showPlayerCards(players[current]);
         if (players[current]->rankOfHand.first == "")
+        {
             checkHand(players[current]);
+        }
         showHandRank(players[current]);
         showPlayerMoney(players[current]);
         showPlayerAccumulateBet(players[current]);
@@ -627,7 +265,7 @@ void PokerGame::showHandRank(Player *p)
 
     cout << p->name << "'s Hand: " << p->rankOfHand.first << "\n";
     cout << p->name << "'s HandRanking: " << p->rankOfHand.second.first << "\n";
-    cout << p->name << "'s MainCard: " << convertToCard(p->rankOfHand.second.second.first) << "\n";
+    cout << p->name << "'s HighestCard: " << convertToCard(p->rankOfHand.second.second.first) << "\n";
     cout << p->name << "'s MinorCard: " << convertToCard(p->rankOfHand.second.second.second) << "\n";
 }
 bool PokerGame::findWinner()
@@ -653,57 +291,67 @@ bool PokerGame::findWinner()
     }
     else if (round == 4)
     {
-        int rankingRef = 0;
-        int mainCard = 0;
-        int minorCard = 0;
+        int cntWin = 0;
+        int rankingRef = 10; // ต้องน้อยสุดเข้าใกล้  1
+        int mainCard = 0;    // ต้องมากสุดเข้าใกล้ 14
+        int minorCard = 0;   // ต้องมากสุดเข้าใกล้ 14
         for (auto &p : players)
         {
             if (p->action == "")
                 return false;
         } // ยังไม่จบรอบนั้นๆ
+        showBoard4();
+        cout << "-------------------------------------------------------------Okay!!! Let Reveal All Players Hand-------------------------------------------------------------\n";
         for (auto &p : players)
         {
             if (p->action != "fold" && p->action != "dead")
             {
-                if (p->rankOfHand.second.first > rankingRef)
-                    rankingRef = p->rankOfHand.second.first; // หา Ranking ไพ่สูงสุด 1-10ว่าคนที่ไม่หมอบคนไหนสูงสุด
-                cout << p->name << "'s cards :";
-                for (const auto &c : p->cards)
+
+                auto maxRank = std::min_element(players.begin(), players.end(),
+                                                [](const Player *a, const Player *b)
+                                                { return *a < b; }); // Iterator is point to Player* Type in vector Name = players แปลไทย คือ Interator ตัวนี้ เป็น ที่อยู่ของ ที่อยู่ของ Player ที่มี min elementในเวกเตอร์ชื่อ players
+                rankingRef = (*maxRank)->rankOfHand.second.first;    // หาRankingRef ก่อน
+                // if(rankingRef == 5) flushCheck(players);
+                if (p->rankOfHand.second.first == rankingRef) // คนที่มี Rank สูงสุดถึงจะมีสิทธิ์เทียบไพ่บนมือ
                 {
-                    cout << c << " ";
-                }
+                    rankingRef = p->rankOfHand.second.first;
+                    if (p->rankOfHand.second.second.first >= mainCard)
+                    {
+                        mainCard = p->rankOfHand.second.second.first;
+                        if (p->rankOfHand.second.second.second > minorCard)
+                            minorCard = p->rankOfHand.second.second.second;
+                    }
+                } // หา Ranking ไพ่สูงสุดใกล้อันดับ 1 คนไหนสูงสุด และ มีลำดับไพ่อะไรบ้าง
+                showPlayerCards(p);
                 cout << p->name << " has " << p->rankOfHand.first << "\n";
-                cout << "Ranking : " << p->rankOfHand.second.first << "\n"; // 10 อันดับฃ
-                cout << "MainCard : " << convertToCard(p->rankOfHand.second.second.first) << "\n";
-                cout << "MinorCard : " << convertToCard(p->rankOfHand.second.second.second) << "\n";
+                cout << "Ranking : " << p->rankOfHand.second.first << "\n"; // 10 อันดับ ใกล้ 1 สูงสุด
+                cout << "HighestCard : " << convertToCard(p->rankOfHand.second.second.first) << "\n";
+                cout << "PairCard : " << convertToCard(p->rankOfHand.second.second.second) << "\n";
             }
-        } // หาเรียบร้อยแล้วว่าคนไหนที่ไม่หมอบมี อันดับสูงสุด
-        for (auto &p : players)
-        {
-            if (p->rankOfHand.second.first == rankingRef)
-            {
-                if (p->rankOfHand.second.second.first > mainCard)
-                {
-                    mainCard = p->rankOfHand.second.second.first;
-                    if (p->rankOfHand.second.second.second > minorCard)
-                        minorCard = p->rankOfHand.second.second.second;
-                }
-            }
-            int cnt = 0;
         }
+        cout << "Max Rank Of Hand = " << rankingRef << "\n";
+        cout << "HighestCard Card  = " << mainCard << "\n";
+        cout << "MinorCard  Card  = " << minorCard << "\n";
+        for (auto &p : players) // หาว่ามีคนเสมอกี่คน
+        {
+            if (p->rankOfHand.second.first == rankingRef && p->rankOfHand.second.second.first == mainCard && p->rankOfHand.second.second.second == minorCard)
+                cntWin++;
+        }
+        cout << "-----------------------We have " << cntWin << " Player win-----------------------\n";
         for (auto &p : players)
         {
             if (p->rankOfHand.second.first == rankingRef && p->rankOfHand.second.second.first == mainCard && p->rankOfHand.second.second.second == minorCard)
+            {
                 cout << "Congratulation!!!! " << p->name << " is a winner here\n";
-            cout << "Press Enter to recieve money on board\n";
-            cin.get();
-            p->chip += pot;
-            cout << "Your Money = " << p->chip;
+                cout << "Press Enter to recieve money on board";
+                cin.get();
+                p->chip += (pot / cntWin);
+                cout << p->name << "'s money = " << p->chip << "\n";
+            }
         }
         return true;
     }
-
-    return false;
+    return false; // ถ้ามาถึงจุดนี้ได้แปลว่า false แล้ว
 }
 void PokerGame::updateRound()
 {
@@ -720,6 +368,7 @@ void PokerGame::updateRound()
     resetAction(cleanIncludeLastRaise);
     resetAccumulateBet();
     resetHandRank();
+    highestBet = 0;
     hasBetRaiseOrAllIn = false;
     round++;
 }
@@ -729,7 +378,7 @@ void PokerGame::flop()
     communityCards(3); // เปิดไพ่กองกลาง 3 ใบ
     while (round == 2) // เริ่มรอบสองอย่างเป็นทางการ
     {
-        if (players[current]->action == "fold" || players[current]->action == "dead")
+         if (players[current]->action == "all-in" ||players[current]->action == "fold" || players[current]->action == "dead")
         {
             updateRound();
             continue; // เจอคนหมอบก็ข้ามได้เลย
@@ -766,7 +415,7 @@ void PokerGame::turn()
     communityCards(1); // เปิดไพ่กองกลางเพิ่ม 1 ใบ
     while (round == 3) // เริ่มรอบสองอย่างเป็นทางการ
     {
-        if (players[current]->action == "fold" || players[current]->action == "dead")
+         if (players[current]->action == "all-in" ||players[current]->action == "fold" || players[current]->action == "dead")
         {
             updateRound();
             continue; // เจอคนหมอบก็ข้ามได้เลย
@@ -798,7 +447,7 @@ void PokerGame::river()
     communityCards(1); // เปิดไพ่กองกลางเพิ่ม 1 ใบ
     while (round == 4) // เริ่มรอบสองอย่างเป็นทางการ
     {
-        if (players[current]->action == "fold" || players[current]->action == "dead")
+        if (players[current]->action == "all-in" ||players[current]->action == "fold" || players[current]->action == "dead")
         {
             updateRound();
             continue; // เจอคนหมอบก็ข้ามได้เลย
@@ -830,10 +479,10 @@ void PokerGame::showActionChoice()
     cout << "Enter Your Action\n";
     if (round == 1)
     {
-        cout << num++ << ".Call\n";  // 1
-        cout << num++ << ".Raise\n"; // 2
-        cout << num++ << ".Cheat\n"; // 3
-        cout << num++ << ".Fold\n";  // 4
+        cout << num++ << ".Call\n";
+        cout << num++ << ".Raise\n";
+        cout << num++ << ".Cheat\n";
+        cout << num++ << ".Fold\n";
     }
     else
     {
@@ -841,14 +490,17 @@ void PokerGame::showActionChoice()
         if (!hasBetRaiseOrAllIn && round > 1)
         {
 
-            cout << num++ << ".Check\n"; //  1
-            cout << num++ << ".Bet\n";   // 2
+            cout << num++ << ".Check\n";
+            cout << num++ << ".Bet\n";
         }
-        cout << num++ << ".Call\n";   // 1,3
-        cout << num++ << ".Raise\n";  // 2,4
-        cout << num++ << ".Cheat\n";  // 3,5
-        cout << num++ << ".All-In\n"; // 4,6
-        cout << num++ << ".Fold\n";   // 5,7
+        if (hasBetRaiseOrAllIn)
+        {
+            cout << num++ << ".Call\n";
+            cout << num++ << ".Raise\n";
+        }
+        cout << num++ << ".Cheat\n";
+        cout << num++ << ".All-In\n";
+        cout << num++ << ".Fold\n";
     }
 }
 
@@ -916,7 +568,7 @@ bool PokerGame::checkOrder(Player *p, string testAction)
     if (testAction == "call" && p->chip < (highestBet - p->accumulateBet) || testAction == "bet" && p->chip < highestBet || testAction == "raise" && p->chip <= (highestBet - p->accumulateBet))
 
     {
-        cout << "Your money isn't enough to " << p->action << " please try again\n";
+        cout << "Your money isn't enough to " << testAction << " please try again\n";
         recieveOrder(p);
         return false;
     }
@@ -1030,7 +682,6 @@ void PokerGame::raise(Player *p)
         cout << "How much money do you want to raise?\n";
         getline(cin, moneyRaise);
         p->moneyToRaise = handleString(moneyRaise);
-        cout << p->moneyToRaise;
         if ((highestBet - p->accumulateBet) + p->moneyToRaise > p->chip || p->moneyToRaise == 0)
         {
             if ((highestBet - p->accumulateBet) + p->moneyToRaise > p->chip)
