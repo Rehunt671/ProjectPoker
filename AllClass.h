@@ -56,7 +56,7 @@ public:
     map<pair<string, string>, vector<string>> userDatabase; //[username,password] displayname money
     vector<string> loginUserName;                           // [username,password]
     bool loggedin;                                          // เพิ่มใน Database
-    unsigned long long int resetTime;                                          // เพิ่มใน Database
+    unsigned long long int resetTime;                       // เพิ่มใน Database
     void registerUser();
     void setDisplayName(string &); // ใช้ตอนสมัครเท่านั้น
     void loginUser();
@@ -65,11 +65,7 @@ public:
     void Delete_();
     // time
     void dailyPrize(const string &, const string &);
-    void setBoolLoggedin(bool);
-    int setResetTime();
-    void reset(int &,unsigned long long int);
-    void read();
-    void write(bool, int);
+    void reset(int &, unsigned long long int);
 };
 class PokerGame
 {
