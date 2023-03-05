@@ -119,7 +119,7 @@ void Database::importDatafromfile() // อ่านไฟล์จากไฟ�
 {
     ifstream source(filename);
     string line;
-    char format[] = "%s %s %s %s %s %s";
+    char format[] = "%s %s %s %s %d %lld";
     char name[100];
     char pass[100];
     char dp[100];
@@ -186,8 +186,7 @@ void Database::loginUser()
             checkPW = true;
             m = false;
             cout << "User " << un << " has logged in successfully.\n";
-            cout << userDatabase[{un, pw}][3];
-            if (userDatabase[{un, pw}][2] == "0" && time(0) > stoi(userDatabase[{un, pw}][3]))
+            if (userDatabase[{un, pw}][2] == "0" && time(0) > stoi(userDatabase[{un, pw}][3]))//เวลาปัจจุบันมากกว่า รีเซต time
             {
                 dailyPrize(un, pw);
             }
@@ -221,7 +220,7 @@ void Database::registerUser()
     string displayname;
     string freeCredit = "500";
     string login = "0";
-    string time = "0";
+    string time = "0" ;
     // ไม่มี money เพราะ money ถูก Fix แล้ว 500 บาท
     int num_UserRegister;
     bool valid = false;
@@ -275,17 +274,16 @@ void Database::registerUser()
 ////                                                                                                  ////
 ////                                                                                                  ////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
-void Database::reset(int &logedin, unsigned long long int resetTime)
+void Database::reset(int &logedin, unsigned long long int &resetTime)
 { // reset ค่า loggedin ให้เป็น false ทุก ๆ 00.00 น.
-    if (time(0) > resetTime)
+    if (time(0) > resetTime){
         logedin = 0;
-    else
-    {
-        logedin = 1;
     }
 }
-int Database::setResetTime()
-{                             // set เวลา reset โดยอ้างอิงเวลาของ วันที่ 01/01/23 เวลา 00.00 น.
+unsigned long long int Database::setResetTime()
+{
+
+    // set เวลา reset โดยอ้างอิงเวลาของ วันที่ 01/01/23 เวลา 00.00 น.
     time_t base = 1672506000; // Thu Jan  1 00:00:00 2023
     struct tm t1 = *localtime(&base);
     time_t next = mktime(&t1);
@@ -296,8 +294,8 @@ int Database::setResetTime()
 
     int a = t2.tm_yday - t1.tm_yday;
 
-    time_t rs = base + 86400 * (a + 1); // เวลา reset
-    return rs;
+    time_t reset = base + 86400 * (a + 1); // เวลา reset
+    return reset;
 }
 
 #endif
