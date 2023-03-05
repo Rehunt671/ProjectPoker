@@ -14,6 +14,8 @@
 #include <chrono>        //time
 #include <thread>        //time
 using namespace std;
+using namespace std::chrono;
+using std::cout;
 struct Deck
 {
 private:
@@ -53,13 +55,21 @@ public:
     ~Database();
     map<pair<string, string>, vector<string>> userDatabase; //[username,password] displayname money
     vector<string> loginUserName;                           // [username,password]
+    bool loggedin;                                          // เพิ่มใน Database
+    unsigned long long int resetTime;                                          // เพิ่มใน Database
     void registerUser();
     void setDisplayName(string &); // ใช้ตอนสมัครเท่านั้น
     void loginUser();
     void writeData2_txt();     // เขียนข้อมูลจาก Map To ไฟล์หลัก ใช้ตอน REGISTER
     void importDatafromfile(); // นำข้อมูลจาก File หลักมาเก็บข้อมูลไว้ใน Vector แต่ละอัน พร้อมกับสร้าง Mapขึ้นมาทันที ใช้ตอน Login
-    // ถ้าต้องการแก้ไข Concept คือ ImportDataFromfile แล้ว ไล่แก้ ข้อมูลให้ตรงกับ Index นั้นๆแล้วนำเวกเตอร์ 4 อันนำมาสร้างแมพแล้ว ส่งกลับขึ้นไปยังไฟล์หลัก
     void Delete_();
+    // time
+    void dailyPrize(const string &, const string &);
+    void setBoolLoggedin(bool);
+    int setResetTime();
+    void reset(int &,unsigned long long int);
+    void read();
+    void write(bool, int);
 };
 class PokerGame
 {
@@ -111,7 +121,7 @@ public:
     void communityCards(int);
     void checkHand(Player *);
     void recieveOrder(Player *);
-    bool checkOrder(Player* ,string);
+    bool checkOrder(Player *, string);
     void doOrder(Player *);
     void updateLastBetRaiseOrAllIn(Player *);
     void check(Player *);
@@ -163,6 +173,19 @@ string convertToCard(int max)
     if (maxVar.count(max) > 0) // กัน return bad behavior
         return maxVar[max];
     return 0;
+}
+int handleString(string str)
+{
+    istringstream iss(str);
+    int num;
+    if (!(iss >> num))
+    {
+        return 0;
+    }
+    else
+    {
+        return num;
+    }
 }
 void clearInput()
 {
