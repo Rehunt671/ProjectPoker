@@ -1,6 +1,5 @@
 #ifndef PROJECT4_H
 #define PROJECT4_H
-
 void recieveSimpleInformation(int &moneyInGame, int &mandatory_betRef)
 {
     int choice;
@@ -60,35 +59,6 @@ void PokerGame::createOrderTable()
     od[5].emplace_back("fold");
     od[5].emplace_back("fold");
 }
-PokerGame::PokerGame(Database &dbRef, Deck &dRef, int numRef, int chipRef, int mandatory_betRef) // สร้าง 1 PokerGame ต้องมีข้อมูลพื้นฐานตาม Parameterต่อไปนี้ ตำแหน่งคนจริง(&) สำรับไพ่ จำนวนคน
-{
-    pokerDB = dbRef;
-    deck = dRef;         // กำหนด *deck ให้ตรงกับสำรับไพ่ที่เราสร้างขึ้นมา
-    num_player = numRef; // กำหนดจำนวนคนของเกม Poker ของเรา
-    createPlayer();
-    createOrderTable();
-    for (auto &p : players)
-    {
-        p->chip = chipRef;
-    }                                    // กำหนดเงินเรียงคน
-    mandatory_bet = mandatory_betRef;    // Chip เดิมพันขั้นต่ำที่จะเล่นกัน
-    current = (dealer + 3) % num_player; // คนซ้าย Big blind index ได้เริ่มก่อน;
-    dealer = rand() % num_player;        // สุ่มคนมาเป็น Role dealer
-    pot = 0;                             // กำหนดเงินใน Board ตั้งต้น
-    highestBet = 0;                      // กำหนด ว่าตอนนี้ค่าเงิน Betสูงสุดเท่าไหร่ คน Call Raise จะได้รู้
-    round = 1;                           // กำหนดรอบของเกม
-    restart = false;                     // กำหนดให้เป็นNew game
-    cleanIncludeLastRaise = true;
-    hasBetRaiseOrAllIn = false; // กำหนดว่ามีการ Bet || All inไปรึยัง ถ้ามีไปแล้วจะ Check ไม่ได้แล้ว แต่ Call Raise หรือ Fold ได้
-}
-PokerGame::~PokerGame()
-{
-    for (auto &p : players)
-    {
-        delete p;
-    }
-}
-
 void PokerGame::createPlayer()
 {
     string pw;      // ไม่จำเป็นต้องเอาตัวแปรมารับก็ได้แต่ ทำไว้เผื่อทวน
@@ -108,7 +78,34 @@ void PokerGame::createPlayer()
         } // เช็คว่าซ้ำไหม
     }
 }
-
+PokerGame::PokerGame(Database &dbRef, Deck &dRef, int numRef, int chipRef, int mandatory_betRef) // สร้าง 1 PokerGame ต้องมีข้อมูลพื้นฐานตาม Parameterต่อไปนี้ ตำแหน่งคนจริง(&) สำรับไพ่ จำนวนคน
+{
+    pokerDB = dbRef;
+    deck = dRef;         // กำหนด *deck ให้ตรงกับสำรับไพ่ที่เราสร้างขึ้นมา
+    num_player = numRef; // กำหนดจำนวนคนของเกม Poker ของเรา
+    createPlayer();
+    for (auto &p : players)
+    {
+        p->chip = chipRef;
+    } // กำหนดเงินเรียงคน
+    createOrderTable();
+    mandatory_bet = mandatory_betRef;    // Chip เดิมพันขั้นต่ำที่จะเล่นกัน
+    current = (dealer + 3) % num_player; // คนซ้าย Big blind index ได้เริ่มก่อน;
+    dealer = rand() % num_player;        // สุ่มคนมาเป็น Role dealer
+    pot = 0;                             // กำหนดเงินใน Board ตั้งต้น
+    highestBet = 0;                      // กำหนด ว่าตอนนี้ค่าเงิน Betสูงสุดเท่าไหร่ คน Call Raise จะได้รู้
+    round = 1;                           // กำหนดรอบของเกม
+    restart = false;                     // กำหนดให้เป็นNew game
+    cleanIncludeLastRaise = true;
+    hasBetRaiseOrAllIn = false; // กำหนดว่ามีการ Bet || All inไปรึยัง ถ้ามีไปแล้วจะ Check ไม่ได้แล้ว แต่ Call Raise หรือ Fold ได้
+}
+PokerGame::~PokerGame()
+{
+    for (auto &p : players)
+    {
+        delete p;
+    }
+}
 void PokerGame::showMoneyPot() // Show ว่าเงินใน Board มีเท่าไหร่แล้ว
 {
     cout << "Pot: " << pot << "\n";
@@ -116,10 +113,6 @@ void PokerGame::showMoneyPot() // Show ว่าเงินใน Board มี�
 void PokerGame::showMoneyBet() // Show ว่าเงิน Bet สูงสุดตอนนี้เท่าไหร่แล้ว
 {
     cout << "Highest Bet Money: " << highestBet << "\n";
-}
-void PokerGame::showPlayerMoney(Player *p) // Showว่าเงินคนปัจจุบัน(ใน Parameter ) เหลือเท่าไหร่
-{
-    cout << p->name << "'s Current Money: " << p->chip << "\n";
 }
 void PokerGame::showPlayerCards(Player *p) // Showว่าไพ่คนปัจจุบัน(ใน Parameter ) มีอะไรบ้าง
 {
@@ -232,7 +225,7 @@ void PokerGame::preflop() // เริ่มรอบแรกของเกม
     showTurn();
     while (round == 1) // เริ่มรอบแรกอย่างเป็นทางการ
     {
-         if (players[current]->action == "all-in" ||players[current]->action == "fold" || players[current]->action == "dead")
+        if (players[current]->action == "all-in" || players[current]->action == "fold" || players[current]->action == "dead")
         {
             updateRound();
             continue; // เจอคนหมอบก็ข้ามได้เลย
@@ -245,7 +238,7 @@ void PokerGame::preflop() // เริ่มรอบแรกของเกม
             checkHand(players[current]);
         }
         showHandRank(players[current]);
-        showPlayerMoney(players[current]);
+
         showPlayerAccumulateBet(players[current]);
         showActionChoice();
         recieveOrder(players[current]);
@@ -378,7 +371,7 @@ void PokerGame::flop()
     communityCards(3); // เปิดไพ่กองกลาง 3 ใบ
     while (round == 2) // เริ่มรอบสองอย่างเป็นทางการ
     {
-         if (players[current]->action == "all-in" ||players[current]->action == "fold" || players[current]->action == "dead")
+        if (players[current]->action == "all-in" || players[current]->action == "fold" || players[current]->action == "dead")
         {
             updateRound();
             continue; // เจอคนหมอบก็ข้ามได้เลย
@@ -394,7 +387,6 @@ void PokerGame::flop()
             }
         checkHand(players[current]);
         showHandRank(players[current]);
-        showPlayerMoney(players[current]);
         showPlayerAccumulateBet(players[current]);
         showActionChoice();
         recieveOrder(players[current]);
@@ -415,7 +407,7 @@ void PokerGame::turn()
     communityCards(1); // เปิดไพ่กองกลางเพิ่ม 1 ใบ
     while (round == 3) // เริ่มรอบสองอย่างเป็นทางการ
     {
-         if (players[current]->action == "all-in" ||players[current]->action == "fold" || players[current]->action == "dead")
+        if (players[current]->action == "all-in" || players[current]->action == "fold" || players[current]->action == "dead")
         {
             updateRound();
             continue; // เจอคนหมอบก็ข้ามได้เลย
@@ -426,7 +418,6 @@ void PokerGame::turn()
         if (players[current]->rankOfHand.first == "")
             checkHand(players[current]);
         showHandRank(players[current]);
-        showPlayerMoney(players[current]);
         showPlayerAccumulateBet(players[current]);
         showActionChoice();
         recieveOrder(players[current]);
@@ -447,7 +438,7 @@ void PokerGame::river()
     communityCards(1); // เปิดไพ่กองกลางเพิ่ม 1 ใบ
     while (round == 4) // เริ่มรอบสองอย่างเป็นทางการ
     {
-        if (players[current]->action == "all-in" ||players[current]->action == "fold" || players[current]->action == "dead")
+        if (players[current]->action == "all-in" || players[current]->action == "fold" || players[current]->action == "dead")
         {
             updateRound();
             continue; // เจอคนหมอบก็ข้ามได้เลย
@@ -458,7 +449,6 @@ void PokerGame::river()
         if (players[current]->rankOfHand.first == "")
             checkHand(players[current]);
         showHandRank(players[current]);
-        showPlayerMoney(players[current]);
         showPlayerAccumulateBet(players[current]);
         showActionChoice();
         recieveOrder(players[current]);
@@ -760,6 +750,60 @@ void PokerGame::cheat(Player *p)
             clearInput();
         }
     } while (choice != 1 && choice != 2);
+}
+void changeCard(Player *p, vector<string> &deck)
+{
+    int c;
+    string needcard;
+    bool have = false;
+    do
+    {
+        cout << "What card do you change 1 or 2 ?\n";
+        cin >> c;
+        if (c != 1 && c != 2)
+            clearInput();
+    } while (c != 1 && c != 2);
+    c -= 1;
+    cout << "What card do you need (Press Alt+3,4,5,6 to type Symbol \3 \4 \5 \6) Ex. K\3,3\6,A\4 \n";
+    cin >> needcard;
+    for (int i = 0; i < deck.size(); i++)
+    {
+        if (needcard == deck[i])
+        {
+            have = true;
+            string tempcard = p->cards[c];
+            p->cards[c] = needcard;
+            deck[i] = tempcard;
+            cout << "This is your hand now:\n";
+            showUiCardHand(p->cards);
+            p->rankOfHand.first = ""; // resetRankOfHand
+            break;
+        }
+        if (i == deck.size() - 1 && !have)
+        {
+            cout << "Unlucky Y^Y you select card that don't exist in deck\n";
+            return;
+        }
+    }
+}
+void seeCheat(Player *p, vector<Player *> players)
+{
+    int num, r;
+    do
+    {
+        cout << "Which player do you want to see card [1],[2],[3],[4]\n";
+        cin >> num;
+        if (num >= 1 && num <= 4 && players[num - 1]->username == p->username)
+            cout << "Can't watch yourself card!!\n";
+        else if (num < 1 || num > players.size() - 1 || cin.fail())
+        {
+            clearInput();
+            cout << "Invalid index of player try again\n";
+        }
+    } while (players[num - 1]->username == p->username || num < 1 || num > players.size() - 1 || cin.fail());
+    num--;
+    r = rand() % 2;
+    cout << "\nrandom card of player " << num + 1 << " is : " << players[num]->cards[r] << "\n";
 }
 void PokerGame::fold(Player *p)
 {
