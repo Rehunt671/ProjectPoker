@@ -111,7 +111,7 @@ public:
     void actionboard3();
     void actionboard4();
     void setActionboard();
-    //AfterDesign
+    // AfterDesign
     void assignRole();
     void showMoneyPot();
     void showMoneyBet();
@@ -144,16 +144,17 @@ public:
     void flop();
     void turn();
     void river();
+    void riskPrize(Player *p, int &);
     bool restart;
 };
 
-//Declaration
-void showUiCardHand(vector<string> );
+// Declaration
+void showUiCardHand(vector<string>);
 void changeCard(Player *p, vector<string> &deck);
 void seeCheat(Player *p, vector<Player *> players);
-string convertToCard(int );
+string convertToCard(int);
 void clearInput();
-int handleString(string );
+int handleString(string);
 /// Definition
 void clearInput()
 {
