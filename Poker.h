@@ -90,8 +90,8 @@ PokerGame::PokerGame(Database &dbRef, Deck &dRef, int numRef, int chipRef, int m
     } // กำหนดเงินเรียงคน
     createOrderTable();
     mandatory_bet = mandatory_betRef;    // Chip เดิมพันขั้นต่ำที่จะเล่นกัน
-    current = (dealer + 3) % num_player; // คนซ้าย Big blind index ได้เริ่มก่อน;
     dealer = rand() % num_player;        // สุ่มคนมาเป็น Role dealer
+    current = (dealer + 3) % num_player; // คนซ้าย Big blind index ได้เริ่มก่อน;
     pot = 0;                             // กำหนดเงินใน Board ตั้งต้น
     highestBet = 0;                      // กำหนด ว่าตอนนี้ค่าเงิน Betสูงสุดเท่าไหร่ คน Call Raise จะได้รู้
     round = 1;                           // กำหนดรอบของเกม
@@ -147,9 +147,9 @@ void PokerGame::resetAction(bool cleanIncludeLastRaise)
     {
         if (restart) // ลบหมดลบทั้งหมอบด้วย
             players[i]->action = "";
-        else if (players[i]->action != "fold" && players[i]->action != "dead" && cleanIncludeLastRaise) // ลบทั้งคน LastRaise แต่ไม่รวมหมอบและคนตาย เป็นการรีเซตที่มีการเปลี่ยนรอบ
+        else if (players[i]->action != "all-in" && players[i]->action != "fold" && players[i]->action != "dead" && cleanIncludeLastRaise) // ลบทั้งคน LastRaise แต่ไม่รวมหมอบและคนตาย เป็นการรีเซตที่มีการเปลี่ยนรอบ
             players[i]->action = "";
-        else if (players[i]->action != "fold" && players[i]->action != "dead" && i != lastRaise) // ลบแค่คนอื่นที่ไม่ใช่ LastRaise และ หมอบ และ คนตาย เป็นการรีเซตที่ยังอยู่ในรอบนั้นๆ
+        else if (players[i]->action != "all-in" && players[i]->action != "fold" && players[i]->action != "dead" && i != lastRaise) // ลบแค่คนอื่นที่ไม่ใช่ LastRaise และ หมอบ และ คนตาย เป็นการรีเซตที่ยังอยู่ในรอบนั้นๆ
             players[i]->action = "";
     }
 }
@@ -238,7 +238,6 @@ void PokerGame::preflop() // เริ่มรอบแรกของเกม
             checkHand(players[current]);
         }
         showHandRank(players[current]);
-
         showPlayerAccumulateBet(players[current]);
         showActionChoice();
         recieveOrder(players[current]);
@@ -382,15 +381,21 @@ void PokerGame::updateRound()
 bool PokerGame::findWinner()
 {
     int cntFold = 0;
+    int cntAllin = 0;
+    int cntDead = 0;
     int cntWin = 0;
     int finalMoney = pot;
     for (auto &p : players)
     {
-        if (p->action == "fold" || p->action == "dead")
+        if (p->action == "all-in")
+            cntAllin++;
+        else if (p->action == "fold")
             cntFold++;
-    }
-    if ((round == 1 || round == 2 || round == 3) && cntFold == num_player - 1)
-    { // ในรอบ preflop flop turn ถ้าเหลือคนไม่หมอบเพียงคนเดียวชนะเลย
+        else if (p->action == "dead")
+            cntDead++;
+    }//นับ Action ที่สำคัญพอ
+    if (cntFold+cntDead == num_player-1)//แปลว่า หมอบหนีหรือตาย จนเหลือเราคนเดียว
+    {
         for (auto &p : players)
         {
             if (p->action != "fold" && p->action != "dead")
@@ -401,7 +406,7 @@ bool PokerGame::findWinner()
             }
         }
     }
-    else if (round == 4)
+    else if (round == 4 || cntAllin+cntDead == num_player)//รอบสี่ต้องเปิดไพ่ หรือ ทุกคน All in มาหมดก็ต้องเปิดไพ่เช่นกัน
     {
         int rankingRef = 10; // ต้องน้อยสุดเข้าใกล้  1
         int mainCard = 0;    // ต้องมากสุดเข้าใกล้ 14
@@ -411,11 +416,25 @@ bool PokerGame::findWinner()
             if (p->action == "")
                 return false;
         } // ยังไม่จบรอบนั้นๆ
-        showBoard4();
+        switch (round)
+        {
+        case 1:
+            showBoard1();
+            break;
+        case 2:
+            showBoard2();
+            break;
+        case 3:
+            showBoard3();
+            break;
+        default:
+            showBoard4();
+            break;
+        }
         cout << "-------------------------------------------------------------Okay!!! Let Reveal All Players Hand-------------------------------------------------------------\n";
         for (auto &p : players)
         {
-            if (p->action != "fold" && p->action != "dead")
+            if (p->action != "fold" && p->action != "dead")//เช็คคนที่ไม่ได้ หมอบ หรือ ตายไปพอ
             {
 
                 auto maxRank = std::min_element(players.begin(), players.end(),
@@ -442,7 +461,7 @@ bool PokerGame::findWinner()
         }
         cout << "Max Rank Of Hand = " << rankingRef << "\n";
         cout << "HighestCard Card  = " << mainCard << "\n";
-        cout << "MinorCard  Card  = " << minorCard << "\n";
+        cout << "PairCard  Card  = " << minorCard << "\n";
         for (auto &p : players) // หาว่ามีคนเสมอกี่คน
         {
             if (p->rankOfHand.second.first == rankingRef && p->rankOfHand.second.second.first == mainCard && p->rankOfHand.second.second.second == minorCard)
@@ -466,7 +485,7 @@ void PokerGame::riskPrize(Player *p, int &cntWin)
     int r;
     int finalPot = pot / cntWin;
     cout << "Congratulation!!!! " << p->name << " is a winner here\n";
-    cout << "Do you want to play risk prize. WARNING !!!!! This prize is make your pot more or lower than you get now!!. " << endl;
+    cout << "Do you want to play risk prize?(Press Y = Yes , N = No)\nWARNING !!!!! This prize is make your pot more or lower than you get now!!. " << endl;
     cin >> c;
     r = rand() % 100 + 1;
     if (c == 'y' || c == 'Y')
@@ -483,16 +502,20 @@ void PokerGame::riskPrize(Player *p, int &cntWin)
             finalPot *= 1.5;
         else if (r > 95 && r <= 100)
             finalPot *= 2;
+        if(pot > finalPot) cout << "Unlucky pot decresed from " << pot/cntWin << " to " << finalPot << endl;
+        else if(pot == finalPot) cout << "your pot still remain the same\n";
+        else cout << "You're so lucky pot increase from " << pot/cntWin << " to " << finalPot << endl;
     }
     else
     {
         cout << "You didn't play risk prize your pot remains the same" << endl;
+        cout << "Your winner pot is = " << finalPot << endl;
     }
-    cout << "Your winner pot is " << finalPot << endl;
     cout << "Press Enter to recieve money on board";
+    cin.ignore();
     cin.get();
     p->chip += finalPot;
-    cout << p->name << "'s money = " << p->chip << "\n";
+    cout << p->name << "'s chip = " << p->chip << "\n";
 }
 void PokerGame::updateLastBetRaiseOrAllIn(Player *p)
 {
@@ -516,14 +539,13 @@ void PokerGame::showActionChoice()
     else
     {
 
-        if (!hasBetRaiseOrAllIn && round > 1)
+        if (!hasBetRaiseOrAllIn)
         {
 
             cout << num++ << ".Check\n";
             cout << num++ << ".Bet\n";
         }
-        if (hasBetRaiseOrAllIn)
-        {
+        else {
             cout << num++ << ".Call\n";
             cout << num++ << ".Raise\n";
         }
@@ -652,9 +674,10 @@ void PokerGame::bet(Player *p)
         cout << "How much money do you want to bet?\n";
         getline(cin, accBet);
         p->accumulateBet = handleString(accBet);
-        if (p->accumulateBet > p->chip || p->accumulateBet < highestBet)
+        if (p->accumulateBet > p->chip || p->accumulateBet < highestBet || p->accumulateBet == 0)
         {
-            if (p->moneyToRaise > p->chip)
+        
+            if (p->accumulateBet > p->chip)
                 cout << "You don't have enough money to bet\n";
             else
                 cout << "Bet money can't  < highestBet value or string input\n";
@@ -665,15 +688,13 @@ void PokerGame::bet(Player *p)
             {
             case 1:
                 continue;
-                break;
             case 2:
                 recieveOrder(p);
                 return;
-                break;
             default:
                 clearInput();
                 cout << "Invalid input please input bet money again\n";
-                break;
+                continue;
             }
         }
     } while (p->accumulateBet > p->chip || p->accumulateBet < highestBet || p->accumulateBet == 0);
@@ -682,6 +703,8 @@ void PokerGame::bet(Player *p)
     pot += p->accumulateBet;
     p->chip -= p->accumulateBet;
     highestBet = p->accumulateBet;
+    if(p->chip == 0 ) p->action = "all-in";
+    else
     p->action = "bet";
     hasBetRaiseOrAllIn = true;
 }
@@ -691,6 +714,8 @@ void PokerGame::call(Player *p)
     pot += (highestBet - p->accumulateBet);
     p->chip -= (highestBet - p->accumulateBet);
     p->accumulateBet = highestBet;
+    if(p->chip == 0 ) p->action = "all-in";
+    else
     p->action = "call";
     // highestBet เท่าเดิม
 }
@@ -733,6 +758,8 @@ void PokerGame::raise(Player *p)
     p->chip -= ((highestBet - p->accumulateBet) + p->moneyToRaise);
     highestBet += p->moneyToRaise;
     p->accumulateBet = highestBet;
+    if(p->chip == 0 ) p->action = "all-in";
+    else
     p->action = "raise";
     hasBetRaiseOrAllIn = true;
 }
