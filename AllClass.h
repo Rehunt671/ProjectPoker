@@ -16,6 +16,7 @@
 using namespace std;
 using namespace std::chrono;
 using std::cout;
+using std::cin;
 struct Deck
 {
 private:
