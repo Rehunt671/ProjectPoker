@@ -234,30 +234,30 @@ void PokerGame::checkHand(Player *p)
 
         findFiveSuit(split, flushSuit); // เริ่มแรกมาเช็คหน้าไพ่ก่อนเลยว่ามีซ้ำครบ 5 ใบไหม
         cout << flushSuit << "\n";
-        if (hasRoyalFlush(split, flushSuit)) // ต้องมี Flush และตรงกับ Rank A K Q J 10
+        if (hasRoyalFlush(split, flushSuit)) // ต้องมี Flush และตรงกับ Rank A K Q J 10 กรณีเช็คยากสุดเทียบ mainCard X
             p->rankOfHand.first = "RoyalFlush";
-        else if (hasStraightFlush(split, mainCardValue, flushSuit, StraightFlush)) // ต้องมีทั้ง Flush กับ Straight ที่ตรงกัน
+        else if (hasStraightFlush(split, mainCardValue, flushSuit, StraightFlush)) // ต้องมีทั้ง Flush กับ Straight ที่ตรงกัน กรณีเช็คยากสุดเทียบ mainCard X
             p->rankOfHand.first = "StraightFlush";
-        else if (hasFourOfKind(split, mainCardValue, minorCardValue)) // ต้องมีไพ่ 4 ใบ Rank เดียวกัน
+        else if (hasFourOfKind(split, mainCardValue, minorCardValue)) // ต้องมีไพ่ 4 ใบ Rank เดียวกัน กรณีเช็คยากสุด เทียบไพ่ใบที่ 5 ที่เรียกว่า Kicker บนมือผู้เล่น 
             p->rankOfHand.first = "FourOfKind";
-        else if (hasFullHouse(split, mainCardValue, minorCardValue)) // ต้องมีไพ่ ตอง 1 และ คู่ 1 คู่
+        else if (hasFullHouse(split, mainCardValue, minorCardValue)) // ต้องมีไพ่ ตอง 1 และ คู่ 1 คู่ กรณีเช็คยากสุด เทียบ main แล้ว minor X
             p->rankOfHand.first = "FullHouse";
-        else if (hasFlush(split, mainCardValue, minorCardValue, flushSuit)) // 5 ใบหน้าตรงกัน
+        else if (hasFlush(split, mainCardValue, minorCardValue, flushSuit)) // 5 ใบหน้าตรงกัน กรณีเช็คยากสุด เทียบเรียงใบ
             p->rankOfHand.first = "Flush";
-        else if (hasStraight(split, mainCardValue, flushSuit, StraightFlush)) // 5 ใบเรียง
+        else if (hasStraight(split, mainCardValue, flushSuit, StraightFlush)) // 5 ใบเรียง กรณีเช็คยากสุดเทียบ mainCard X
             p->rankOfHand.first = "Straight";
-        else if (hasTreeOfKind(split, mainCardValue, minorCardValue)) // 1ต้อง
+        else if (hasTreeOfKind(split, mainCardValue, minorCardValue)) // 1ต้อง   กรณีเช็คยากสุดเทียบ Kicker บนมือผู้เล่น  
             p->rankOfHand.first = "ThreeOfKind";
-        else if (hasTwoPair(split, mainCardValue, minorCardValue)) // 2 คู่
+        else if (hasTwoPair(split, mainCardValue, minorCardValue)) // 2 คู่  กรณีเช็คยากสุด เทียบ main แล้ว minor X
             p->rankOfHand.first = "TwoPair";
     }
     if (p->rankOfHand.first == "")
     {
-        if (hasPair(split, mainCardValue, minorCardValue)) // 1 คู่
+        if (hasPair(split, mainCardValue, minorCardValue)) // 1 คู่  กรณีเช็คยากสุดเทียบ mainCard X
             p->rankOfHand.first = "Pair";
         else
         {
-            hasHighcards(split, mainCardValue); // เดี่ยว
+            hasHighcards(split, mainCardValue); // เดี่ยว กรณีเช็คยากสุดเทียบ mainCard X
             p->rankOfHand.first = "HighCard";
         }
     }
