@@ -1,5 +1,5 @@
-#ifndef PROJECT1_H
-#define PROJECT1_H
+#ifndef PROJECT2_H
+#define PROJECT2_H
 // สร้าง map เพื่อเก็บข้อมูลของผู้ใช้งาน
 void Database::dailyPrize(const string &un, const string &pw)
 {
@@ -202,7 +202,6 @@ void Database::loginUser()
             return;
         }
     }
-    cin.ignore();
 }
 
 // ฟังก์ชันสำหรับ Register ผู้ใช้งาน //
