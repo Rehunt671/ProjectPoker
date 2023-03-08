@@ -14,7 +14,7 @@ int main()
     int choice;
     int cnt = 1;
     int moneyInGame; // Money in game
-    int mandatory_betRef;
+    int mandatoryBet;
 
     cout << "Welcome to Poker Game\n";
     do
@@ -50,8 +50,8 @@ int main()
         if (choice == 1)
             cnt++;
     }
-    recieveSimpleInformation(moneyInGame, mandatory_betRef);
-    PokerGame poker(pokerDB, deck, num_player, moneyInGame, mandatory_betRef); // เข้ามานั่งในเกมโป๊กเกอร์พร้อมที่จะเล่นเกม
+    recieveSimpleInformation(moneyInGame, mandatoryBet);
+    PokerGame poker(pokerDB, deck, num_player, moneyInGame, mandatoryBet); // เข้ามานั่งในเกมโป๊กเกอร์พร้อมที่จะเล่นเกม
     do
     {
         poker.beforeStart();
