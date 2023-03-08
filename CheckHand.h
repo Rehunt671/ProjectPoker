@@ -35,12 +35,12 @@ bool findFreq(vector<std::pair<int, char>> hand, int &mainCardValue, int &minorC
         return true;
     return false;
 }
-int findKicker(vector<std::pair<int, char>> &split)
+int findKicker(vector<std::pair<int, char>> &split, int &mainCardValue)/////หาไพ่ใบรองจาก main ในมือเราถ้าไม่มี ก็คือเสมอเลย
 {
     int kicker = 0;
     for (const auto &c : split)
     {
-        if (c.first > kicker)
+        if (c.first > kicker && c.first != mainCardValue)
             kicker = c.first;
     }
     return kicker;
@@ -251,7 +251,7 @@ void PokerGame::checkHand(Player *p)
         else if (hasFourOfKind(split, mainCardValue, minorCardValue))
         { // ต้องมีไพ่ 4 ใบ Rank เดียวกัน กรณีเช็คยากสุด เทียบไพ่ใบที่ 5 ที่เรียกว่า Kicker บนมือผู้เล่น
             p->rankOfHand.first = "FourOfKind";
-            kicker = findKicker(split);
+            kicker = findKicker(split, mainCardValue);
         }
         else if (hasFullHouse(split, mainCardValue, minorCardValue)) // ต้องมีไพ่ ตอง 1 และ คู่ 1 คู่ กรณีเช็คยากสุด เทียบ main แล้ว minor X
             p->rankOfHand.first = "FullHouse";
@@ -262,7 +262,7 @@ void PokerGame::checkHand(Player *p)
         else if (hasTreeOfKind(split, mainCardValue, minorCardValue))
         {
             p->rankOfHand.first = "ThreeOfKind";
-            kicker = findKicker(split);
+            kicker = findKicker(split, mainCardValue);
         }                                                          // 1ต้อง   กรณีเช็คยากสุดเทียบ Kicker บนมือผู้เล่น
         else if (hasTwoPair(split, mainCardValue, minorCardValue)) // 2 คู่  กรณีเช็คยากสุด เทียบ main แล้ว minor X
             p->rankOfHand.first = "TwoPair";
