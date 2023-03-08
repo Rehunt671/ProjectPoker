@@ -287,14 +287,9 @@ unsigned long long int Database::setResetTime()
     // set เวลา reset โดยอ้างอิงเวลาของ วันที่ 01/01/23 เวลา 00.00 น.
     time_t base = 1672506000; // Thu Jan  1 00:00:00 2023
     struct tm t1 = *localtime(&base);
-    time_t next = mktime(&t1);
-
     time_t now = time(0); // เวลาตอนนี้
     struct tm t2 = *localtime(&now);
-    time_t next2 = mktime(&t2);
-
     int a = t2.tm_yday - t1.tm_yday;
-
     time_t reset = base + 86400 * (a + 1); // เวลา reset
     return reset;
 }
