@@ -11,6 +11,7 @@
 #include <set>           //not include same element
 #include <unordered_map> //mapscards
 #include <map>           //map
+#include <ctime>
 #include <chrono>        //time
 #include <thread>        //time
 using namespace std;
@@ -85,7 +86,7 @@ private:
     int lastRaise; // position
     int dealer;    // position
     int round;
-    int mandatory_bet;
+    int mandatoryBet;
     int pot;        // เงินใน Board รวม
     int highestBet; // เงินเดิมพันสูงสุด ณ ตอนนี้resetAccumulateBet
     bool cleanIncludeLastRaise;
