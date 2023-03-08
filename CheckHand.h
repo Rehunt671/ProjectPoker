@@ -35,7 +35,16 @@ bool findFreq(vector<std::pair<int, char>> hand, int &mainCardValue, int &minorC
         return true;
     return false;
 }
-
+int findKicker(vector<std::pair<int, char>> &split)
+{
+    int kicker = 0;
+    for (const auto &c : split)
+    {
+        if (c.first > kicker)
+            kicker = c.first;
+    }
+    return kicker;
+}
 string convertToCard(int max)
 {
     map<int, string> maxVar;
@@ -222,6 +231,7 @@ void PokerGame::checkHand(Player *p)
     bool StraightFlush = true;
     int mainCardValue = 0;
     int minorCardValue = 0;
+    int kicker = 0;
     vector<string> combined(p->cards.begin(), p->cards.end());
     combined.insert(combined.end(), cardsOnBoard.begin(), cardsOnBoard.end());
     sort(combined.begin(), combined.end(), [](const string &a, const string &b)
@@ -238,16 +248,22 @@ void PokerGame::checkHand(Player *p)
             p->rankOfHand.first = "RoyalFlush";
         else if (hasStraightFlush(split, mainCardValue, flushSuit, StraightFlush)) // ต้องมีทั้ง Flush กับ Straight ที่ตรงกัน กรณีเช็คยากสุดเทียบ mainCard X
             p->rankOfHand.first = "StraightFlush";
-        else if (hasFourOfKind(split, mainCardValue, minorCardValue)) // ต้องมีไพ่ 4 ใบ Rank เดียวกัน กรณีเช็คยากสุด เทียบไพ่ใบที่ 5 ที่เรียกว่า Kicker บนมือผู้เล่น 
+        else if (hasFourOfKind(split, mainCardValue, minorCardValue))
+        { // ต้องมีไพ่ 4 ใบ Rank เดียวกัน กรณีเช็คยากสุด เทียบไพ่ใบที่ 5 ที่เรียกว่า Kicker บนมือผู้เล่น
             p->rankOfHand.first = "FourOfKind";
+            kicker = findKicker(split);
+        }
         else if (hasFullHouse(split, mainCardValue, minorCardValue)) // ต้องมีไพ่ ตอง 1 และ คู่ 1 คู่ กรณีเช็คยากสุด เทียบ main แล้ว minor X
             p->rankOfHand.first = "FullHouse";
         else if (hasFlush(split, mainCardValue, minorCardValue, flushSuit)) // 5 ใบหน้าตรงกัน กรณีเช็คยากสุด เทียบเรียงใบ
             p->rankOfHand.first = "Flush";
         else if (hasStraight(split, mainCardValue, flushSuit, StraightFlush)) // 5 ใบเรียง กรณีเช็คยากสุดเทียบ mainCard X
             p->rankOfHand.first = "Straight";
-        else if (hasTreeOfKind(split, mainCardValue, minorCardValue)) // 1ต้อง   กรณีเช็คยากสุดเทียบ Kicker บนมือผู้เล่น  
+        else if (hasTreeOfKind(split, mainCardValue, minorCardValue))
+        {
             p->rankOfHand.first = "ThreeOfKind";
+            kicker = findKicker(split);
+        }                                                          // 1ต้อง   กรณีเช็คยากสุดเทียบ Kicker บนมือผู้เล่น
         else if (hasTwoPair(split, mainCardValue, minorCardValue)) // 2 คู่  กรณีเช็คยากสุด เทียบ main แล้ว minor X
             p->rankOfHand.first = "TwoPair";
     }
