@@ -129,6 +129,12 @@ void PokerGame::actionboard2()
     cout << left << "money : ";
     cout.width(25);
     cout << players[1]->chip << "\n";
+    cout << left << "accomulate bet : ";
+    cout.width(16);
+    cout << players[0]->accumulateBet;
+    cout << left << "accomulate bet : ";
+    cout.width(16);
+    cout << players[1]->accumulateBet << "\n";
     cout << left << "action : ";
     cout.width(24);
     cout << players[0]->action;
@@ -140,7 +146,18 @@ void PokerGame::actionboard2()
 
 void PokerGame::actionboard3()
 {
-
+    cout << left;
+    cout.width(33);
+    cout << players[0]->role;
+    cout << left;
+    cout.width(33);
+    cout << players[1]->role;
+    cout << left;
+    cout.width(33);
+    cout << players[2]->role;
+    cout << left;
+    cout.width(33);
+    cout << players[3]->role << "\n";
     cout << left << "player1 : ";
     cout.width(23);
     cout << players[0]->name;
@@ -159,6 +176,15 @@ void PokerGame::actionboard3()
     cout << left << "money : ";
     cout.width(25);
     cout << players[2]->chip << "\n";
+    cout << left << "accomulate bet : ";
+    cout.width(16);
+    cout << players[0]->accumulateBet;
+    cout << left << "accomulate bet : ";
+    cout.width(16);
+    cout << players[1]->accumulateBet;
+    cout << left << "accomulate bet : ";
+    cout.width(16);
+    cout << players[2]->accumulateBet << "\n";
     cout << left << "action : ";
     cout.width(24);
     cout << players[0]->action;
@@ -173,7 +199,18 @@ void PokerGame::actionboard3()
 
 void PokerGame::actionboard4()
 {
-
+    cout << left;
+    cout.width(33);
+    cout << players[0]->role;
+    cout << left;
+    cout.width(33);
+    cout << players[1]->role;
+    cout << left;
+    cout.width(33);
+    cout << players[2]->role;
+    cout << left;
+    cout.width(33);
+    cout << players[3]->role << "\n";
     cout << left << "player1 : ";
     cout.width(23);
     cout << players[0]->name;
@@ -198,6 +235,18 @@ void PokerGame::actionboard4()
     cout << left << "money : ";
     cout.width(20);
     cout << players[3]->chip << "\n";
+    cout << left << "accomulate bet : ";
+    cout.width(16);
+    cout << players[0]->accumulateBet;
+    cout << left << "accomulate bet : ";
+    cout.width(16);
+    cout << players[1]->accumulateBet;
+    cout << left << "accomulate bet : ";
+    cout.width(16);
+    cout << players[2]->accumulateBet;
+    cout << left << "accomulate bet : ";
+    cout.width(16);
+    cout << players[3]->accumulateBet << "\n";
     cout << left << "action : ";
     cout.width(24);
     cout << players[0]->action;
@@ -315,5 +364,21 @@ void showUiCardHand(vector<string> s)
         cout << "|         |    |         |" << endl;
         cout << "|_ _ _ _ _|    | _ _ _ _ |" << endl;
     }
+}
+void showprize(){
+    cout << "\n=========================================================================================";
+    cout << "==                       PPPPP    RRRRR    IIIII  ZZZZZZ  EEEEEE                       =="<<endl;
+    cout << "==                       P    P   R    R     I        Z   E                            =="<<endl;
+    cout << "==                       PPPPP    RRRRR      I       Z    EEEEEE                       =="<<endl;
+    cout << "==                       P        R   R      I     Z      E                            =="<<endl;
+    cout << "==                       P        R    R   IIIII  ZZZZZZ  EEEEEE                       =="<<endl;
+    cout << "========================================================================================="<<endl;
+    cout << "========================================================================================="<<endl;
+    cout << "=                                    This is pot*......                                  "<<endl;
+    cout << "=            *0.5 in 20 percent      *0.8 in 20 percent      *1.0 in 40 percent          "<<endl;
+    cout << "=                       *1.2 in 10 percent      *1.5 in 5 percent                        "<<endl;
+    cout << "                                                                                         "<<endl;
+    cout << "                        !!!! And the big win *2 in 5 percent !!!!                        "<<endl;        
+    cout << "========================================================================================="<<endl;
 }
 #endif
