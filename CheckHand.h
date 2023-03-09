@@ -35,13 +35,20 @@ bool findFreq(vector<std::pair<int, char>> hand, int &mainCardValue, int &minorC
         return true;
     return false;
 }
-int findKicker(vector<std::pair<int, char>> &split, int &mainCardValue)/////หาไพ่ใบรองจาก main ในมือเราถ้าไม่มี ก็คือเสมอเลย
+int findKicker(vector<string> cards,const int mainCardValue,const int minorCardValue,const bool twopair)/////หาไพ่ใบรองจาก main ในมือเราถ้าไม่มี ก็คือเสมอเลย
 {
     int kicker = 0;
-    for (const auto &c : split)
-    {
-        if (c.first > kicker && c.first != mainCardValue)
-            kicker = c.first;
+    int cardVar = 0;
+    convertFrontToNumber(cards);
+    for(size_t i = 0 ; i < cards.size() ;i++){
+        cardVar =  stoi(cards[i].substr(0, cards[i].length() - 1));
+        if(twopair) {
+            if(cardVar > kicker && cardVar != mainCardValue && cardVar != minorCardValue ) kicker = cardVar;
+        }
+        else {
+            if(cardVar > kicker && cardVar != mainCardValue) 
+                kicker = cardVar;
+            }
     }
     return kicker;
 }
@@ -79,33 +86,51 @@ int findRankInNumber(string strRank)
         return ranking[strRank];
     return 0;
 }
-
+string findRankInStr(int intRank){
+    map<int,string> ranking;
+    ranking[1] = "RoyalFlush";
+    ranking[2] = "StraightFlush";
+    ranking[3] = "FourOfKind";
+    ranking[4] = "FullHouse";
+    ranking[5] = "Flush";
+    ranking[6] = "Straight";
+    ranking[7] = "ThreeOfKind";
+    ranking[8] = "TwoPair";
+    ranking[9] = "Pair";
+    ranking[10] = "HighCard";
+    if(ranking.count(intRank) > 0)
+        return ranking[intRank];
+    return 0;
+}
+void convertFrontToNumber(vector<string> & v){
+    for (size_t i = 0; i < v.size(); i++)
+    {
+        if (v[i][0] == 'A')
+        {
+            v[i].replace(0, 1, "14");
+        }
+        else if (v[i][0] == 'K')
+        {
+            v[i].replace(0, 1, "13");
+        }
+        else if (v[i][0] == 'Q')
+        {
+            v[i].replace(0, 1, "12");
+        }
+        else if (v[i][0] == 'J')
+        {
+            v[i].replace(0, 1, "11");
+        }
+        else if (v[i][0] == 'T')
+        {
+            v[i].replace(0, 1, "10");
+        }
+    }
+}
 void convertToPairVector(vector<std::pair<int, char>> &split, vector<string> &combined)
 {
     split.resize(combined.size());
-    for (size_t i = 0; i < combined.size(); i++)
-    {
-        if (combined[i][0] == 'A')
-        {
-            combined[i].replace(0, 1, "14");
-        }
-        else if (combined[i][0] == 'K')
-        {
-            combined[i].replace(0, 1, "13");
-        }
-        else if (combined[i][0] == 'Q')
-        {
-            combined[i].replace(0, 1, "12");
-        }
-        else if (combined[i][0] == 'J')
-        {
-            combined[i].replace(0, 1, "11");
-        }
-        else if (combined[i][0] == 'T')
-        {
-            combined[i].replace(0, 1, "10");
-        }
-    }
+    convertFrontToNumber(combined);
     for (size_t i = 0; i < combined.size(); i++)
     {
         split[i].first = stoi(combined[i].substr(0, combined[i].length() - 1));
@@ -152,7 +177,7 @@ bool hasStraight(vector<std::pair<int, char>> hand, int &mainCardValue, char &fl
     }
     return false;
 }
-bool findFiveSuit(vector<std::pair<int, char>> hand, char &flushSuit)
+bool findFlushSuit(vector<std::pair<int, char>> hand, char &flushSuit)
 {
     unordered_map<char, int> suitCounts;
     for (auto &p : hand)
@@ -175,18 +200,18 @@ bool findFiveSuit(vector<std::pair<int, char>> hand, char &flushSuit)
     }
     return true;
 }
-bool hasFlush(vector<std::pair<int, char>> hand, int &mainCardValue, int &minorCardValue, char &flushSuit)
+bool hasFlush(vector<std::pair<int, char>> hand,vector<int> &flushRank,const char flushSuit)
 {
-    minorCardValue = 0;
     if (flushSuit != '\0')
     {
         for (int i = 0; i < hand.size(); i++)
         {
-            if (hand[i].second == flushSuit && hand[i].first > mainCardValue)
+            if (hand[i].second == flushSuit)
             {
-                mainCardValue = hand[i].first;
+                flushRank.emplace_back(hand[i].first);
             }
         }
+        sort(flushRank.begin(),flushRank.end(),greater<int>());
         return true;
     }
     return false;
@@ -231,7 +256,6 @@ void PokerGame::checkHand(Player *p)
     bool StraightFlush = true;
     int mainCardValue = 0;
     int minorCardValue = 0;
-    int kicker = 0;
     vector<string> combined(p->cards.begin(), p->cards.end());
     combined.insert(combined.end(), cardsOnBoard.begin(), cardsOnBoard.end());
     sort(combined.begin(), combined.end(), [](const string &a, const string &b)
@@ -242,34 +266,29 @@ void PokerGame::checkHand(Player *p)
     if (split.size() >= 5)
     {
 
-        findFiveSuit(split, flushSuit); // เริ่มแรกมาเช็คหน้าไพ่ก่อนเลยว่ามีซ้ำครบ 5 ใบไหม
+        findFlushSuit(split, flushSuit); // เริ่มแรกมาเช็คหน้าไพ่ก่อนเลยว่ามีซ้ำครบ 5 ใบไหม
         cout << flushSuit << "\n";
         if (hasRoyalFlush(split, flushSuit)) // ต้องมี Flush และตรงกับ Rank A K Q J 10 กรณีเช็คยากสุดเทียบ mainCard X
             p->rankOfHand.first = "RoyalFlush";
         else if (hasStraightFlush(split, mainCardValue, flushSuit, StraightFlush)) // ต้องมีทั้ง Flush กับ Straight ที่ตรงกัน กรณีเช็คยากสุดเทียบ mainCard X
             p->rankOfHand.first = "StraightFlush";
-        else if (hasFourOfKind(split, mainCardValue, minorCardValue))
-        { // ต้องมีไพ่ 4 ใบ Rank เดียวกัน กรณีเช็คยากสุด เทียบไพ่ใบที่ 5 ที่เรียกว่า Kicker บนมือผู้เล่น
+        else if (hasFourOfKind(split, mainCardValue, minorCardValue)) // ต้องมีไพ่ 4 ใบ Rank เดียวกัน กรณีเช็คยากสุด เทียบไพ่ใบที่ 5 ที่เรียกว่า Kicker บนมือผู้เล่น
             p->rankOfHand.first = "FourOfKind";
-            kicker = findKicker(split, mainCardValue);
-        }
         else if (hasFullHouse(split, mainCardValue, minorCardValue)) // ต้องมีไพ่ ตอง 1 และ คู่ 1 คู่ กรณีเช็คยากสุด เทียบ main แล้ว minor X
             p->rankOfHand.first = "FullHouse";
-        else if (hasFlush(split, mainCardValue, minorCardValue, flushSuit)) // 5 ใบหน้าตรงกัน กรณีเช็คยากสุด เทียบเรียงใบ
+        else if (hasFlush(split,p->flushRank,flushSuit)) // 5 ใบหน้าตรงกัน กรณีเช็คยากสุด เทียบเรียงใบ 5 ใบ
             p->rankOfHand.first = "Flush";
         else if (hasStraight(split, mainCardValue, flushSuit, StraightFlush)) // 5 ใบเรียง กรณีเช็คยากสุดเทียบ mainCard X
             p->rankOfHand.first = "Straight";
         else if (hasTreeOfKind(split, mainCardValue, minorCardValue))
-        {
-            p->rankOfHand.first = "ThreeOfKind";
-            kicker = findKicker(split, mainCardValue);
-        }                                                          // 1ต้อง   กรณีเช็คยากสุดเทียบ Kicker บนมือผู้เล่น
-        else if (hasTwoPair(split, mainCardValue, minorCardValue)) // 2 คู่  กรณีเช็คยากสุด เทียบ main แล้ว minor X
+            p->rankOfHand.first = "ThreeOfKind";                                                        // 1ต้อง   กรณีเช็คยากสุดเทียบ Kicker บนมือผู้เล่น
+        else if (hasTwoPair(split, mainCardValue, minorCardValue)) // 2 คู่  กรณีเช็คยากสุด เทียบ main แล้ว minor แล้วไป kicker
             p->rankOfHand.first = "TwoPair";
+        
     }
     if (p->rankOfHand.first == "")
     {
-        if (hasPair(split, mainCardValue, minorCardValue)) // 1 คู่  กรณีเช็คยากสุดเทียบ mainCard X
+        if (hasPair(split, mainCardValue, minorCardValue)) // 1 คู่  กรณีเช็คยากสุดเทียบ kicker
             p->rankOfHand.first = "Pair";
         else
         {
@@ -277,6 +296,12 @@ void PokerGame::checkHand(Player *p)
             p->rankOfHand.first = "HighCard";
         }
     }
+    if(p->rankOfHand.first == "FourOfKind" || p->rankOfHand.first == "ThreeOfKind" ||
+     p->rankOfHand.first == "TwoPair" || p->rankOfHand.first == "Pair"  ){
+        bool twopair = false;
+        if(p->rankOfHand.first == "TwoPair") twopair = true;
+        p->kicker = findKicker(p->cards,mainCardValue,minorCardValue,twopair);
+     }
     p->rankOfHand.second.first = findRankInNumber(p->rankOfHand.first);
     p->rankOfHand.second.second.first = mainCardValue;
     p->rankOfHand.second.second.second = minorCardValue;
