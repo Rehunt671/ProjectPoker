@@ -44,18 +44,13 @@ void PokerGame::createOrderTable()
 { // Collum 1-2
 
     od[1].emplace_back("call");
-    od[1].emplace_back("call");
     od[1].emplace_back("check");
-    od[2].emplace_back("raise");
     od[2].emplace_back("raise");
     od[2].emplace_back("bet");
     od[3].emplace_back("cheat");
     od[3].emplace_back("cheat");
-    od[3].emplace_back("cheat");
-    od[4].emplace_back("fold");
     od[4].emplace_back("all-in");
     od[4].emplace_back("all-in");
-    od[5].emplace_back("");
     od[5].emplace_back("fold");
     od[5].emplace_back("fold");
 }
@@ -87,6 +82,7 @@ PokerGame::PokerGame(Database &pokerDB, Deck &deck, int num_player, int chip, in
     for (auto &p : players)
     {
         p->chip = chip;
+        p->kicker = 0;
     } // กำหนดเงินเรียงคน
     createOrderTable();
     this->mandatoryBet = mandatorybet;   // Chip เดิมพันขั้นต่ำที่จะเล่นกัน
@@ -175,7 +171,7 @@ void PokerGame::assignRole()
         dealer = (dealer + 1) % num_player;
         resetAction(cleanIncludeLastRaise);
     }
-    players[dealer]->role = "dealer";
+    players[dealer]->role = ""; // จริงๆไม่ต้องมีก็ได้
     players[(dealer + 1) % num_player]->role = "small-blind";
     players[(dealer + 2) % num_player]->role = "big-blind";
 }
@@ -209,6 +205,47 @@ void PokerGame::showTurn()
         break;
     }
 }
+void PokerGame::showPlayerHandRank(Player *p)
+{
+
+    cout << p->name << "'s Hand: " << p->rankOfHand.first << "\n";
+    cout << p->name << "'s HandRanking: " << p->rankOfHand.second.first << "\n"; // 10 อันดับ ใกล้ 1 สูงสุด
+    if (p->rankOfHand.first != "Flush")
+    {
+        cout << p->name << "'s HighestCard: " << convertToCard(p->rankOfHand.second.second.first) << "\n";
+        if (p->rankOfHand.first == "FullHouse" || p->rankOfHand.first == "TwoPair")
+            cout << p->name << "'s PairCard: " << convertToCard(p->rankOfHand.second.second.second) << "\n";
+    }
+    else
+    {
+        string num = "1";
+        string back = "";
+        int temp = 0;
+        for (const auto &rank : p->flushRank)
+        {
+            switch (num.back())
+            {
+            case '1':
+                back = "st";
+                break;
+            case '2':
+                back = "nd";
+                break;
+            case '3':
+                back = "rd";
+                break;
+
+            default:
+                back = "th";
+                break;
+            }
+            cout << "Rank of card " << num + back << ": " << convertToCard(rank) << "\n";
+            temp = stoi(num);
+            temp++;
+            num = to_string(temp);
+        }
+    }
+}
 void PokerGame::showPlayerAccumulateBet(Player *p)
 {
     cout << p->name << "'s AccumulateBet = " << p->accumulateBet << "\n";
@@ -234,11 +271,8 @@ void PokerGame::preflop() // เริ่มรอบแรกของเกม
         cout << players[current]->name << "'s Turn\n";
         showPlayerCards(players[current]);
         if (players[current]->rankOfHand.first == "")
-        {
             checkHand(players[current]);
-        }
-        showHandRank(players[current]);
-        showPlayerAccumulateBet(players[current]);
+        showPlayerHandRank(players[current]);
         showActionChoice();
         recieveOrder(players[current]);
         if (findWinner())
@@ -251,14 +285,6 @@ void PokerGame::preflop() // เริ่มรอบแรกของเกม
             updateRound();
         }
     }
-}
-void PokerGame::showHandRank(Player *p)
-{
-
-    cout << p->name << "'s Hand: " << p->rankOfHand.first << "\n";
-    cout << p->name << "'s HandRanking: " << p->rankOfHand.second.first << "\n";
-    cout << p->name << "'s HighestCard: " << convertToCard(p->rankOfHand.second.second.first) << "\n";
-    cout << p->name << "'s MinorCard: " << convertToCard(p->rankOfHand.second.second.second) << "\n";
 }
 
 void PokerGame::flop()
@@ -276,14 +302,8 @@ void PokerGame::flop()
         cout << players[current]->name << "'s Turn\n";
         showPlayerCards(players[current]);
         if (players[current]->rankOfHand.first == "")
-            if (players[current]->action == "fold")
-            {
-                updateRound();
-                continue; // เจอคนหมอบก็ข้ามได้เลย
-            }
-        checkHand(players[current]);
-        showHandRank(players[current]);
-        showPlayerAccumulateBet(players[current]);
+            checkHand(players[current]);
+        showPlayerHandRank(players[current]);
         showActionChoice();
         recieveOrder(players[current]);
         if (findWinner())
@@ -313,8 +333,7 @@ void PokerGame::turn()
         showPlayerCards(players[current]);
         if (players[current]->rankOfHand.first == "")
             checkHand(players[current]);
-        showHandRank(players[current]);
-        showPlayerAccumulateBet(players[current]);
+        showPlayerHandRank(players[current]);
         showActionChoice();
         recieveOrder(players[current]);
         if (findWinner())
@@ -344,8 +363,7 @@ void PokerGame::river()
         showPlayerCards(players[current]);
         if (players[current]->rankOfHand.first == "")
             checkHand(players[current]);
-        showHandRank(players[current]);
-        showPlayerAccumulateBet(players[current]);
+        showPlayerHandRank(players[current]);
         showActionChoice();
         recieveOrder(players[current]);
         if (findWinner())
@@ -378,41 +396,68 @@ void PokerGame::updateRound()
     hasBetRaiseOrAllIn = false;
     round++;
 }
+void filterWinnerNormal(vector<Player *> &allWinner, const int &rankingRef, int &mainCard, int &minorCard, int &kicker)
+{
+
+    for (auto &p : allWinner)
+    {
+        if (p->rankOfHand.second.first == rankingRef) // คนที่มี Rank สูงสุดถึงจะมีสิทธิ์เทียบไพ่บนมือ
+        {
+            if (p->rankOfHand.second.second.first >= mainCard)
+            {
+                mainCard = p->rankOfHand.second.second.first;
+                if (p->rankOfHand.second.second.second >= minorCard)
+                {
+                    minorCard = p->rankOfHand.second.second.second;
+                    if (p->kicker > kicker)
+                        kicker = p->kicker;
+                }
+            }
+        } // หา Ranking ไพ่สูงสุดใกล้อันดับ 1 คนไหนสูงสุด และ มีลำดับไพ่อะไรบ้าง
+    }
+    for (int i = allWinner.size() - 1; i >= 0; i--)
+    {
+        if (allWinner[i]->rankOfHand.second.first == rankingRef && allWinner[i]->rankOfHand.second.second.first == mainCard &&
+            allWinner[i]->rankOfHand.second.second.second == minorCard && allWinner[i]->kicker == kicker)
+            continue;
+        else
+            allWinner.erase(allWinner.begin() + i);
+    }
+}
 bool PokerGame::findWinner()
 {
+    vector<Player *> allWinner;
     int cntAllin = 0;
     int cntKnockout = 0;
     int cntWin = 0;
     int finalMoney = pot;
     for (auto &p : players)
     {
+        if (p->action == "")
+            return false;
+    } // ยังไม่จบรอบนั้นๆ
+    ////////////////////////////////////มาถึงตรงนี้ได้แปลว่ามี Action กันหมดทุกคนแล้ว
+    for (auto &p : players)
+    {
         if (p->action == "all-in")
             cntAllin++;
         else if (p->action == "fold" || p->action == "dead")
             cntKnockout++;
-    }                                        // นับ Action ที่สำคัญพอ
-    if (cntKnockout == num_player - 1) // แปลว่า หมอบหนีหรือตาย จนเหลือเราคนเดียว
+        if (p->action != "fold" && p->action != "dead")
+            allWinner.emplace_back(p); // หาคนที่มีสิทธิชนะ
+    }
+    if (allWinner.size() == 1) // แปลว่า หมอบหนีหรือตาย จนเหลือเราคนเดียว
     {
-        for (auto &p : players)
-        {
-            if (p->action != "fold" && p->action != "dead")
-            {
-                cntWin++;
-                riskPrize(p, cntWin);
-                return true;
-            }
-        }
+        cntWin = 1;
+        riskPrize(allWinner[0], cntWin);
+        return true;
     }
     else if (round == 4 || cntAllin + cntKnockout == num_player) // รอบสี่ต้องเปิดไพ่ หรือ ทุกคน All in มาหมดก็ต้องเปิดไพ่เช่นกัน
     {
         int rankingRef = 10; // ต้องน้อยสุดเข้าใกล้  1
         int mainCard = 0;    // ต้องมากสุดเข้าใกล้ 14
         int minorCard = 0;   // ต้องมากสุดเข้าใกล้ 14
-        for (auto &p : players)
-        {
-            if (p->action == "")
-                return false;
-        } // ยังไม่จบรอบนั้นๆ
+        int kicker = 0;
         switch (round)
         {
         case 1:
@@ -429,48 +474,33 @@ bool PokerGame::findWinner()
             break;
         }
         cout << "-------------------------------------------------------------Okay!!! Let Reveal All Players Hand-------------------------------------------------------------\n";
-        for (auto &p : players)
+        for (auto &p : allWinner)
         {
-            if (p->action != "fold" && p->action != "dead") // เช็คคนที่ไม่ได้ หมอบ หรือ ตายไปพอ
-            {
+            showPlayerCards(p);
+            showPlayerHandRank(p);
+            if (p->rankOfHand.second.first < rankingRef) // เก็บ Rankของคนที่ไม่หมอบกับตาย เอาอันที่เข้าใกล้ 1 สุด
+                rankingRef = p->rankOfHand.second.first;
+        }
+        switch (rankingRef)
+        {
+        case 5:
 
-                auto maxRank = std::min_element(players.begin(), players.end(),
-                                                [](const Player *a, const Player *b)
-                                                { return *a < b; }); // Iterator is point to Player* Type in vector Name = players แปลไทย คือ Interator ตัวนี้ เป็น ที่อยู่ของ ที่อยู่ของ Player ที่มี min elementในเวกเตอร์ชื่อ players
-                rankingRef = (*maxRank)->rankOfHand.second.first;    // หาRankingRef ก่อน
-                // if(rankingRef == 5) flushCheck(players);
-                if (p->rankOfHand.second.first == rankingRef) // คนที่มี Rank สูงสุดถึงจะมีสิทธิ์เทียบไพ่บนมือ
-                {
-                    rankingRef = p->rankOfHand.second.first;
-                    if (p->rankOfHand.second.second.first >= mainCard)
-                    {
-                        mainCard = p->rankOfHand.second.second.first;
-                        if (p->rankOfHand.second.second.second > minorCard)
-                            minorCard = p->rankOfHand.second.second.second;
-                    }
-                } // หา Ranking ไพ่สูงสุดใกล้อันดับ 1 คนไหนสูงสุด และ มีลำดับไพ่อะไรบ้าง
-                showPlayerCards(p);
-                cout << p->name << " has " << p->rankOfHand.first << "\n";
-                cout << "Ranking : " << p->rankOfHand.second.first << "\n"; // 10 อันดับ ใกล้ 1 สูงสุด
-                cout << "HighestCard : " << convertToCard(p->rankOfHand.second.second.first) << "\n";
-                cout << "PairCard : " << convertToCard(p->rankOfHand.second.second.second) << "\n";
-            }
+            break;
+
+        default:
+            filterWinnerNormal(allWinner, rankingRef, mainCard, minorCard, kicker);
+            break;
         }
-        cout << "Max Rank Of Hand = " << rankingRef << "\n";
-        cout << "HighestCard Card  = " << mainCard << "\n";
-        cout << "PairCard  Card  = " << minorCard << "\n";
-        for (auto &p : players) // หาว่ามีคนเสมอกี่คน
+        cntWin = allWinner.size();
+        cout << "----------------------------------------------------------\n";
+        cout << "RankingRef = " << rankingRef << "\n";
+        cout << "MainCard = " << convertToCard(mainCard) << "\n";
+        cout << "MinorCard = " << convertToCard(minorCard) << "\n";
+        cout << "KickerCard = " << convertToCard(kicker) << "\n";
+        cout << "-----------------------We have " << cntWin << " player win-----------------------\n";
+        for (auto &p : allWinner)
         {
-            if (p->rankOfHand.second.first == rankingRef && p->rankOfHand.second.second.first == mainCard && p->rankOfHand.second.second.second == minorCard)
-                cntWin++;
-        }
-        cout << "-----------------------We have " << cntWin << " Player win-----------------------\n";
-        for (auto &p : players)
-        {
-            if (p->rankOfHand.second.first == rankingRef && p->rankOfHand.second.second.first == mainCard && p->rankOfHand.second.second.second == minorCard)
-            {
-                riskPrize(p, cntWin);
-            }
+            riskPrize(p, cntWin);
         }
         return true;
     }
@@ -482,7 +512,8 @@ void PokerGame::riskPrize(Player *p, int &cntWin)
     int r;
     int finalPot = pot / cntWin;
     cout << "Congratulation!!!! " << p->name << " is a winner here\n";
-    cout << "Do you want to play risk prize?(Press Y = Yes , N = No)\nWARNING !!!!! This prize is make your pot more or lower than you get now!!. " << endl;
+    showprize();
+    cout << "Do you want to play risk prize?(Press Y = Yes , Other = No)\nWARNING !!!!! This prize is make your pot more or lower than you get now!!. " << endl;
     cin >> c;
     r = rand() % 100 + 1;
     if (c == 'y' || c == 'Y')
@@ -534,6 +565,7 @@ void PokerGame::showActionChoice()
         cout << num++ << ".Call\n";
         cout << num++ << ".Raise\n";
         cout << num++ << ".Cheat\n";
+        cout << num++ << ".All-In\n";
         cout << num++ << ".Fold\n";
     }
     else
@@ -592,13 +624,9 @@ void PokerGame::recieveOrder(Player *p) // รับคำสั่งมาก�
                 clearInput();
             }
         }
-        if (hasBetRaiseOrAllIn && round > 1)
+        if (!hasBetRaiseOrAllIn && round > 1)
         {
             collum = 1;
-        }
-        else if (!hasBetRaiseOrAllIn && round > 1)
-        {
-            collum = 2;
         }
         auto it = od.find(p->order);
         if (it == od.end() || od[p->order][collum].empty()) // ไม่มี or หาไม่เจอ
@@ -878,6 +906,10 @@ Player::Player(string username, string password, string name, int moneyInWeb) : 
     role = "";
     accumulateBet = 0;
     order = 1;
+}
+Player::~Player()
+{
+    cout << "Player class has been destroy\n";
 }
 Deck::Deck()
 {
