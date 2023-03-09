@@ -34,8 +34,10 @@ struct Player
 {
 public:
     Player(string, string, string, int);
+    ~Player();
     pair<string, pair<int, pair<int, int>>> rankOfHand; // ประกอบไปด้วย (Rankไพ่บนมือ(String),{Rank(int1-10),{ไพ่สูงสุดMainCard,ไพ่รองคู่สูงสุดMinorCard}})
-    // vector<int> allOfFlushCards;
+    int kicker;
+    vector<int> flushRank;
     string username;
     string password; //
     string name;     // ชื่อคนเล่น
@@ -47,10 +49,6 @@ public:
     string action;        // การกระทำของเรา ณ ตอนนั้น Call Raise Bet Fold Cheat etc.
     string role;          // ตำแหน่งของเรา dealer ,Small Blind, Big Blind
     int order;            // คำสั่งของเรา
-    bool operator<(const Player *other) const
-    {
-        return rankOfHand.second.first < other->rankOfHand.second.first;
-    }
 };
 class Database
 {
@@ -119,7 +117,7 @@ public:
     void showMoneyBet();
     void showActionChoice();
     void showPlayerCards(Player *);
-    void showHandRank(Player *);
+    void showPlayerHandRank(Player *);
     void showPlayerAccumulateBet(Player *);
     void holecards();
     void communityCards(int);
@@ -155,6 +153,7 @@ void showUiCardHand(vector<string>);
 void changeCard(Player *p, vector<string> &deck);
 void seeCheat(Player *p, vector<Player *> players);
 string convertToCard(int);
+void convertFrontToNumber(vector<string> & v);
 void clearInput();
 int handleString(string);
 /// Definition
