@@ -12,12 +12,12 @@
 #include <unordered_map> //mapscards
 #include <map>           //map
 #include <ctime>
-#include <chrono>        //time
-#include <thread>        //time
+#include <chrono> //time
+#include <thread> //time
 using namespace std;
 using namespace std::chrono;
-using std::cout;
 using std::cin;
+using std::cout;
 struct Deck
 {
 private:
@@ -153,7 +153,8 @@ void showUiCardHand(vector<string>);
 void changeCard(Player *p, vector<string> &deck);
 void seeCheat(Player *p, vector<Player *> players);
 string convertToCard(int);
-void convertFrontToNumber(vector<string> & v);
+void convertFrontToNumber(vector<string> &v);
+void showprize();
 void clearInput();
 int handleString(string);
 /// Definition
