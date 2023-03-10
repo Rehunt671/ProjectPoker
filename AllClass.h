@@ -35,9 +35,10 @@ struct Player
 public:
     Player(string, string, string, int);
     ~Player();
-    pair<string, pair<int, pair<int, int>>> rankOfHand; // ประกอบไปด้วย (Rankไพ่บนมือ(String),{Rank(int1-10),{ไพ่สูงสุดMainCard,ไพ่รองคู่สูงสุดMinorCard}})
-    int kicker;
-    vector<int> flushRank;
+    pair<string, int> handRanking; // ประกอบไปด้วย (Rankไพ่บนมือ(String),{Rank(int1-10),{ไพ่สูงสุดMainCard,ไพ่รองคู่สูงสุดMinorCard}}
+    pair<pair<int,char>,pair<int,char>> cardRanking; 
+    vector<pair<int,char>> kicker;
+    vector<pair<int,char>> flushRank;
     string username;
     string password; //
     string name;     // ชื่อคนเล่น
@@ -94,7 +95,7 @@ public:
     PokerGame(Database &, Deck &, int, int, int);
     ~PokerGame();
     map<int, vector<string>> od;
-    void createPlayer();
+    void createPlayer(const int);
     void createOrderTable();
     void showTurn();
     void topboard();
