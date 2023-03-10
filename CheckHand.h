@@ -1,10 +1,15 @@
 #ifndef PROJECT3_H
 #define PROJECT3_H
-bool findFreq(vector<std::pair<int, char>> hand, int &mainCardValue, int &minorCardValue, int num)
+void sortIntChar(vector<pair<int, char>> &vec)
+{
+    std::sort(vec.begin(), vec.end(), [](const auto &a, const auto &b)
+              { return a.first < b.first; });
+}
+bool findFreq(vector<std::pair<int, char>> hand, pair<int, char> &mainCardValue, pair<int, char> &minorCardValue, int num)
 {
     // Reset ค่าออกให้หมดก่อน
-    mainCardValue = 0;
-    minorCardValue = 0;
+    mainCardValue.first = 0;
+    minorCardValue.first = 0;
     unordered_map<int, int> freqRank;
     bool found = false;
     for (const auto &cards : hand)
@@ -21,35 +26,43 @@ bool findFreq(vector<std::pair<int, char>> hand, int &mainCardValue, int &minorC
 
     for (const auto &pair : freqRank) // เรียงจากมากมาน้อยแล้ว
     {
-        if (pair.second >= num && mainCardValue == 0)
+        if (pair.second >= num && mainCardValue.first == 0)
         {
-            mainCardValue = pair.first;
+            mainCardValue.first = pair.first;
+            mainCardValue.second = pair.second;
             found = true;
         }
-        else if (pair.second >= 2 && minorCardValue == 0) // ต้องเป็นคู่ 2 เท่านั้น && ทำจนได้ค่ารอบเดียวพอ && ต้อง != mainCardValue เนื่องจาก ถ้า TwoPair เจอ TwoPair ให้ค่าหลักไปอยู่ที่ mainCardValue
+        else if (pair.second >= 2 && minorCardValue.first == 0) // ต้องเป็นคู่ 2 เท่านั้น && ทำจนได้ค่ารอบเดียวพอ && ต้อง != mainCardValue เนื่องจาก ถ้า TwoPair เจอ TwoPair ให้ค่าหลักไปอยู่ที่ mainCardValue
         {
-            minorCardValue = pair.first;
+            minorCardValue.first = pair.first;
+            minorCardValue.second = pair.second;
         }
     }
     if (found)
         return true;
     return false;
 }
-int findKicker(vector<string> cards,const int mainCardValue,const int minorCardValue,const bool twopair)/////หาไพ่ใบรองจาก main ในมือเราถ้าไม่มี ก็คือเสมอเลย
+vector<pair<int,char>> findKicker(vector<string> cards, const pair<int, char> mainCardValue, const pair<int, char> minorCardValue, const bool twopair) /////หาไพ่ใบรองจาก main ในมือเราถ้าไม่มี ก็คือเสมอเลย
 {
-    int kicker = 0;
-    int cardVar = 0;
+    vector<pair<int, char>> kicker(2);
+    pair<int, char> cardVar;
     convertFrontToNumber(cards);
-    for(size_t i = 0 ; i < cards.size() ;i++){
-        cardVar =  stoi(cards[i].substr(0, cards[i].length() - 1));
-        if(twopair) {
-            if(cardVar > kicker && cardVar != mainCardValue && cardVar != minorCardValue ) kicker = cardVar;
+    for (size_t i = 0; i < cards.size(); i++)
+    {
+        cardVar.first = stoi(cards[i].substr(0, cards[i].length() - 1));
+        cardVar.second = cards[i].back();
+        if (twopair)
+        {
+            if (cardVar.first > kicker[i].first && cardVar.first != mainCardValue.first && cardVar.first != minorCardValue.first)
+                kicker.emplace_back((cardVar.first,cardVar.second));
         }
-        else {
-            if(cardVar > kicker && cardVar != mainCardValue) 
-                kicker = cardVar;
-            }
+        else
+        {
+            if (cardVar > kicker[i] && cardVar != mainCardValue)
+                kicker.emplace_back((cardVar.first,cardVar.second));
+        }
     }
+    sortIntChar(kicker);
     return kicker;
 }
 string convertToCard(int max)
@@ -86,8 +99,9 @@ int findRankInNumber(string strRank)
         return ranking[strRank];
     return 0;
 }
-string findRankInStr(int intRank){
-    map<int,string> ranking;
+string findRankInStr(int intRank)
+{
+    map<int, string> ranking;
     ranking[1] = "RoyalFlush";
     ranking[2] = "StraightFlush";
     ranking[3] = "FourOfKind";
@@ -98,11 +112,12 @@ string findRankInStr(int intRank){
     ranking[8] = "TwoPair";
     ranking[9] = "Pair";
     ranking[10] = "HighCard";
-    if(ranking.count(intRank) > 0)
+    if (ranking.count(intRank) > 0)
         return ranking[intRank];
     return 0;
 }
-void convertFrontToNumber(vector<string> & v){
+void convertFrontToNumber(vector<string> &v)
+{
     for (size_t i = 0; i < v.size(); i++)
     {
         if (v[i][0] == 'A')
@@ -156,7 +171,7 @@ bool hasRoyalFlush(vector<std::pair<int, char>> hand, char &flushSuit)
 
     return false;
 }
-bool hasStraight(vector<std::pair<int, char>> hand, int &mainCardValue, char &flushSuit, bool &StraightFlush)
+bool hasStraight(vector<std::pair<int, char>> hand, pair<int, char> &mainCardValue, char &flushSuit, bool &StraightFlush)
 {
     int i = hand.size() - 1;
     while (i > 0)
@@ -169,7 +184,7 @@ bool hasStraight(vector<std::pair<int, char>> hand, int &mainCardValue, char &fl
     {
         if (i - 4 >= 0 && hand[i].first - hand[i - 1].first == 1 && hand[i].first - hand[i - 2].first == 2 && hand[i].first - hand[i - 3].first == 3 && hand[i].first - hand[i - 4].first == 4)
         {
-            mainCardValue = hand[i].first;
+            mainCardValue.first = hand[i].first;
             if (hand[i].second != flushSuit || hand[i - 1].second != flushSuit || hand[i - 2].second != flushSuit || hand[i - 3].second != flushSuit || hand[i - 4].second != flushSuit)
                 StraightFlush = false;
             return true;
@@ -200,7 +215,7 @@ bool findFlushSuit(vector<std::pair<int, char>> hand, char &flushSuit)
     }
     return true;
 }
-bool hasFlush(vector<std::pair<int, char>> hand,vector<int> &flushRank,const char flushSuit)
+bool hasFlush(vector<pair<int, char>> hand, vector<pair<int, char>> &flushRank, const char flushSuit)
 {
     if (flushSuit != '\0')
     {
@@ -208,54 +223,57 @@ bool hasFlush(vector<std::pair<int, char>> hand,vector<int> &flushRank,const cha
         {
             if (hand[i].second == flushSuit)
             {
-                flushRank.emplace_back(hand[i].first);
+                flushRank.emplace_back(make_pair(hand[i].first, hand[i].second));
             }
         }
-        sort(flushRank.begin(),flushRank.end(),greater<int>());
+        sort(flushRank.begin(), flushRank.end(), greater<int>());
         return true;
     }
     return false;
 }
-bool hasStraightFlush(vector<std::pair<int, char>> hand, int &mainCardValue, char &flushSuit, bool &StraightFlush)
+bool hasStraightFlush(vector<std::pair<int, char>> hand, pair<int, char> &mainCardValue, char &flushSuit, bool &StraightFlush)
 {
     return hasStraight(hand, mainCardValue, flushSuit, StraightFlush) && StraightFlush; // ต้องมี Straight ก่อนแล้วต้องเป็น StraightFlush ด้วย
 }
 
-bool hasFourOfKind(vector<std::pair<int, char>> hand, int &mainCardValue, int &minorCardValue)
+bool hasFourOfKind(vector<std::pair<int, char>> hand, pair<int, char> &mainCardValue, pair<int, char> &minorCardValue)
 {
     return findFreq(hand, mainCardValue, minorCardValue, 4);
 }
-bool hasTreeOfKind(vector<std::pair<int, char>> hand, int &mainCardValue, int &minorCardValue)
+bool hasTreeOfKind(vector<std::pair<int, char>> hand, pair<int, char> &mainCardValue, pair<int, char> &minorCardValue)
 {
 
     return findFreq(hand, mainCardValue, minorCardValue, 3);
 }
-bool hasTwoPair(vector<std::pair<int, char>> hand, int &mainCardValue, int &minorCardValue)
+bool hasTwoPair(vector<std::pair<int, char>> hand, pair<int, char> &mainCardValue, pair<int, char> &minorCardValue)
 {
 
-    return (findFreq(hand, mainCardValue, minorCardValue, 2) && minorCardValue != 0); // ต้องมีไพ่คู่รองด้วย(minorCardValue) ด้วยถ้ามัน == 0 แปลว่าไม่มีไพ่คู่รอง
+    return (findFreq(hand, mainCardValue, minorCardValue, 2) && minorCardValue.first != 0); // ต้องมีไพ่คู่รองด้วย(minorCardValue) ด้วยถ้ามัน == 0 แปลว่าไม่มีไพ่คู่รอง
 }
-bool hasPair(vector<std::pair<int, char>> hand, int &mainCardValue, int &minorCardValue)
+bool hasPair(vector<std::pair<int, char>> hand, pair<int, char> &mainCardValue, pair<int, char> &minorCardValue)
 {
 
     return findFreq(hand, mainCardValue, minorCardValue, 2);
 }
-bool hasFullHouse(vector<std::pair<int, char>> hand, int &mainCardValue, int &minorCardValue)
+bool hasFullHouse(vector<std::pair<int, char>> hand, pair<int, char> &mainCardValue, pair<int, char> &minorCardValue)
 {
-    return (hasTreeOfKind(hand, mainCardValue, minorCardValue) && minorCardValue != 0);
+    return (hasTreeOfKind(hand, mainCardValue, minorCardValue) && minorCardValue.first != 0);
 }
 
-void hasHighcards(vector<std::pair<int, char>> hand, int &mainCardValue)
+void hasHighcards(vector<std::pair<int, char>> hand, pair<int, char> &mainCardValue)
 {
-    mainCardValue = hand.back().first;
+    mainCardValue.first = hand.back().first;
 }
 void PokerGame::checkHand(Player *p)
 { // Check กรณีดังต่อไปนี้ 2 5 6 7 ใบ
     vector<std::pair<int, char>> split;
     char flushSuit = '\0';
     bool StraightFlush = true;
-    int mainCardValue = 0;
-    int minorCardValue = 0;
+    pair<int, char> mainCardValue;
+    pair<int, char> minorCardValue;
+    mainCardValue.first = 0;
+    minorCardValue.first = 0;
+    ////////////////////////////////////////////////////////////////////////////////
     vector<string> combined(p->cards.begin(), p->cards.end());
     combined.insert(combined.end(), cardsOnBoard.begin(), cardsOnBoard.end());
     sort(combined.begin(), combined.end(), [](const string &a, const string &b)
@@ -266,45 +284,45 @@ void PokerGame::checkHand(Player *p)
     if (split.size() >= 5)
     {
 
-        findFlushSuit(split, flushSuit); // เริ่มแรกมาเช็คหน้าไพ่ก่อนเลยว่ามีซ้ำครบ 5 ใบไหม
-        cout << flushSuit << "\n";
+        findFlushSuit(split, flushSuit);     // เริ่มแรกมาเช็คหน้าไพ่ก่อนเลยว่ามีซ้ำครบ 5 ใบไหม
         if (hasRoyalFlush(split, flushSuit)) // ต้องมี Flush และตรงกับ Rank A K Q J 10 กรณีเช็คยากสุดเทียบ mainCard X
-            p->rankOfHand.first = "RoyalFlush";
+            p->handRanking.first = "RoyalFlush";
         else if (hasStraightFlush(split, mainCardValue, flushSuit, StraightFlush)) // ต้องมีทั้ง Flush กับ Straight ที่ตรงกัน กรณีเช็คยากสุดเทียบ mainCard X
-            p->rankOfHand.first = "StraightFlush";
+            p->handRanking.first = "StraightFlush";
         else if (hasFourOfKind(split, mainCardValue, minorCardValue)) // ต้องมีไพ่ 4 ใบ Rank เดียวกัน กรณีเช็คยากสุด เทียบไพ่ใบที่ 5 ที่เรียกว่า Kicker บนมือผู้เล่น
-            p->rankOfHand.first = "FourOfKind";
+            p->handRanking.first = "FourOfKind";
         else if (hasFullHouse(split, mainCardValue, minorCardValue)) // ต้องมีไพ่ ตอง 1 และ คู่ 1 คู่ กรณีเช็คยากสุด เทียบ main แล้ว minor X
-            p->rankOfHand.first = "FullHouse";
-        else if (hasFlush(split,p->flushRank,flushSuit)) // 5 ใบหน้าตรงกัน กรณีเช็คยากสุด เทียบเรียงใบ 5 ใบ
-            p->rankOfHand.first = "Flush";
+            p->handRanking.first = "FullHouse";
+        else if (hasFlush(split, p->flushRank, flushSuit)) // 5 ใบหน้าตรงกัน กรณีเช็คยากสุด เทียบเรียงใบ 5 ใบ
+            p->handRanking.first = "Flush";
         else if (hasStraight(split, mainCardValue, flushSuit, StraightFlush)) // 5 ใบเรียง กรณีเช็คยากสุดเทียบ mainCard X
-            p->rankOfHand.first = "Straight";
+            p->handRanking.first = "Straight";
         else if (hasTreeOfKind(split, mainCardValue, minorCardValue))
-            p->rankOfHand.first = "ThreeOfKind";                                                        // 1ต้อง   กรณีเช็คยากสุดเทียบ Kicker บนมือผู้เล่น
+            p->handRanking.first = "ThreeOfKind";                  // 1ต้อง   กรณีเช็คยากสุดเทียบ Kicker บนมือผู้เล่น
         else if (hasTwoPair(split, mainCardValue, minorCardValue)) // 2 คู่  กรณีเช็คยากสุด เทียบ main แล้ว minor แล้วไป kicker
-            p->rankOfHand.first = "TwoPair";
-        
+            p->handRanking.first = "TwoPair";
     }
-    if (p->rankOfHand.first == "")
+    if (p->handRanking.first == "")
     {
         if (hasPair(split, mainCardValue, minorCardValue)) // 1 คู่  กรณีเช็คยากสุดเทียบ kicker
-            p->rankOfHand.first = "Pair";
+            p->handRanking.first = "Pair";
         else
         {
             hasHighcards(split, mainCardValue); // เดี่ยว กรณีเช็คยากสุดเทียบ mainCard X
-            p->rankOfHand.first = "HighCard";
+            p->handRanking.first = "HighCard";
         }
     }
-    if(p->rankOfHand.first == "FourOfKind" || p->rankOfHand.first == "ThreeOfKind" ||
-     p->rankOfHand.first == "TwoPair" || p->rankOfHand.first == "Pair"  ){
+    if (p->handRanking.first == "FourOfKind" || p->handRanking.first == "ThreeOfKind" ||
+        p->handRanking.first == "TwoPair" || p->handRanking.first == "Pair")
+    {
         bool twopair = false;
-        if(p->rankOfHand.first == "TwoPair") twopair = true;
-        p->kicker = findKicker(p->cards,mainCardValue,minorCardValue,twopair);
-     }
-    p->rankOfHand.second.first = findRankInNumber(p->rankOfHand.first);
-    p->rankOfHand.second.second.first = mainCardValue;
-    p->rankOfHand.second.second.second = minorCardValue;
+        if (p->handRanking.first == "TwoPair")
+            twopair = true;
+        p->kicker = findKicker(p->cards, mainCardValue, minorCardValue, twopair);
+    }
+    p->handRanking.second = findRankInNumber(p->handRanking.first);
+    p->handRanking = mainCardValue;
+    p->handRanking = minorCardValue;
 }
 
 #endif
