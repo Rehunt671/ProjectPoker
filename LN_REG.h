@@ -289,8 +289,8 @@ unsigned long long int Database::setResetTime()
     struct tm t1 = *localtime(&base);
     time_t now = time(0); // เวลาตอนนี้
     struct tm t2 = *localtime(&now);
-    int a = t2.tm_yday - t1.tm_yday;
-    time_t reset = base + 86400 * (a + 1); // เวลา reset
+    int yd = t2.tm_yday - t1.tm_yday;
+    time_t reset = base + 86400 * (yd + 1); // เวลา reset
     return reset;
 }
 
