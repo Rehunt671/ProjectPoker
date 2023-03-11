@@ -20,14 +20,14 @@ bool findFreq(vector<pair<int, char>> hand, int &mainCardValue, int &minorCardVa
             freqRank[cards.first]++;
         }
     }
-    for (const auto &pair : freqRank) // เรียงจากมากไปน้อย
+  for (const auto &pair : freqRank) // เรียงจากมากไปน้อย
     {
-        if (pair.second >= num && pair.first > mainCardValue)
+        if (pair.second >= num && mainCardValue == 0 )
         {
             mainCardValue = pair.first;
             found = true;
         }
-        if (pair.second >= 2 && pair.first != mainCardValue && pair.first > minorCardValue)
+        else if (pair.second >= 2 && minorCardValue == 0)
         {
             minorCardValue = pair.first;
         }
