@@ -60,7 +60,7 @@ public:
     Database();
     ~Database();
     map<pair<string, string>, vector<string>> userDatabase; //[username,password] displayname money
-    vector<string> loginUserName;                           // [username,password]
+    vector<string> loginUserName;                           // [username]
     unsigned long long int resetTime;                       // เพิ่มใน Database
     void registerUser();
     void setDisplayName(string &); // ใช้ตอนสมัครเท่านั้น
@@ -151,10 +151,10 @@ public:
 };
 
 // Declaration
+string convertToCard(int);
 void showUiCardHand(vector<string>);
 void changeCard(Player *p, vector<string> &deck);
 void seeCheat(Player *p, vector<Player *> players);
-string convertToCard(int);
 void convertFrontToNumber(vector<string> &v);
 void showprize();
 void clearInput();
