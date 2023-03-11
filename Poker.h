@@ -393,6 +393,7 @@ void PokerGame::updateRound()
     resetAction(cleanIncludeLastRaise);
     resetAccumulateBet();
     resetHandRank();
+    current = (dealer + 1) % num_player; // small Blind
     highestBet = 0;
     hasBetRaiseOrAllIn = false;
     round++;
@@ -463,9 +464,7 @@ void filterHighestRank(vector<Player *> &allWinner, const int rankingRef)
 {
     for (int i = allWinner.size() - 1; i >= 0; i--)
     {
-        if (allWinner[i]->handRanking.second == rankingRef)
-            continue;
-        else
+        if (allWinner[i]->handRanking.second != rankingRef)
             allWinner.erase(allWinner.begin() + i);
     }
 }
@@ -486,17 +485,20 @@ void filterWinnerFlush(vector<Player *> &allWinner)
         cardIndex++;
     }
 }
-void changeKicker(vector<int> &kicker, Player *p)
+void changeKicker(int rankingRef, vector<int> &kicker, Player *p)
 {
-    kicker[0] = p->kicker[0];
-    kicker[1] = p->kicker[1];
+    if (rankingRef != 1 && rankingRef != 2 && rankingRef != 4 && rankingRef != 6)
+    {
+        kicker[0] = p->kicker[0];
+        kicker[1] = p->kicker[1];
+    }
 }
 void checkGreaterKicker(int rankingRef, vector<int> &kicker, Player *p)
 {
-    if (p->kicker[0] >= kicker[0] && rankingRef != 1 && rankingRef != 2 && rankingRef != 4 && rankingRef != 6) //จะเช็คKicker ก็ต้อเมื่อไม่ใช่ไพ่อันดับพวกนี้ เนื่องจากไม่มี Kicker อยู่แล้ว
+    if (p->kicker[0] >= kicker[0]) // จะเช็คKicker ก็ต้อเมื่อไม่ใช่ไพ่อันดับพวกนี้ เนื่องจากไม่มี Kicker อยู่แล้ว
     {
         if (p->kicker[0] > kicker[0])
-            changeKicker(kicker, p);
+            changeKicker(rankingRef, kicker, p);
         else if (p->kicker[0] == kicker[0])
         {
             if (p->kicker[1] > kicker[1])
@@ -506,7 +508,6 @@ void checkGreaterKicker(int rankingRef, vector<int> &kicker, Player *p)
 }
 void filterWinnerNormal(vector<Player *> &allWinner, const int rankingRef, int &mainCard, int &minorCard, vector<int> &kicker)
 {
-
     for (auto &p : allWinner)
     {
         if (p->cardRanking.first >= mainCard)
@@ -514,27 +515,25 @@ void filterWinnerNormal(vector<Player *> &allWinner, const int rankingRef, int &
             if (p->cardRanking.first > mainCard)
             {
                 mainCard = p->cardRanking.first;
-                changeKicker(kicker, p);
+                changeKicker(rankingRef, kicker, p);
             }
             else
                 checkGreaterKicker(rankingRef, kicker, p);
-            if (rankingRef != 1 && rankingRef != 2 && rankingRef != 4 && rankingRef != 6) // จะเริ่มเช็คไพ่รองก็ต่อเมื่อแร้งสูงสุดที่เราเช็คไม่ใช่ Royal Flush, StraightFlush ,Full House ,Straightเพราะพวกนี้เช็คแค่ mainCardไม่ได้มีkicker
+            if (p->cardRanking.second >= minorCard && rankingRef != 1 && rankingRef != 2 && rankingRef != 6) // คนที่มีการ์ดรองมากกว่าถึงจะมีสิทธิเปลี่ยนไพ่ kicker
             {
-                if (p->cardRanking.second >= minorCard) // คนที่มีการ์ดรองมากกว่าถึงจะมีสิทธิเปลี่ยนไพ่ kicker
-                {
-                    minorCard = p->cardRanking.second;
-                    if (p->cardRanking.second > minorCard)
-                        changeKicker(kicker, p);
-                    else
-                        checkGreaterKicker(rankingRef, kicker, p);
-                }
+                minorCard = p->cardRanking.second;
+                if (p->cardRanking.second > minorCard)
+                    changeKicker(rankingRef, kicker, p);
+                else
+                    checkGreaterKicker(rankingRef, kicker, p);
             }
         }
     }
     for (int i = allWinner.size() - 1; i >= 0; i--)
     {
+
         if (allWinner[i]->cardRanking.first == mainCard && allWinner[i]->cardRanking.second == minorCard && allWinner[i]->kicker[0] == kicker[0] && allWinner[i]->kicker[1] == kicker[1])
-            continue;
+            ;
         else
             allWinner.erase(allWinner.begin() + i);
     }
