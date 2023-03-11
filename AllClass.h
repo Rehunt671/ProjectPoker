@@ -35,10 +35,10 @@ struct Player
 public:
     Player(string, string, string, int);
     ~Player();
-    pair<string, int> handRanking; // ประกอบไปด้วย (Rankไพ่บนมือ(String),{Rank(int1-10),{ไพ่สูงสุดMainCard,ไพ่รองคู่สูงสุดMinorCard}}
-    pair<pair<int,char>,pair<int,char>> cardRanking; 
-    vector<pair<int,char>> kicker;
-    vector<pair<int,char>> flushRank;
+    pair<string, int> handRanking;
+    pair<int, int> cardRanking;
+    vector<int> kicker;
+    vector<int> flushRank;
     string username;
     string password; //
     string name;     // ชื่อคนเล่น
@@ -145,7 +145,8 @@ public:
     void flop();
     void turn();
     void river();
-    void riskPrize(Player *p, int &);
+    void summarizeTheGame(vector<Player *> &, const int, int, int, vector<int> &,  int );
+    void riskPrize(Player *p, const int );
     bool restart;
 };
 
