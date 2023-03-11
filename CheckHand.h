@@ -1,12 +1,13 @@
 #ifndef PROJECT3_H
 #define PROJECT3_H
-bool findFreq(vector<std::pair<int, char>> hand, int &mainCardValue, int &minorCardValue, int num)
+bool findFreq(vector<pair<int, char>> hand, int &mainCardValue, int &minorCardValue, int num)
 {
     // Reset ค่าออกให้หมดก่อน
     mainCardValue = 0;
     minorCardValue = 0;
-    reverse(hand.begin(), hand.end()); // เปลี่ยนจากเรียงจากน้อยไปมาก ไปเป็น มากไปน้อย
-    unordered_map<int, int> freqRank;
+    auto cmp = [](int a, int b)
+    { return a > b; };
+    map<int, int, decltype(cmp)> freqRank(cmp); // create map with sorted key max to min
     bool found = false;
     for (const auto &cards : hand)
     {
@@ -21,12 +22,12 @@ bool findFreq(vector<std::pair<int, char>> hand, int &mainCardValue, int &minorC
     }
     for (const auto &pair : freqRank) // เรียงจากมากไปน้อย
     {
-        if (pair.second >= num && mainCardValue == 0)
+        if (pair.second >= num && pair.first > mainCardValue)
         {
             mainCardValue = pair.first;
             found = true;
         }
-        else if (pair.second >= 2 && mainCardValue == 0)
+        if (pair.second >= 2 && pair.first != mainCardValue && pair.first > minorCardValue)
         {
             minorCardValue = pair.first;
         }
@@ -55,8 +56,6 @@ vector<int> findKicker(vector<string> cards, const int mainCardValue, const int 
         }
     }
     sort(kicker.begin(), kicker.end(), greater<int>());
-    cout << "Kicker 0 ========== " << kicker[0] << "\n";
-    cout << "Kicker 1 ========== " << kicker[1] << "\n";
     return kicker;
 }
 string convertToCard(int max)
@@ -144,6 +143,8 @@ void convertToPairVector(vector<std::pair<int, char>> &split, vector<string> &co
     {
         split[i].first = stoi(combined[i].substr(0, combined[i].length() - 1));
         split[i].second = combined[i].back();
+        // cout << split[i].first;
+        // cout << split[i].second;
     }
 }
 
@@ -228,7 +229,7 @@ bool hasFlush(vector<std::pair<int, char>> hand, vector<int> &flushRank, const c
 }
 bool hasStraightFlush(vector<std::pair<int, char>> hand, int &mainCardValue, char &flushSuit, bool &StraightFlush)
 {
-    return hasStraight(hand, mainCardValue, flushSuit, StraightFlush) && StraightFlush; // ต้องมี Straight ก่อนแล้วต้องเป็น StraightFlush ด้วย
+    return (hasStraight(hand, mainCardValue, flushSuit, StraightFlush) && StraightFlush); // ต้องมี Straight ก่อนแล้วต้องเป็น StraightFlush ด้วย
 }
 
 bool hasFourOfKind(vector<std::pair<int, char>> hand, int &mainCardValue, int &minorCardValue)
