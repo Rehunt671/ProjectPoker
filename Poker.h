@@ -545,13 +545,7 @@ bool PokerGame::findWinner()
     int cntKnockout = 0;
     int cntWin = 0;
     int finalMoney = pot;
-    for (auto &p : players)
-    {
-        if (p->action == "")
-            return false;
-    } // ยังไม่จบรอบนั้นๆ
-    ////////////////////////////////////มาถึงตรงนี้ได้แปลว่ามี Action กันหมดทุกคนแล้ว
-    for (auto &p : players)
+   for (auto &p : players)
     {
         if (p->action == "all-in")
             cntAllin++;
@@ -559,6 +553,11 @@ bool PokerGame::findWinner()
             cntKnockout++;
         if (p->action != "fold" && p->action != "dead")
             allWinner.emplace_back(p); // หาคนที่มีสิทธิชนะ
+    }
+    for (auto &p : players)
+    {
+        if (p->action == "" && allWinner.size() != 1)
+            return false;
     }
     if (allWinner.size() == 1) // แปลว่า หมอบหนีหรือตาย จนเหลือเราคนเดียว
     {
