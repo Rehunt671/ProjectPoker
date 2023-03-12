@@ -366,7 +366,7 @@ void showUiCardHand(vector<string> s)
     }
 }
 void showprize(){
-    cout << "\n=========================================================================================";
+    cout << "\n========================================================================================="<<endl;
     cout << "==                       PPPPP    RRRRR    IIIII  ZZZZZZ  EEEEEE                       =="<<endl;
     cout << "==                       P    P   R    R     I        Z   E                            =="<<endl;
     cout << "==                       PPPPP    RRRRR      I       Z    EEEEEE                       =="<<endl;
