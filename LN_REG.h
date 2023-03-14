@@ -116,7 +116,21 @@ void Database::writeData2_txt()
     // Close the file
     dest.close();
 }
+void Database::fixData2_txt(pair<string, string> key, string dp, string money, string login, string t)
+{
+    userDatabase[key][0] = dp;
+    userDatabase[key][1] = money;
+    userDatabase[key][2] = login;
+    userDatabase[key][3] = t;
+    writeData2_txt();
+}
+void Database::appendData2_txt(pair<string, string> key, string dp, string money, string login, string t)
+{
 
+    ofstream dest(filename, ios::app);
+    dest << key.first << " " << key.second << " " << dp << " " << money << " " << login << " " << t;
+    dest.close();
+}
 void Database::importDatafromfile() // อ่านไฟล์จากไฟล์หลักพร้อมกับเขียนMapขึ้นมา
 {
     ifstream source(filename);
@@ -148,11 +162,13 @@ void Database::importDatafromfile() // อ่านไฟล์จากไฟ�
 //                                                           //
 //__________________________________________________________//
 
-void Database::loginUser()
+void Database::loginUser(vector<Player *> &players, int &minChip)
 { // ตรวจสอบว่ามีบัญชีในฐานข้อมูลหรือไม่
     // ตรวจสอบว่ามีชื่ออยุ่ในฐานข้อมูลไหมน้าาา
     string un; // เก็บข้อมูล
     string pw; // เก็บข้อมูล
+    string dp;
+    int moneyInWeb;
     bool n = true;
     bool m = true;
     bool checkUN = false;
@@ -182,23 +198,38 @@ void Database::loginUser()
     {
         cout << "Password : ";
         cin >> pw;
-        auto it = userDatabase.find({un, pw});
+        pair<string, string> keyToFind = make_pair(un, pw);
+        auto it = userDatabase.find(keyToFind);
         if (it != userDatabase.end())
         {
-            checkPW = true;
-            m = false;
-            cout << "User " << un << " has logged in successfully.\n";
-            if (userDatabase[{un, pw}][2] == "0" && time(0) > stoi(userDatabase[{un, pw}][3]))//เวลาปัจจุบันมากกว่า รีเซต time
             {
-                dailyPrize(un, pw);
+                checkPW = true;
+                m = false;
+                cout << "User " << un << " has logged in successfully.\n";
+                if (it->second[2] == "0") // เวลาปัจจุบันมากกว่า รีเซต time
+                {
+                    dailyPrize(un, pw);
+                }
+                dp = it->second[0];
+                moneyInWeb = stoi(it->second[1]);
+                if (moneyInWeb < minChip)
+                {
+                    cout << un << " money don't reach minimum to play poker please comeback later\n";
+                    loginUser(players, minChip);
+                    return;
+                }
+                else
+                {
+                    moneyInWeb -= minChip;
+                    it->second[1] = to_string(moneyInWeb);
+                }
+                players.emplace_back(new Player(un, pw, dp, minChip, moneyInWeb));
             }
-            loginUserName.push_back(un);
-            break;
         }
         if (checkPW == false)
         {
             cout << "Incorrect password for user " << un << ".\n";
-            loginUser();
+            loginUser(players, minChip);
             return;
         }
     }
@@ -219,9 +250,9 @@ void Database::registerUser()
     string password;
     string passwordCF;
     string displayname;
-    string freeCredit = "500";
+    string freeCredit = "1000";
     string login = "0";
-    string time = "0" ;
+    string time = "0";
     // ไม่มี money เพราะ money ถูก Fix แล้ว 500 บาท
     int num_UserRegister;
     bool valid = false;
@@ -263,7 +294,7 @@ void Database::registerUser()
     userDatabase[{username, password}].push_back(freeCredit);
     userDatabase[{username, password}].push_back(login);
     userDatabase[{username, password}].push_back(time);
-    writeData2_txt();
+    appendData2_txt(make_pair(username, password), displayname, freeCredit, login, time);
 
     cout << "User " << username << " has been registered successfully." << endl;
     cout << "You recieve free credit : $" << freeCredit << " Dollar\n";
@@ -277,7 +308,8 @@ void Database::registerUser()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 void Database::reset(int &logedin, unsigned long long int &resetTime)
 { // reset ค่า loggedin ให้เป็น false ทุก ๆ 00.00 น.
-    if (time(0) > resetTime){
+    if (time(0) > resetTime)
+    {
         logedin = 0;
     }
 }
@@ -289,8 +321,8 @@ unsigned long long int Database::setResetTime()
     struct tm t1 = *localtime(&base);
     time_t now = time(0); // เวลาตอนนี้
     struct tm t2 = *localtime(&now);
-    int yd = t2.tm_yday - t1.tm_yday;
-    time_t reset = base + 86400 * (yd + 1); // เวลา reset
+    int a = t2.tm_yday - t1.tm_yday;
+    time_t reset = base + 86400 * (a + 1); // เวลา reset
     return reset;
 }
 
