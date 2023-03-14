@@ -306,7 +306,7 @@ void PokerGame::checkHand(Player *p)
         }
     }
     if (p->handRanking.first == "FourOfKind" || p->handRanking.first == "ThreeOfKind" ||
-        p->handRanking.first == "TwoPair" || p->handRanking.first == "Pair")
+        p->handRanking.first == "TwoPair" || p->handRanking.first == "Pair" || p->handRanking.first == "HighCard")
     {
         bool twopair = false;
         if (p->handRanking.first == "TwoPair")
