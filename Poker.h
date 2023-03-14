@@ -477,13 +477,16 @@ void PokerGame::endGameLogic()
         {
             cout << players[i]->username << " body was taken away. . .\n";
             pokerDB.userDatabase.erase(make_pair(players[i]->username, players[i]->password)); // delete account at that key
+            delete players[i];
             players.erase(players.begin() + i);
+            players.shrink_to_fit();
         }
         if ((players[i]->moneyInWeb + players[i]->chip) < minChip)
         {
             cout << players[i]->name << " don't have enough chip to play knockout!!\n";
-            players.back()->action = "";
+            delete players[i];
             players.erase(players.begin() + i);
+            players.shrink_to_fit();
         }
         else
         {
@@ -506,8 +509,9 @@ void PokerGame::endGameLogic()
             else
             {
                 pokerDB.userDatabase[make_pair(players[i]->username, players[i]->password)][1] = to_string(players[i]->moneyInWeb + players[i]->chip);
-                players.back()->action = "";
+                delete players[i];
                 players.erase(players.begin() + i);
+                players.shrink_to_fit();
             }
         }
     }
@@ -532,7 +536,7 @@ void PokerGame::endGameLogic()
                 exit(0);
                 break;
             }
-            cout << players.size();
+
             if (players.size() == 4)
                 break;
             cout << "Do you guy want to waiting for another player?\n[1] Yes [2] No\n";
@@ -540,7 +544,8 @@ void PokerGame::endGameLogic()
         } while (suborder == 1 || players.size() < 2);
         restart = 1;
     }
-    else restart = 1;
+    else
+        restart = 1;
 }
 void filterHighestRank(vector<Player *> &allWinner, const int rankingRef)
 {
@@ -1090,6 +1095,7 @@ void PokerGame::resetGame()
 {
     deck.reset();
     cardsOnBoard.clear();
+    cardsOnBoard.shrink_to_fit();
     num_player = players.size();
     lastRaise = 0;
     round = 1;
@@ -1105,10 +1111,13 @@ void PokerGame::resetGame()
         p->cardRanking.first = 0;
         p->cardRanking.second = 0;
         p->kicker.clear();
-        p->kicker.emplace_back(0);
-        p->kicker.emplace_back(0);
         p->flushRank.clear();
         p->cards.clear();
+        p->kicker.shrink_to_fit();
+        p->flushRank.shrink_to_fit();
+        p->cards.shrink_to_fit();
+        p->kicker.emplace_back(0);
+        p->kicker.emplace_back(0);
         p->moneyToRaise = 0;
         p->accumulateBet = 0;
         p->action = "";
