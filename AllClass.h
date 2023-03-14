@@ -27,13 +27,14 @@ private:
 public:
     Deck();
     vector<string> allCardsLeft; // ไพ่ใน Deck ที่เหลือ ณ ตอนนั้น
-    void shuffle();              // สับไพ่
-    void showcardsLeft();        // Show cards ที่เหลือ
+    void reset();
+    void shuffle();       // สับไพ่
+    void showcardsLeft(); // Show cards ที่เหลือ
 };
 struct Player
 {
 public:
-    Player(string, string, string, int);
+    Player(string, string, string, int,int);
     ~Player();
     pair<string, int> handRanking;
     pair<int, int> cardRanking;
@@ -60,12 +61,13 @@ public:
     Database();
     ~Database();
     map<pair<string, string>, vector<string>> userDatabase; //[username,password] displayname money
-    vector<string> loginUserName;                           // [username]
     unsigned long long int resetTime;                       // เพิ่มใน Database
     void registerUser();
     void setDisplayName(string &); // ใช้ตอนสมัครเท่านั้น
-    void loginUser();
-    void writeData2_txt();     // เขียนข้อมูลจาก Map To ไฟล์หลัก ใช้ตอน REGISTER
+    void loginUser(vector<Player *> &, int &);
+    void writeData2_txt(); // เขียนข้อมูลจาก Map To ไฟล์หลัก ใช้ตอน REGISTER
+    void fixData2_txt(pair<string, string>, string, string, string, string);
+    void appendData2_txt(pair<string, string>, string, string, string, string);
     void importDatafromfile(); // นำข้อมูลจาก File หลักมาเก็บข้อมูลไว้ใน Vector แต่ละอัน พร้อมกับสร้าง Mapขึ้นมาทันที ใช้ตอน Login
     void Delete_();
     // time
@@ -85,6 +87,7 @@ private:
     int lastRaise; // position
     int dealer;    // position
     int round;
+    int minChip;
     int mandatoryBet;
     int pot;        // เงินใน Board รวม
     int highestBet; // เงินเดิมพันสูงสุด ณ ตอนนี้resetAccumulateBet
@@ -92,7 +95,7 @@ private:
     bool hasBetRaiseOrAllIn;
 
 public:
-    PokerGame(Database &, Deck &, int, int, int);
+    PokerGame(Database &, vector<Player *> &, Deck &, int, int);
     ~PokerGame();
     map<int, vector<string>> od;
     void createPlayer(const int);
@@ -145,12 +148,15 @@ public:
     void flop();
     void turn();
     void river();
-    void summarizeTheGame(vector<Player *> &, const int, int, int, vector<int> &,  int );
-    void riskPrize(Player *p, const int );
+    void summarizeTheGame(vector<Player *> &, const int, int, int, vector<int> &, int);
+    void riskPrize(Player *p, const int);
+    void resetGame();
+    void endGameLogic();
     bool restart;
 };
 
 // Declaration
+void recieveSimpleInformation(int &, int &);
 string convertToCard(int);
 void showUiCardHand(vector<string>);
 void changeCard(Player *p, vector<string> &deck);
