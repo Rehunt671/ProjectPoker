@@ -6,17 +6,16 @@
 using namespace std;
 int main()
 {
-
     srand(time(NULL));
     Database pokerDB;
     Deck deck;
+    vector<Player *> players;
     int num_player;
+    int minChip;
+    int mandatoryBet;
     int choice;
     int cnt = 1;
-    int chip;
-    int mandatoryBet;
-
-    cout << "Welcome to Poker Game\n";
+    drawPic();
     do
     {
         cout << "Enter number of player(2-4)\n";
@@ -26,6 +25,7 @@ int main()
             clearInput();
         }
     } while (num_player < 2 || num_player > 4);
+    recieveSimpleInformation(minChip, mandatoryBet);
     while (cnt <= num_player)
     {
         cout << " ================================================= Player " << cnt << " =================================================\n";
@@ -34,7 +34,7 @@ int main()
         switch (choice)
         {
         case 1:
-            pokerDB.loginUser();
+            pokerDB.loginUser(players, minChip);
             break;
         case 2:
             pokerDB.registerUser();
@@ -50,14 +50,24 @@ int main()
         if (choice == 1)
             cnt++;
     }
-    recieveSimpleInformation(chip, mandatoryBet);
-    PokerGame poker(pokerDB, deck, num_player, chip, mandatoryBet); // เข้ามานั่งในเกมโป๊กเกอร์พร้อมที่จะเล่นเกม
+    PokerGame poker(pokerDB, players, deck, minChip, mandatoryBet); // เข้าม   านั่งในเกมโป๊กเกอร์พร้อมที่จะเล่นเกม
     do
     {
+        if (poker.restart)
+        {
+            poker.restart = false;
+            poker.resetGame();
+        }
         poker.beforeStart();
         poker.preflop();
+        if (poker.restart)
+            continue;
         poker.flop();
+        if (poker.restart)
+            continue;
         poker.turn();
+        if (poker.restart)
+            continue;
         poker.river();
     } while (poker.restart);
 }
