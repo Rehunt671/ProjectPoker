@@ -1,43 +1,58 @@
 #ifndef PROJECT4_H
 #define PROJECT4_H
-void recieveSimpleInformation(int &moneyInGame, int &mandatoryBetRef)
+void recieveSimpleInformation(int &minChip, int &mandatoryBetRef)
 {
     int choice;
     do
     {
-        cout << "How much money do you want to play(500 - 1,000): ";
-        cin >> moneyInGame;
-        if (moneyInGame < 500 || moneyInGame > 1000)
+        cout << "How much minChip do you want to set\n";
+        cout << "[1]$500\n[2]$800\n[3]$1000\n";
+        cin >> choice;
+        switch (choice)
         {
+        case 1:
+            minChip = 500;
+            break;
+        case 2:
+            minChip = 800;
+            break;
+        case 3:
+            minChip = 1000;
+            break;
+        default:
             clearInput();
-            cout << "Invalid money value\n";
+            cout << "Don't have input choice try again\n";
+            break;
         }
-    } while (moneyInGame < 500 || moneyInGame > 1000); // ถามจะให้มีคนละกี่บาท
-    cout << "How Much Mandatory do you want to play\n";
-    cout << "1.10\n2.20\n3.30\n4.40\n5.50\n";
-    cin >> choice;
-    switch (choice)
+    } while (choice != 1 && choice != 2 && choice != 3);
+    do
     {
-    case 1:
-        mandatoryBetRef = 10;
-        break;
-    case 2:
-        mandatoryBetRef = 20;
-        break;
-    case 3:
-        mandatoryBetRef = 30;
-        break;
-    case 4:
-        mandatoryBetRef = 40;
-        break;
-    case 5:
-        mandatoryBetRef = 50;
-        break;
-    default:
-        clearInput();
-        cout << "Don't have input choice try again\n";
-        break;
-    }
+        cout << "How Much Mandatory do you want to play\n";
+        cout << "1.10\n2.20\n3.30\n4.40\n5.50\n";
+        cin >> choice;
+        switch (choice)
+        {
+        case 1:
+            mandatoryBetRef = 10;
+            break;
+        case 2:
+            mandatoryBetRef = 20;
+            break;
+        case 3:
+            mandatoryBetRef = 30;
+            break;
+        case 4:
+            mandatoryBetRef = 40;
+            break;
+        case 5:
+            mandatoryBetRef = 50;
+            break;
+        default:
+            clearInput();
+            cout << "Don't have input choice try again\n";
+            break;
+        }
+    } while (choice != 1 && choice != 2 && choice != 3 && choice != 4 && choice != 5);
     cout << "Okay!! Mandatory = " << mandatoryBetRef << "\n";
 }
 void PokerGame::createOrderTable()
@@ -54,45 +69,20 @@ void PokerGame::createOrderTable()
     od[5].emplace_back("fold");
     od[5].emplace_back("fold");
 }
-void PokerGame::createPlayer(const int chip)
-{
-    string pw;      // ไม่จำเป็นต้องเอาตัวแปรมารับก็ได้แต่ ทำไว้เผื่อทวน
-    string dp;      // ไม่จำเป็นต้องเอาตัวแปรมารับก็ได้แต่ ทำไว้เผื่อทวน
-    int moneyInWeb; // ไม่จำเป็นต้องเอาตัวแปรมารับก็ได้แต่ ทำไว้เผื่อทวน
-    for (auto &user : pokerDB.loginUserName)
-    {
-        for (const auto &element : pokerDB.userDatabase) //[username,password]
-        {
-            if (user == element.first.first)
-            {
-                pw = element.first.second;
-                dp = element.second[0];
-                moneyInWeb = stoi(element.second[1]);
-                players.emplace_back(new Player(user, pw, dp, moneyInWeb));
-            }
-        } // เช็คว่าซ้ำไหม
-    }
-    for (auto &p : players)
-    {
-        p->chip = chip;
-        p->kicker.emplace_back(0);
-        p->kicker.emplace_back(0);
-    }
-}
-PokerGame::PokerGame(Database &pokerDB, Deck &deck, int num_player, int chip, int mandatorybet) // สร้าง 1 PokerGame ต้องมีข้อมูลพื้นฐานตาม Parameterต่อไปนี้ ตำแหน่งคนจริง(&) สำรับไพ่ จำนวนคน
+
+PokerGame::PokerGame(Database &pokerDB, vector<Player *> &players, Deck &deck, int minChip, int mandatoryBet) // สร้าง 1 PokerGame ต้องมีข้อมูลพื้นฐานตาม Parameterต่อไปนี้ ตำแหน่งคนจริง(&) สำรับไพ่ จำนวนคน
 {
     this->pokerDB = pokerDB;
-    this->deck = deck;             // กำหนด *deck ให้ตรงกับสำรับไพ่ที่เราสร้างขึ้นมา
-    this->num_player = num_player; // กำหนดจำนวนคนของเกม Poker ของเรา
-    createPlayer(chip);
+    this->deck = deck; // กำหนด *deck ให้ตรงกับสำรับไพ่ที่เราสร้างขึ้นมา
+    this->players = players;
+    this->num_player = players.size(); // กำหนดจำนวนคนของเกม Poker ของเรา
+    this->minChip = minChip;
+    this->mandatoryBet = mandatoryBet; // Chip เดิมพันขั้นต่ำที่จะเล่นกัน
     createOrderTable();
-    this->mandatoryBet = mandatorybet;   // Chip เดิมพันขั้นต่ำที่จะเล่นกัน
-    dealer = rand() % num_player;        // สุ่มคนมาเป็น Role dealer
-    current = (dealer + 3) % num_player; // คนซ้าย Big blind index ได้เริ่มก่อน;
-    pot = 0;                             // กำหนดเงินใน Board ตั้งต้น
-    highestBet = 0;                      // กำหนด ว่าตอนนี้ค่าเงิน Betสูงสุดเท่าไหร่ คน Call Raise จะได้รู้
-    round = 1;                           // กำหนดรอบของเกม
-    restart = false;                     // กำหนดให้เป็นNew game
+    pot = 0;         // กำหนดเงินใน Board ตั้งต้น
+    highestBet = 0;  // กำหนด ว่าตอนนี้ค่าเงิน Betสูงสุดเท่าไหร่ คน Call Raise จะได้รู้
+    round = 1;       // กำหนดรอบของเกม
+    restart = false; // กำหนดให้เป็นNew game
     cleanIncludeLastRaise = true;
     hasBetRaiseOrAllIn = false; // กำหนดว่ามีการ Bet || All inไปรึยัง ถ้ามีไปแล้วจะ Check ไม่ได้แล้ว แต่ Call Raise หรือ Fold ได้
 }
@@ -142,9 +132,7 @@ void PokerGame::resetAction(bool cleanIncludeLastRaise)
 
     for (size_t i = 0; i < players.size(); i++)
     {
-        if (restart) // ลบหมดลบทั้งหมอบด้วย
-            players[i]->action = "";
-        else if (players[i]->action != "all-in" && players[i]->action != "fold" && players[i]->action != "dead" && cleanIncludeLastRaise) // ลบทั้งคน LastRaise แต่ไม่รวมหมอบและคนตาย เป็นการรีเซตที่มีการเปลี่ยนรอบ
+        if (players[i]->action != "all-in" && players[i]->action != "fold" && players[i]->action != "dead" && cleanIncludeLastRaise) // ลบทั้งคน LastRaise แต่ไม่รวมหมอบและคนตาย เป็นการรีเซตที่มีการเปลี่ยนรอบ
             players[i]->action = "";
         else if (players[i]->action != "all-in" && players[i]->action != "fold" && players[i]->action != "dead" && i != lastRaise) // ลบแค่คนอื่นที่ไม่ใช่ LastRaise และ หมอบ และ คนตาย เป็นการรีเซตที่ยังอยู่ในรอบนั้นๆ
             players[i]->action = "";
@@ -167,14 +155,19 @@ void PokerGame::resetHandRank()
 }
 void PokerGame::assignRole()
 {
-    if (restart)
+    if (players.size() == 2)
     {
-        dealer = (dealer + 1) % num_player;
-        resetAction(cleanIncludeLastRaise);
+        players[0]->role = "small-blind";
+        players[1]->role = "big-blind";
+        dealer = 1;
     }
-    players[dealer]->role = ""; // จริงๆไม่ต้องมีก็ได้
-    players[(dealer + 1) % num_player]->role = "small-blind";
-    players[(dealer + 2) % num_player]->role = "big-blind";
+    else
+    {
+        dealer = rand() % num_player;
+        players[dealer]->role = ""; // จริงๆไม่ต้องมีก็ได้
+        players[(dealer + 1) % num_player]->role = "small-blind";
+        players[(dealer + 2) % num_player]->role = "big-blind";
+    }
 }
 void PokerGame::moneyForMandatoryBet(Player *s, Player *b)
 {
@@ -253,10 +246,19 @@ void PokerGame::showPlayerAccumulateBet(Player *p)
 }
 void PokerGame::beforeStart()
 {
-    deck.shuffle();                                                                               // สับไพ่ในสำรับก่อน
-    assignRole();                                                                                 // จัด Role ให้ผู้เล่นให้ครบ ว่าเป็น dealer or small or big
-    moneyForMandatoryBet(players[(dealer + 1) % num_player], players[(dealer + 2) % num_player]); // ก่อนแจกไพ่ต้องมีการวางเดิมพันก่อนสำหรับ small and big
-    holecards();                                                                                  // ทุกคนยังไม่มีไพ่บนมือดังนั้นเราจะเริ่มด้วยการแจกไพ่คนละ2ใบก่อน
+    deck.shuffle(); // สับไพ่ในสำรับก่อน
+    assignRole();   // จัด Role ให้ผู้เล่นให้ครบ ว่าเป็น dealer or small or big
+    holecards();    // ทุกคนยังไม่มีไพ่บนมือดังนั้นเราจะเริ่มด้วยการแจกไพ่คนละ2ใบก่อน
+    if (players.size() > 2)
+    {
+        current = (dealer + 3) % num_player;
+        moneyForMandatoryBet(players[(dealer + 1) % num_player], players[(dealer + 2) % num_player]); // ก่อนแจกไพ่ต้องมีการวางเดิมพันก่อนสำหรับ small and big
+    }
+    else
+    {
+        current = (dealer + 1) % num_player;//เอา small blind เล่นก่อน
+        moneyForMandatoryBet(players[(dealer+1) % num_player], players[(dealer) % num_player]); // ก่อนแจกไพ่ต้องมีการวางเดิมพันก่อนสำหรับ small and big
+    }
 }
 void PokerGame::preflop() // เริ่มรอบแรกของเกม
 {
@@ -269,16 +271,17 @@ void PokerGame::preflop() // เริ่มรอบแรกของเกม
             continue; // เจอคนหมอบก็ข้ามได้เลย
         }
         showBoard1();
-        cout << players[current]->name << "'s Turn\n";
         showPlayerCards(players[current]);
         if (players[current]->handRanking.first == "")
+        {
             checkHand(players[current]);
+        }
         showPlayerHandRank(players[current]);
         showActionChoice();
         recieveOrder(players[current]);
         if (findWinner())
         {
-            exit(0);
+            endGameLogic();
             break;
         }
         else
@@ -309,7 +312,7 @@ void PokerGame::flop()
         recieveOrder(players[current]);
         if (findWinner())
         {
-            exit(0);
+            endGameLogic();
             break;
         }
         else
@@ -339,7 +342,7 @@ void PokerGame::turn()
         recieveOrder(players[current]);
         if (findWinner())
         {
-            exit(0);
+            endGameLogic();
             break;
         }
         else
@@ -369,7 +372,7 @@ void PokerGame::river()
         recieveOrder(players[current]);
         if (findWinner())
         {
-            exit(0);
+            endGameLogic();
             break;
         }
         else
@@ -387,6 +390,8 @@ void PokerGame::updateRound()
         if (p->action == "")
         {
             current = (current + 1) % num_player;
+            cout << "PRESS ENTER TO CONTINUE\n";
+            cin.get();
             return;
         }
     }
@@ -460,6 +465,81 @@ void PokerGame::summarizeTheGame(vector<Player *> &allWinner, const int rankingR
         riskPrize(p, cntWin);
     }
 }
+void PokerGame::endGameLogic()
+{
+    int chipToStore = 0;
+    char input = '\0';
+    int order;
+    int suborder;
+    for (int i = players.size() - 1; i >= 0; i--)
+    {
+        if (players[i]->action == "dead")
+        {
+            cout << players[i]->username << " body was taken away. . .\n";
+            pokerDB.userDatabase.erase(make_pair(players[i]->username, players[i]->password)); // delete account at that key
+            players.erase(players.begin() + i);
+        }
+        if ((players[i]->moneyInWeb + players[i]->chip) < minChip)
+        {
+            cout << players[i]->name << " don't have enough chip to play knockout!!\n";
+            players.back()->action = "";
+            players.erase(players.begin() + i);
+        }
+        else
+        {
+            cout << players[i]->name << " you want to restart with " << players.size() << " remaining player? (Y = yes , N = no)\n";
+            cin >> input;
+            if (input == 'Y' || input == 'y')
+            {
+                restart = 1;
+                if (players[i]->chip >= minChip)
+                {
+                    chipToStore = players[i]->chip - minChip; // เงินมากก็เก็บ
+                    players[i]->chip = minChip;
+                    pokerDB.userDatabase[make_pair(players[i]->username, players[i]->password)][1] = to_string(players[i]->moneyInWeb + chipToStore);
+                }
+                else
+                {
+                    players[i]->chip = minChip; // เงินน้อยก็ดึงจากเว็บ
+                    pokerDB.userDatabase[make_pair(players[i]->username, players[i]->password)][1] = to_string(players[i]->moneyInWeb - (minChip - players[i]->chip));
+                }
+            }
+            else
+            {
+                pokerDB.userDatabase[make_pair(players[i]->username, players[i]->password)][1] = to_string(players[i]->moneyInWeb + players[i]->chip);
+                players.back()->action = "";
+                players.erase(players.begin() + i);
+            }
+        }
+    }
+
+    pokerDB.writeData2_txt();
+    if (players.size() < 2)
+    {
+        cout << "Players don't have enough to restart waiting for another player . . .\n";
+        do
+        {
+            cout << "[1]Login [2]Register\n";
+            cin >> order;
+            switch (order)
+            {
+            case 1:
+                pokerDB.loginUser(players, minChip);
+                break;
+            case 2:
+                pokerDB.registerUser();
+                break;
+            default:
+                exit(0);
+                break;
+            }
+            cout << "Do you want to waiting for another player?[1]Yes,[2]No\n";
+            cin >> suborder;
+            if (suborder == 1)
+                continue;
+        } while (players.size() < 2);
+    }
+}
 void filterHighestRank(vector<Player *> &allWinner, const int rankingRef)
 {
     for (int i = allWinner.size() - 1; i >= 0; i--)
@@ -495,7 +575,7 @@ void changeKicker(int rankingRef, vector<int> &kicker, Player *p)
 }
 void checkGreaterKicker(int rankingRef, vector<int> &kicker, Player *p)
 {
-    if (p->kicker[0] >= kicker[0]) // จะเช็คKicker ก็ต้อเมื่อไม่ใช่ไพ่อันดับพวกนี้ เนื่องจากไม่มี Kicker อยู่แล้ว
+    if (p->kicker[0] >= kicker[0])
     {
         if (p->kicker[0] > kicker[0])
             changeKicker(rankingRef, kicker, p);
@@ -531,10 +611,7 @@ void filterWinnerNormal(vector<Player *> &allWinner, const int rankingRef, int &
     }
     for (int i = allWinner.size() - 1; i >= 0; i--)
     {
-
-        if (allWinner[i]->cardRanking.first == mainCard && allWinner[i]->cardRanking.second == minorCard && allWinner[i]->kicker[0] == kicker[0] && allWinner[i]->kicker[1] == kicker[1])
-            ;
-        else
+        if (allWinner[i]->cardRanking.first != mainCard || allWinner[i]->cardRanking.second != minorCard || allWinner[i]->kicker[0] != kicker[0] || allWinner[i]->kicker[1] != kicker[1])
             allWinner.erase(allWinner.begin() + i);
     }
 }
@@ -545,7 +622,13 @@ bool PokerGame::findWinner()
     int cntKnockout = 0;
     int cntWin = 0;
     int finalMoney = pot;
-   for (auto &p : players)
+    for (auto &p : players)
+    {
+        if (p->action == "")
+            return false;
+    } // ยังไม่จบรอบนั้นๆ
+    ////////////////////////////////////มาถึงตรงนี้ได้แปลว่ามี Action กันหมดทุกคนแล้ว
+    for (auto &p : players)
     {
         if (p->action == "all-in")
             cntAllin++;
@@ -553,11 +636,6 @@ bool PokerGame::findWinner()
             cntKnockout++;
         if (p->action != "fold" && p->action != "dead")
             allWinner.emplace_back(p); // หาคนที่มีสิทธิชนะ
-    }
-    for (auto &p : players)
-    {
-        if (p->action == "" && allWinner.size() != 1)
-            return false;
     }
     if (allWinner.size() == 1) // แปลว่า หมอบหนีหรือตาย จนเหลือเราคนเดียว
     {
@@ -1005,19 +1083,62 @@ void PokerGame::fold(Player *p)
 {
     p->action = "fold";
 }
-Player::Player(string username, string password, string name, int moneyInWeb) : username(username), password(password), name(name), moneyInWeb(moneyInWeb)
+void PokerGame::resetGame()
+{
+    deck.reset();
+    cardsOnBoard.clear();
+    num_player = players.size();
+    lastRaise = 0;
+    round = 1;
+    pot = 0;
+    highestBet = 0;
+    hasBetRaiseOrAllIn = false;
+    cleanIncludeLastRaise = true;
+
+    for (auto &p : players)
+    {
+        p->handRanking.first = "";
+        p->handRanking.second = 0;
+        p->cardRanking.first = 0;
+        p->cardRanking.second = 0;
+        p->kicker.clear();
+        p->kicker.emplace_back(0);
+        p->kicker.emplace_back(0);
+        p->flushRank.clear();
+        p->cards.clear();
+        p->moneyToRaise = 0;
+        p->accumulateBet = 0;
+        p->action = "";
+        p->role = "";
+        p->order = 0;
+    }
+}
+Player::Player(string username, string password, string name, int chip, int moneyInWeb) : username(username), password(password), name(name), chip(chip), moneyInWeb(moneyInWeb)
 {
     action = "";
     role = "";
+    kicker.emplace_back(0);
+    kicker.emplace_back(0);
     accumulateBet = 0;
     order = 1;
 }
 Player::~Player()
 {
-    cout << "Player class has been destroy\n";
+    cout << "player has walk out\n";
 }
 Deck::Deck()
 {
+    for (const auto &r : ranks)
+    {
+        for (const auto &s : suits)
+        {
+            allCardsLeft.emplace_back(string(1, r) + string(1, s));
+        }
+    }
+}
+void Deck::reset()
+{
+    allCardsLeft.clear();
     for (const auto &r : ranks)
     {
         for (const auto &s : suits)
