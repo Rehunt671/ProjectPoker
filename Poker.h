@@ -256,8 +256,8 @@ void PokerGame::beforeStart()
     }
     else
     {
-        current = (dealer + 1) % num_player;//เอา small blind เล่นก่อน
-        moneyForMandatoryBet(players[(dealer+1) % num_player], players[(dealer) % num_player]); // ก่อนแจกไพ่ต้องมีการวางเดิมพันก่อนสำหรับ small and big
+        current = (dealer + 1) % num_player;                                                      // เอา small blind เล่นก่อน
+        moneyForMandatoryBet(players[(dealer + 1) % num_player], players[(dealer) % num_player]); // ก่อนแจกไพ่ต้องมีการวางเดิมพันก่อนสำหรับ small and big
     }
 }
 void PokerGame::preflop() // เริ่มรอบแรกของเกม
@@ -491,7 +491,6 @@ void PokerGame::endGameLogic()
             cin >> input;
             if (input == 'Y' || input == 'y')
             {
-                restart = 1;
                 if (players[i]->chip >= minChip)
                 {
                     chipToStore = players[i]->chip - minChip; // เงินมากก็เก็บ
@@ -516,10 +515,10 @@ void PokerGame::endGameLogic()
     pokerDB.writeData2_txt();
     if (players.size() < 2)
     {
-        cout << "Players don't have enough to restart waiting for another player . . .\n";
+        cout << ". . . Players don't have enough to restart . . .\n. . . Waiting for another player . . .\n";
         do
         {
-            cout << "[1]Login [2]Register\n";
+            cout << "[1] Login [2] Register [3] ExitGame\n";
             cin >> order;
             switch (order)
             {
@@ -533,12 +532,15 @@ void PokerGame::endGameLogic()
                 exit(0);
                 break;
             }
-            cout << "Do you want to waiting for another player?[1]Yes,[2]No\n";
+            cout << players.size();
+            if (players.size() == 4)
+                break;
+            cout << "Do you guy want to waiting for another player?\n[1] Yes [2] No\n";
             cin >> suborder;
-            if (suborder == 1)
-                continue;
-        } while (players.size() < 2);
+        } while (suborder == 1 || players.size() < 2);
+        restart = 1;
     }
+    else restart = 1;
 }
 void filterHighestRank(vector<Player *> &allWinner, const int rankingRef)
 {
@@ -719,17 +721,18 @@ void PokerGame::riskPrize(Player *p, const int cntWin)
             cout << "your pot still remain the same\n";
         else
             cout << "You're so lucky pot increase from " << pot / cntWin << " to " << finalPot << endl;
+        cout << "Press Enter to recieve money on board";
+        cin.ignore();
+        cin.get();
     }
     else
     {
         cout << "You didn't play risk prize your pot remains the same" << endl;
         cout << "Your winner pot is = " << finalPot << endl;
     }
-    cout << "Press Enter to recieve money on board";
-    cin.ignore();
-    cin.get();
     p->chip += finalPot;
     cout << p->name << "'s chip = " << p->chip << "\n";
+    cout << "=========================================================================================" << endl;
 }
 void PokerGame::updateLastBetRaiseOrAllIn(Player *p)
 {
