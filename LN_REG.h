@@ -5,7 +5,7 @@ void Database::dailyPrize(const string &un, const string &pw)
 {
     cout << "\n------------------------------------------------------------\n";
     cout << "                       DAILY PRIZE\n";
-    cout << "           $50 , $100 , $200 , $300 , $400 , $500\n";
+    cout << "           $200 , $300 , $400 , $500 , $1000 , $2000\n";
     cout << "------------------------------------------------------------\n";
     cout << "            Press Enter to receive daily prize.\n";
     cout << "------------------------------------------------------------";
@@ -16,22 +16,22 @@ void Database::dailyPrize(const string &un, const string &pw)
     switch (i)
     {
     case 0:
-        value = "50"; // +$50
-        break;
-    case 1:
-        value = "100"; // +$100
-        break;
-    case 2:
         value = "200"; // +$200
         break;
-    case 3:
+    case 1:
         value = "300"; // +$300
         break;
-    case 4:
+    case 2:
         value = "400"; // +$400
         break;
-    default:
+    case 3:
         value = "500"; // +$500
+        break;
+    case 4:
+        value = "1000"; // +$1000
+        break;
+    default:
+        value = "2000"; // +$2000
         break;
     }
     userDatabase[{un, pw}][1] = to_string(stoi(userDatabase[{un, pw}][1]) + stoi(value));
@@ -253,7 +253,7 @@ void Database::registerUser()
     string freeCredit = "1000";
     string login = "0";
     string time = "0";
-    // ไม่มี money เพราะ money ถูก Fix แล้ว 500 บาท
+    // ไม่มี money เพราะ money ถูก Fix แล้ว 1000 บาท
     int num_UserRegister;
     bool valid = false;
     while (true)
