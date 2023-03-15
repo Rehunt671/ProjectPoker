@@ -61,7 +61,9 @@ int main()
         poker.beforeStart();
         poker.preflop();
         if (poker.restart)
+        {
             continue;
+        }
         poker.flop();
         if (poker.restart)
             continue;
