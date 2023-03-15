@@ -22,7 +22,7 @@ bool findFreq(vector<pair<int, char>> hand, int &mainCardValue, int &minorCardVa
     }
     for (const auto &pair : freqRank) // เรียงจากมากไปน้อย
     {
-        if (pair.second >= num && mainCardValue == 0 )
+        if (pair.second >= num && mainCardValue == 0)
         {
             mainCardValue = pair.first;
             found = true;
@@ -56,6 +56,8 @@ vector<int> findKicker(vector<string> cards, const int mainCardValue, const int 
         }
     }
     sort(kicker.begin(), kicker.end(), greater<int>());
+    // cout << "kicker 0 = " << kicker[0] << "\n";
+    // cout << "kicker 1 = " << kicker[1] << "\n";
     return kicker;
 }
 string convertToCard(int max)
@@ -166,8 +168,10 @@ bool hasRoyalFlush(vector<pair<int, char>> hand, char &flushSuit)
 
     return false;
 }
-bool hasStraight(vector<pair<int, char>> hand, int &mainCardValue, char &flushSuit, bool &StraightFlush)
+bool hasStraight(vector<pair<int, char>> hand, int &mainCardValue,int &minorCardValue, char &flushSuit, bool &StraightFlush)
 {
+
+    minorCardValue = 0;
     int i = hand.size() - 1;
     while (i > 0)
     {
@@ -227,9 +231,9 @@ bool hasFlush(vector<pair<int, char>> hand, vector<int> &flushRank, const char f
     }
     return false;
 }
-bool hasStraightFlush(vector<pair<int, char>> hand, int &mainCardValue, char &flushSuit, bool &StraightFlush)
+bool hasStraightFlush(vector<pair<int, char>> hand, int &mainCardValue, int &minorCardValue, char &flushSuit, bool &StraightFlush)
 {
-    return (hasStraight(hand, mainCardValue, flushSuit, StraightFlush) && StraightFlush); // ต้องมี Straight ก่อนแล้วต้องเป็น StraightFlush ด้วย
+    return (hasStraight(hand, mainCardValue, minorCardValue, flushSuit, StraightFlush) && StraightFlush); // ต้องมี Straight ก่อนแล้วต้องเป็น StraightFlush ด้วย
 }
 
 bool hasFourOfKind(vector<pair<int, char>> hand, int &mainCardValue, int &minorCardValue)
@@ -280,7 +284,7 @@ void PokerGame::checkHand(Player *p)
         findFlushSuit(split, flushSuit);     // เริ่มแรกมาเช็คหน้าไพ่ก่อนเลยว่ามีซ้ำครบ 5 ใบไหม
         if (hasRoyalFlush(split, flushSuit)) // ต้องมี Flush และตรงกับ Rank A K Q J 10 กรณีเช็คยากสุดเทียบ mainCard X
             p->handRanking.first = "RoyalFlush";
-        else if (hasStraightFlush(split, mainCardValue, flushSuit, StraightFlush)) // ต้องมีทั้ง Flush กับ Straight ที่ตรงกัน กรณีเช็คยากสุดเทียบ mainCard X
+        else if (hasStraightFlush(split, mainCardValue,minorCardValue,flushSuit, StraightFlush)) // ต้องมีทั้ง Flush กับ Straight ที่ตรงกัน กรณีเช็คยากสุดเทียบ mainCard X
             p->handRanking.first = "StraightFlush";
         else if (hasFourOfKind(split, mainCardValue, minorCardValue)) // ต้องมีไพ่ 4 ใบ Rank เดียวกัน กรณีเช็คยากสุด เทียบไพ่ใบที่ 5 ที่เรียกว่า Kicker บนมือผู้เล่น
             p->handRanking.first = "FourOfKind";
@@ -288,7 +292,7 @@ void PokerGame::checkHand(Player *p)
             p->handRanking.first = "FullHouse";
         else if (hasFlush(split, p->flushRank, flushSuit)) // 5 ใบหน้าตรงกัน กรณีเช็คยากสุด เทียบเรียงใบ 5 ใบ
             p->handRanking.first = "Flush";
-        else if (hasStraight(split, mainCardValue, flushSuit, StraightFlush)) // 5 ใบเรียง กรณีเช็คยากสุดเทียบ mainCard X
+        else if (hasStraight(split, mainCardValue,minorCardValue, flushSuit, StraightFlush)) // 5 ใบเรียง กรณีเช็คยากสุดเทียบ mainCard X
             p->handRanking.first = "Straight";
         else if (hasTreeOfKind(split, mainCardValue, minorCardValue))
             p->handRanking.first = "ThreeOfKind";                  // 1ต้อง   กรณีเช็คยากสุดเทียบ Kicker บนมือผู้เล่น
