@@ -201,21 +201,24 @@ void PokerGame::showTurn()
 }
 void PokerGame::showPlayerHandRank(Player *p)
 {
-
+    string num = "1";
+    string back = "";
+    int temp = 0;
     cout << p->name << "'s Hand: " << p->handRanking.first << "\n";
     cout << p->name << "'s HandRanking: " << p->handRanking.second << "\n"; // 10 อันดับ ใกล้ 1 สูงสุด
-    if (p->handRanking.first != "Flush")
+    cout << p->name << "'s MainCard: " << convertToCard(p->cardRanking.first) << "\n";
+    if (p->handRanking.first != "Flush" && p->handRanking.first != "Straight" && p->handRanking.first != "StraightFlush" && p->handRanking.first != "RoyalFlush")
     {
-        cout << p->name << "'s HighestCard: " << convertToCard(p->cardRanking.first) << "\n";
         if (p->handRanking.first == "FullHouse" || p->handRanking.first == "TwoPair")
-            cout << p->name << "'s PairCard: " << convertToCard(p->cardRanking.second) << "\n";
+            cout << p->name << "'s MinorCard: " << convertToCard(p->cardRanking.second) << "\n";
     }
     else
     {
         string num = "1";
         string back = "";
+        int rankOfcard = p->cardRanking.first;
         int temp = 0;
-        for (const auto &rank : p->flushRank)
+        for (size_t i = 0; i < 5; i++)
         {
             switch (num.back())
             {
@@ -233,11 +236,24 @@ void PokerGame::showPlayerHandRank(Player *p)
                 back = "th";
                 break;
             }
-            cout << "Rank of card " << num + back << ": " << convertToCard(rank) << "\n";
+            if (p->handRanking.first == "Flush")
+                cout << "Rank of card " << num + back << ": " << convertToCard(p->flushRank[i]) << "\n";
+            else if (p->handRanking.first == "Straight" ||p->handRanking.first == "StraightFlush" )
+            {
+                cout << "Rank of card " << num + back << ": " << convertToCard(rankOfcard--) << "\n";
+            }
+            else if (p->handRanking.first == "RoyalFlush")
+            {
+                for (int i = 14; i > 9; i--)
+                {
+                    cout << "Rank of card " << num + back << ": " << convertToCard(i) << "\n";
+                }
+            }
             temp = stoi(num);
             temp++;
             num = to_string(temp);
         }
+      
     }
 }
 void PokerGame::showPlayerAccumulateBet(Player *p)
@@ -409,11 +425,10 @@ void PokerGame::summarizeTheGame(vector<Player *> &allWinner, const int rankingR
     cout << "---------------------------------------------------------------------------------\n";
     cout << "HighestHand = " << findRankInStr(rankingRef) << "\n";
     cout << "HighestHandRanking = " << rankingRef << "\n";
-    if (rankingRef != 1 && rankingRef != 2 && rankingRef != 5 && rankingRef != 6) // StraightFlush Straight flush
+    cout << "HighestMainCard: " << mainCard << "\n";
+    if (rankingRef == 4 || rankingRef == 8) // Fullhouse or TwoPair
     {
-        cout << "HighestCard: " << convertToCard(mainCard) << "\n";
-        if (rankingRef == 4 || rankingRef == 8)
-            cout << "PairCard: " << convertToCard(minorCard) << "\n";
+            cout << "HighestMinorCard: " << convertToCard(minorCard) << "\n";
     }
     else
     {
@@ -438,19 +453,19 @@ void PokerGame::summarizeTheGame(vector<Player *> &allWinner, const int rankingR
                 back = "th";
                 break;
             }
-            if (rankingRef == 1)
+            if (rankingRef == 5)
+                cout << "Rank of card " << num + back << ": " << convertToCard(allWinner[0]->flushRank[i]) << "\n";
+            else if(rankingRef == 2 || rankingRef == 6 )
+            {
+                cout << "Rank of card " << num + back << ": " << convertToCard(mainCard) << "\n";
+                mainCard--;
+            }
+            else if (rankingRef == 1)
             {
                 for (int i = 14; i > 9; i--)
                 {
                     cout << "Rank of card " << num + back << ": " << convertToCard(i) << "\n";
                 }
-            }
-            else if (rankingRef == 5)
-                cout << "Rank of card " << num + back << ": " << convertToCard(allWinner[0]->flushRank[i]) << "\n";
-            else
-            {
-                cout << "Rank of card " << num + back << ": " << convertToCard(mainCard) << "\n";
-                mainCard--;
             }
             temp = stoi(num);
             temp++;
@@ -551,6 +566,7 @@ void filterHighestRank(vector<Player *> &allWinner, const int rankingRef)
 {
     for (int i = allWinner.size() - 1; i >= 0; i--)
     {
+
         if (allWinner[i]->handRanking.second != rankingRef)
             allWinner.erase(allWinner.begin() + i);
     }
@@ -559,7 +575,7 @@ void filterWinnerFlush(vector<Player *> &allWinner)
 {
     int cardIndex = 0; // เรารู้อยู่แล้วว่า index มันถูกเรียงจากมากไปน้อยเทียบตัวมากก่อน
     int cardMaxValue = 0;
-    while (cardIndex == 4)
+    while (cardIndex <= 4)
     {
         for (int i = allWinner.size() - 1; i > 0; i++)
         {
@@ -586,7 +602,7 @@ void checkGreaterKicker(int rankingRef, vector<int> &kicker, Player *p)
     {
         if (p->kicker[0] > kicker[0])
             changeKicker(rankingRef, kicker, p);
-        else if (p->kicker[0] == kicker[0])
+        else
         {
             if (p->kicker[1] > kicker[1])
                 kicker[1] = p->kicker[1];
@@ -602,24 +618,33 @@ void filterWinnerNormal(vector<Player *> &allWinner, const int rankingRef, int &
             if (p->cardRanking.first > mainCard)
             {
                 mainCard = p->cardRanking.first;
+                minorCard = p->cardRanking.second;
                 changeKicker(rankingRef, kicker, p);
             }
             else
-                checkGreaterKicker(rankingRef, kicker, p);
-            if (p->cardRanking.second >= minorCard && rankingRef != 1 && rankingRef != 2 && rankingRef != 6) // คนที่มีการ์ดรองมากกว่าถึงจะมีสิทธิเปลี่ยนไพ่ kicker
             {
-                minorCard = p->cardRanking.second;
-                if (p->cardRanking.second > minorCard)
-                    changeKicker(rankingRef, kicker, p);
-                else
-                    checkGreaterKicker(rankingRef, kicker, p);
+                if (p->cardRanking.second >= minorCard && rankingRef != 1 && rankingRef != 2 && rankingRef != 6) // คนที่มีการ์ดรองมากกว่าถึงจะมีสิทธิเปลี่ยนไพ่ kicker
+                {
+                    if (p->cardRanking.second > minorCard)
+                    {
+                        minorCard = p->cardRanking.second;
+                        changeKicker(rankingRef, kicker, p);
+                    }
+                    else
+                        checkGreaterKicker(rankingRef, kicker, p);
+                }
             }
         }
     }
     for (int i = allWinner.size() - 1; i >= 0; i--)
     {
-        if (allWinner[i]->cardRanking.first != mainCard || allWinner[i]->cardRanking.second != minorCard || allWinner[i]->kicker[0] != kicker[0] || allWinner[i]->kicker[1] != kicker[1])
+
+        if (allWinner[i]->cardRanking.first == mainCard && allWinner[i]->cardRanking.second == minorCard && allWinner[i]->kicker[0] == kicker[0] && allWinner[i]->kicker[1] == kicker[1])
+            ;
+        else
+        {
             allWinner.erase(allWinner.begin() + i);
+        }
     }
 }
 bool PokerGame::findWinner()
@@ -671,7 +696,7 @@ bool PokerGame::findWinner()
             showBoard4();
             break;
         }
-        cout << "-------------------------------------------------------------Okay!!! Let Reveal All Players Hand-------------------------------------------------------------\n";
+        cout << "------------------------------------------------Okay!!! Reveal all player hand------------------------------------------------\n";
         for (auto &p : allWinner)
         {
             showPlayerCards(p);
@@ -679,6 +704,45 @@ bool PokerGame::findWinner()
             if (p->handRanking.second < rankingRef) // เก็บ Rankของคนที่ไม่หมอบกับตาย เอาอันที่เข้าใกล้ 1 สุด
                 rankingRef = p->handRanking.second;
         }
+        if (cntAllin + cntKnockout == num_player)
+        {
+            do
+            {
+                if (cardsOnBoard.size() < 5)
+                {
+                    cout << "------------------------------------------------Draw Another Board Card!!!------------------------------------------------\n";
+                    if (cardsOnBoard.size() == 0)
+                        communityCards(3);
+                    else
+                        communityCards(1);
+                    switch (cardsOnBoard.size())
+                    {
+                    case 3:
+                        showBoard2();
+                        break;
+                    case 4:
+                        showBoard3();
+                        break;
+                    default:
+                        showBoard4();
+                        break;
+                    }
+                }
+                cout << "------------------------------------------------Okay!!! let's See rank of all player hand------------------------------------------------\n";
+                for (auto &p : allWinner)
+                {
+                    showPlayerCards(p);
+                    p->handRanking.first = "";
+                    p->kicker[0] = 0;
+                    p->kicker[1] = 0; // Set kicker ใหม่
+                    checkHand(p);
+                    showPlayerHandRank(p);
+                    if (p->handRanking.second < rankingRef) // เก็บ Rankของคนที่ไม่หมอบกับตาย เอาอันที่เข้าใกล้ 1 สุด
+                        rankingRef = p->handRanking.second;
+                }
+            } while (cardsOnBoard.size() < 5);
+        }
+        /////After Show player hand ranking
         filterHighestRank(allWinner, rankingRef);
         switch (rankingRef)
         {
