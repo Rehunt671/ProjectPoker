@@ -42,6 +42,7 @@ void Database::dailyPrize(const string &un, const string &pw)
     userDatabase[{un, pw}][2] = "1";                       // หลังจากบวกเงินของ user แล้ว set ค่า loggedin เป็น true
     userDatabase[{un, pw}][3] = to_string(setResetTime()); // set เวลา reset ให้เป็น 00.00 น. ของวันถัดไป
     writeData2_txt();                                      // เขียนค่า loggedin กับ resetTime ลงไฟล์
+    cin.get();
 }
 Database::Database() : filename("DataLN&RG.txt")
 {
