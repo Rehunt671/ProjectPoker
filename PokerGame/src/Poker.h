@@ -109,7 +109,7 @@ void PokerGame::showPlayerCards(Player *p) // Showว่าไพ่คนปั
 }
 void PokerGame::holecards()
 {
-    for (size_t i = 0; i < num_player; i++)
+    for (size_t i = 0; i < num_player; i++) // ใช้ size_t เนื่องจากเป็นการบอกว่าเป็น size หรือ index และใช้เพื่อ represent largest value ของ object นั้นๆ
     {
         for (size_t amount = 0; amount < 2; amount++)
         {
@@ -203,6 +203,7 @@ void PokerGame::showPlayerHandRank(Player *p)
 {
     string num = "1";
     string back = "";
+    int rankOfcard = p->cardRanking.first;
     int temp = 0;
     cout << p->name << "'s Hand: " << p->handRanking.first << "\n";
     cout << p->name << "'s HandRanking: " << p->handRanking.second << "\n"; // 10 อันดับ ใกล้ 1 สูงสุด
@@ -214,10 +215,6 @@ void PokerGame::showPlayerHandRank(Player *p)
     }
     else
     {
-        string num = "1";
-        string back = "";
-        int rankOfcard = p->cardRanking.first;
-        int temp = 0;
         for (size_t i = 0; i < 5; i++)
         {
             switch (num.back())
@@ -266,12 +263,12 @@ void PokerGame::beforeStart()
     holecards();    // ทุกคนยังไม่มีไพ่บนมือดังนั้นเราจะเริ่มด้วยการแจกไพ่คนละ2ใบก่อน
     if (players.size() > 2)
     {
-        current = (dealer + 3) % num_player;
+        current = (dealer + 3) % num_player;  //ถัดจาก big blind 
         moneyForMandatoryBet(players[(dealer + 1) % num_player], players[(dealer + 2) % num_player]); // ก่อนแจกไพ่ต้องมีการวางเดิมพันก่อนสำหรับ small and big
     }
     else
     {
-        current = (dealer + 1) % num_player;                                                      // เอา small blind เล่นก่อน
+        current = (dealer + 1) % num_player;  //small  blind                                                // เอา small blind เล่นก่อน
         moneyForMandatoryBet(players[(dealer + 1) % num_player], players[(dealer) % num_player]); // ก่อนแจกไพ่ต้องมีการวางเดิมพันก่อนสำหรับ small and big
     }
 }
@@ -1234,6 +1231,10 @@ Deck::Deck()
             allCardsLeft.emplace_back(string(1, r) + string(1, s));
         }
     }
+}
+Deck::~Deck()
+{
+    cout << "Deck class has been destroyed\n";
 }
 void Deck::reset()
 {
