@@ -368,9 +368,9 @@ void showUiCardHand(vector<string> s)
         cout << "|_ _ _ _ _|    | _ _ _ _ |" << endl;
     }
 }
-void showprize()
+void showprize(int potMoney)
 {
-    cout << "\n=========================================================================================";
+    cout << "\n=========================================================================================\n";
     cout << "==                       PPPPP    RRRRR    IIIII  ZZZZZZ  EEEEEE                       ==" << endl;
     cout << "==                       P    P   R    R     I        Z   E                            ==" << endl;
     cout << "==                       PPPPP    RRRRR      I       Z    EEEEEE                       ==" << endl;
@@ -378,7 +378,7 @@ void showprize()
     cout << "==                       P        R    R   IIIII  ZZZZZZ  EEEEEE                       ==" << endl;
     cout << "=========================================================================================" << endl;
     cout << "=========================================================================================" << endl;
-    cout << "=                                    This is pot*......                                  " << endl;
+    cout << "=                                    This is pot $"<< potMoney << "                                  " << endl;
     cout << "=            *0.5 in 20 percent      *0.8 in 20 percent      *1.0 in 40 percent          " << endl;
     cout << "=                       *1.2 in 10 percent      *1.5 in 5 percent                        " << endl;
     cout << "                                                                                         " << endl;
