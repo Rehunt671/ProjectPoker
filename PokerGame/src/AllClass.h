@@ -16,7 +16,7 @@ using namespace std;
 using namespace std::chrono;
 using std::cin;
 using std::cout;
-struct Deck
+class Deck
 {
 private:
     char ranks[13] = {'2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'};
@@ -30,7 +30,7 @@ public:
     void shuffle();       // สับไพ่
     void showcardsLeft(); // Show cards ที่เหลือ
 };
-struct Player
+class Player
 {
 public:
     Player(string, string, string, int,int);
