@@ -214,7 +214,7 @@ bool findFlushSuit(vector<pair<int, char>> hand, char &flushSuit)
     }
     return true;
 }
-bool hasFlush(vector<pair<int, char>> hand, vector<int> &flushRank, const char flushSuit)
+bool hasFlush(vector<pair<int, char>> hand,vector<int> &flushRank, const char flushSuit)
 {
     if (flushSuit != '\0')
     {
