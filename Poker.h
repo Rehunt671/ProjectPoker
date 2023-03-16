@@ -238,7 +238,7 @@ void PokerGame::showPlayerHandRank(Player *p)
             }
             if (p->handRanking.first == "Flush")
                 cout << "Rank of card " << num + back << ": " << convertToCard(p->flushRank[i]) << "\n";
-            else if (p->handRanking.first == "Straight" ||p->handRanking.first == "StraightFlush" )
+            else if (p->handRanking.first == "Straight" || p->handRanking.first == "StraightFlush")
             {
                 cout << "Rank of card " << num + back << ": " << convertToCard(rankOfcard--) << "\n";
             }
@@ -253,7 +253,6 @@ void PokerGame::showPlayerHandRank(Player *p)
             temp++;
             num = to_string(temp);
         }
-      
     }
 }
 void PokerGame::showPlayerAccumulateBet(Player *p)
@@ -425,10 +424,10 @@ void PokerGame::summarizeTheGame(vector<Player *> &allWinner, const int rankingR
     cout << "---------------------------------------------------------------------------------\n";
     cout << "HighestHand = " << findRankInStr(rankingRef) << "\n";
     cout << "HighestHandRanking = " << rankingRef << "\n";
-    cout << "HighestMainCard: " << mainCard << "\n";
+    cout << "HighestMainCard: " << convertToCard(mainCard) << "\n";
     if (rankingRef == 4 || rankingRef == 8) // Fullhouse or TwoPair
     {
-            cout << "HighestMinorCard: " << convertToCard(minorCard) << "\n";
+        cout << "HighestMinorCard: " << convertToCard(minorCard) << "\n";
     }
     else
     {
@@ -455,7 +454,7 @@ void PokerGame::summarizeTheGame(vector<Player *> &allWinner, const int rankingR
             }
             if (rankingRef == 5)
                 cout << "Rank of card " << num + back << ": " << convertToCard(allWinner[0]->flushRank[i]) << "\n";
-            else if(rankingRef == 2 || rankingRef == 6 )
+            else if (rankingRef == 2 || rankingRef == 6)
             {
                 cout << "Rank of card " << num + back << ": " << convertToCard(mainCard) << "\n";
                 mainCard--;
@@ -496,16 +495,16 @@ void PokerGame::endGameLogic()
             players.erase(players.begin() + i);
             players.shrink_to_fit();
         }
-        if ((players[i]->moneyInWeb + players[i]->chip) < minChip)
+        if ((players[i]->moneyInWeb + players[i]->chip) < minChip) // มีเงินไม่มากพอ
         {
             cout << players[i]->name << " don't have enough chip to play knockout!!\n";
             delete players[i];
             players.erase(players.begin() + i);
             players.shrink_to_fit();
-        }
+        } // มีเงินมากพอ
         else
         {
-            cout << players[i]->name << " you want to restart with " << players.size() << " remaining player? (Y = yes , N = no)\n";
+            cout << players[i]->name << " you want to restart with " << players.size() << " max remaining player? (Y = yes , N = no)\n";
             cin >> input;
             if (input == 'Y' || input == 'y')
             {
@@ -523,6 +522,7 @@ void PokerGame::endGameLogic()
             }
             else
             {
+                clearInput();
                 pokerDB.userDatabase[make_pair(players[i]->username, players[i]->password)][1] = to_string(players[i]->moneyInWeb + players[i]->chip);
                 delete players[i];
                 players.erase(players.begin() + i);
@@ -530,37 +530,44 @@ void PokerGame::endGameLogic()
             }
         }
     }
-
     pokerDB.writeData2_txt();
-    if (players.size() < 2)
-    {
-        cout << ". . . Players don't have enough to restart . . .\n. . . Waiting for another player . . .\n";
-        do
-        {
-            cout << "[1] Login [2] Register [3] ExitGame\n";
-            cin >> order;
-            switch (order)
-            {
-            case 1:
-                pokerDB.loginUser(players, minChip);
-                break;
-            case 2:
-                pokerDB.registerUser();
-                break;
-            default:
-                exit(0);
-                break;
-            }
-
-            if (players.size() == 4)
-                break;
-            cout << "Do you guy want to waiting for another player?\n[1] Yes [2] No\n";
-            cin >> suborder;
-        } while (suborder == 1 || players.size() < 2);
-        restart = 1;
-    }
+    cout << "================================================Important!!!! If you want to exit this game just press [X] if not the game will continue ==================================================\n";
+    cin >> input;
+    if (input == 'X' || input == 'x')
+        exit(0);
     else
-        restart = 1;
+    {
+        clearInput();
+        if (players.size() < 2)
+        {
+            cout << ". . . Players don't have enough to restart . . .\n. . . . . . . Waiting for another player . . . . . . .\n";
+            do
+            {
+                cout << "[1] Login [2] Register\n";
+                cin >> order;
+                switch (order)
+                {
+                case 1:
+                    pokerDB.loginUser(players, minChip);
+                    break;
+                case 2:
+                    pokerDB.registerUser();
+                    continue;
+                    break;
+                default:
+                    clearInput();
+                    break;
+                }
+                if (players.size() == 4)
+                    break;
+                cout << "Do you guy want to waiting for another player?\n[1] Yes [2] No\n";
+                cin >> suborder;
+            } while (suborder == 1 || players.size() < 2);
+            restart = 1;
+        }
+        else
+            restart = 1;
+    }
 }
 void filterHighestRank(vector<Player *> &allWinner, const int rankingRef)
 {
@@ -571,21 +578,36 @@ void filterHighestRank(vector<Player *> &allWinner, const int rankingRef)
             allWinner.erase(allWinner.begin() + i);
     }
 }
-void filterWinnerFlush(vector<Player *> &allWinner)
+void filterWinnerFlush(vector<Player *> &allWinner, int &mainCard)
 {
     int cardIndex = 0; // เรารู้อยู่แล้วว่า index มันถูกเรียงจากมากไปน้อยเทียบตัวมากก่อน
     int cardMaxValue = 0;
-    while (cardIndex <= 4)
+    if (allWinner.size() == 1)
     {
-        for (int i = allWinner.size() - 1; i > 0; i++)
+        mainCard = allWinner[0]->flushRank[0];
+    }
+    else
+    {
+        while (cardIndex <= 4)
         {
-            cardMaxValue = allWinner[i]->flushRank[cardIndex]; // เอาตัวหลักเป็นด้านหลังสุดเทียบมาด้านหน้า 1 index
-            if (cardMaxValue > allWinner[i - 1]->flushRank[cardIndex])
-                allWinner.erase(allWinner.begin() + (i - 1)); // ถ้าตัวเรามากกว่าลบตัวหน้า
-            else if (cardMaxValue < allWinner[i - 1]->flushRank[cardIndex])
-                allWinner.erase(allWinner.begin() + i); // ถ้าตัวเค้ามากกว่าลบตัวเราแทน
+            for (int i = allWinner.size() - 1; i > 0; i++)
+            {
+                cardMaxValue = allWinner[i]->flushRank[cardIndex]; // เอาตัวหลักเป็นด้านหลังสุดเทียบมาด้านหน้า 1 index
+                if (cardMaxValue > allWinner[i - 1]->flushRank[cardIndex])
+                {
+                    if (cardIndex == 0)
+                    {
+                        mainCard = cardMaxValue;
+                    }
+                    else
+                        mainCard = allWinner[i - 1]->flushRank[cardIndex];
+                    allWinner.erase(allWinner.begin() + (i - 1)); // ถ้าตัวเรามากกว่าลบตัวหน้า
+                }
+                else if (cardMaxValue < allWinner[i - 1]->flushRank[cardIndex])
+                    allWinner.erase(allWinner.begin() + i); // ถ้าตัวเค้ามากกว่าลบตัวเราแทน
+            }
+            cardIndex++;
         }
-        cardIndex++;
     }
 }
 void changeKicker(int rankingRef, vector<int> &kicker, Player *p)
@@ -696,7 +718,7 @@ bool PokerGame::findWinner()
             showBoard4();
             break;
         }
-        cout << "------------------------------------------------Okay!!! Reveal all player hand------------------------------------------------\n";
+        cout << "------------------------------------------------Okay!!! reveal all player hand------------------------------------------------\n";
         for (auto &p : allWinner)
         {
             showPlayerCards(p);
@@ -728,7 +750,7 @@ bool PokerGame::findWinner()
                         break;
                     }
                 }
-                cout << "------------------------------------------------Okay!!! let's See rank of all player hand------------------------------------------------\n";
+                cout << "------------------------------------------------Okay!!! let's see rank of all player hand------------------------------------------------\n";
                 for (auto &p : allWinner)
                 {
                     showPlayerCards(p);
@@ -747,7 +769,7 @@ bool PokerGame::findWinner()
         switch (rankingRef)
         {
         case 5:
-            filterWinnerFlush(allWinner);
+            filterWinnerFlush(allWinner, mainCard);
             break;
 
         default:
@@ -766,7 +788,7 @@ void PokerGame::riskPrize(Player *p, const int cntWin)
     int r;
     int finalPot = pot / cntWin;
     cout << "Congratulation!!!! " << p->name << " is a winner here\n";
-    showprize();
+    showprize(pot);
     cout << "Do you want to play risk prize?(Press Y = Yes , Other = No)\nWARNING !!!!! This prize is make your pot more or lower than you get now!!. " << endl;
     cin >> c;
     r = rand() % 100 + 1;
@@ -796,6 +818,7 @@ void PokerGame::riskPrize(Player *p, const int cntWin)
     }
     else
     {
+        clearInput();
         cout << "You didn't play risk prize your pot remains the same" << endl;
         cout << "Your winner pot is = " << finalPot << endl;
     }
@@ -964,7 +987,7 @@ void PokerGame::bet(Player *p)
             if (p->accumulateBet > p->chip)
                 cout << "You don't have enough money to bet\n";
             else
-                cout << "Bet money can't  < highestBet value or string input\n";
+                cout << "Bet money can't  <= highestBet value or string input\n";
             cout << "Press 1:Try Again\nPress 2:Exit\n";
             getline(cin, od);
             subOrder = handleString(od);
