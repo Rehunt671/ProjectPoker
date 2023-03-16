@@ -4,14 +4,12 @@
 #include <iomanip> //design
 #include <fstream> //read and write data
 #include <string>
-#include <cstring>       //convert string to c string
 #include <algorithm>     //sort
 #include <vector>        //vector
 #include <utility>       //vector pair
 #include <set>           //not include same element
 #include <unordered_map> //mapscards
 #include <map>           //map
-#include <ctime>
 #include <chrono> //time
 #include <thread> //time
 using namespace std;
@@ -26,6 +24,7 @@ private:
 
 public:
     Deck();
+    ~Deck();
     vector<string> allCardsLeft; // ไพ่ใน Deck ที่เหลือ ณ ตอนนั้น
     void reset();
     void shuffle();       // สับไพ่
