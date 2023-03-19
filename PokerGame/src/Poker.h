@@ -978,7 +978,7 @@ void PokerGame::bet(Player *p)
         cout << "How much money do you want to bet?\n";
         getline(cin, accBet);
         p->accumulateBet = handleString(accBet);
-        if (p->accumulateBet > p->chip || p->accumulateBet < highestBet || p->accumulateBet == 0)
+        if (p->accumulateBet > p->chip || p->accumulateBet < highestBet || p->accumulateBet <= 0)
         {
 
             if (p->accumulateBet > p->chip)
